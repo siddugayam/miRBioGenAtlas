@@ -1,21 +1,22 @@
 ################################################################################
 ##                                                                            ##
-##   miRBioGenAtlas — Pan-cancer miRNA Biogenesis Gene Alteration Landscape  ##
-##   Figure Generation Script (Publication-ready, 300 DPI TIFF)              ##
+##   miRBioGenAtlas — Pan-cancer miRNA Biogenesis Gene Alteration Landscape   ##
+##   Figure Generation Script (Publication-ready, 300 DPI TIFF)               ##
 ##                                                                            ##
-##   Author  : Gayam Prasanna Kumar Reddy                                    ##
-##   Affil.  : Manipal Academy of Higher Education, India                    ##
-##   GitHub  : https://github.com/prasannareddy/miRBioGenAtlas               ##
-##   Data    : TCGA PanCancer Atlas 2018 via cBioPortal API                  ##
+##   Author  : Gayam Prasanna Kumar Reddy                                     ##
+##   Affil.  : Manipal Academy of Higher Education, India                     ##
+##   GitHub  : https://github.com/siddugayam/miRBioGenAtlas                   ##
+##   DOI     : https://doi.org/10.5281/zenodo.20068007                        ##
+##   Data    : TCGA PanCancer Atlas 2018 via cBioPortal API                   ##
 ##   License : MIT                                                            ##
 ##                                                                            ##
 ##   Figures generated:                                                       ##
-##     Fig1 — Pan-cancer heatmap (gene x tumour, any-alteration freq)        ##
-##     Fig2 — Gene ranking by mean alteration frequency (stacked bar)        ##
-##     Fig3 — Tumour type burden ranking (horizontal bar)                    ##
-##     Fig4 — BRCA deep-dive alteration class breakdown                      ##
+##     Fig1 — Pan-cancer heatmap (gene x tumour, any-alteration freq)         ##
+##     Fig2 — Gene ranking by mean alteration frequency (stacked bar)         ##
+##     Fig3 — Tumour type burden ranking (horizontal bar)                     ##
+##     Fig4 — BRCA deep-dive alteration class breakdown                       ##
 ##                                                                            ##
-##   Output: TIFF files at 300 DPI, publication-ready                        ##
+##   Output: TIFF files at 300 DPI, publication-ready                         ##
 ##                                                                            ##
 ################################################################################
 

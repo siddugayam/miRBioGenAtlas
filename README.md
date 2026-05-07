@@ -87,7 +87,7 @@ miRBioGenAtlas/
 
 ```r
 # 1. Clone this repository
-# git clone https://github.com/prasannareddy/miRBioGenAtlas.git
+# git clone https://github.com/siddugayam/miRBioGenAtlas.git
 # cd miRBioGenAtlas
 
 # 2. Open R and run
@@ -195,6 +195,7 @@ This project is licensed under the **MIT License** — see [LICENSE](LICENSE) fo
 
 **Gayam Prasanna Kumar Reddy**
 Manipal Academy of Higher Education, India
-gayam.prasanna@manipal.edu
+gayam.prasanna@learner.manipal.edu
+siddugayam1994@gmail.com
 
 *Issues and pull requests welcome.*

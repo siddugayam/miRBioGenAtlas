@@ -5,7 +5,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Data: TCGA](https://img.shields.io/badge/Data-TCGA%20PanCancer%20Atlas-green)](https://www.cbioportal.org)
 [![R version](https://img.shields.io/badge/R-%3E%3D4.2-blue)](https://www.r-project.org)
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.XXXXXXX.svg)](https://doi.org/10.5281/zenodo.XXXXXXX)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.20068007.svg)](https://doi.org/10.5281/zenodo.20068007)
 
 ---
 
@@ -15,7 +15,7 @@
 
 This repository accompanies the manuscript:
 
-> Gayam PK. *Pan-cancer alteration landscape of the miRNA biogenesis machinery: a TCGA analysis across 32 tumour types.* [Journal name, 2026] [DOI pending]
+> Gayam PK. *Pan-cancer alteration landscape of the miRNA biogenesis machinery: a TCGA analysis across 32 tumour types.* [Journal name, 2026] https://doi.org/10.5281/zenodo.20068007
 
 ---
 
@@ -169,7 +169,7 @@ If you use this data or code, please cite:
   author  = {Gayam, Prasanna Kumar Reddy},
   journal = {[Journal name]},
   year    = {2026},
-  doi     = {[DOI pending]}
+  doi     = {https://doi.org/10.5281/zenodo.20068007}
 }
 ```
 
@@ -181,7 +181,7 @@ Please also cite the cBioPortal:
 
 ## Data availability
 
-All underlying data were obtained from publicly available TCGA PanCancer Atlas studies via the cBioPortal API. No individual patient data are included. The processed dataset is also archived at Zenodo: [DOI pending].
+All underlying data were obtained from publicly available TCGA PanCancer Atlas studies via the cBioPortal API. No individual patient data are included. The processed dataset is also archived at Zenodo: https://doi.org/10.5281/zenodo.20068007.
 
 ---
 

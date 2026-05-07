@@ -1,0 +1,33 @@
+studyId,cancerTypeId,studyName,sampleCount_all,sampleCount_sequenced,sampleCount_cna,intersection_sequenced_cna_n,cnaseq_sampleListId,cnaseq_n,threeway_sampleListId,threeway_n,ratio_intersection_over_min_seq_cna,ratio_cnaseq_over_intersection,ratio_threeway_over_intersection
+acc_tcga_pan_can_atlas_2018,acc,"Adrenocortical Carcinoma (TCGA, PanCancer Atlas)",92,91,89,89,acbc_mskcc_2015_cnaseq,12,acc_tcga_3way_complete,75,1.0,0.1348314606741573,0.8426966292134831
+blca_tcga_pan_can_atlas_2018,blca,"Bladder Urothelial Carcinoma (TCGA, PanCancer Atlas)",411,410,408,407,acbc_mskcc_2015_cnaseq,12,acc_tcga_3way_complete,75,0.9975490196078431,0.029484029484029485,0.18427518427518427
+brca_tcga_pan_can_atlas_2018,brca,"Breast Invasive Carcinoma (TCGA, PanCancer Atlas)",1084,1066,1070,1052,acbc_mskcc_2015_cnaseq,12,acc_tcga_3way_complete,75,0.9868667917448405,0.011406844106463879,0.07129277566539924
+cesc_tcga_pan_can_atlas_2018,cesc,"Cervical Squamous Cell Carcinoma (TCGA, PanCancer Atlas)",297,291,293,287,acbc_mskcc_2015_cnaseq,12,acc_tcga_3way_complete,75,0.9862542955326461,0.041811846689895474,0.2613240418118467
+chol_tcga_pan_can_atlas_2018,chol,"Cholangiocarcinoma (TCGA, PanCancer Atlas)",36,36,36,36,acbc_mskcc_2015_cnaseq,12,acc_tcga_3way_complete,75,1.0,0.3333333333333333,2.0833333333333335
+coadread_tcga_pan_can_atlas_2018,coadread,"Colorectal Adenocarcinoma (TCGA, PanCancer Atlas)",594,534,592,532,acbc_mskcc_2015_cnaseq,12,acc_tcga_3way_complete,75,0.9962546816479401,0.022556390977443608,0.14097744360902256
+dlbc_tcga_pan_can_atlas_2018,dlbclnos,"Diffuse Large B-Cell Lymphoma (TCGA, PanCancer Atlas)",48,41,48,41,acbc_mskcc_2015_cnaseq,12,acc_tcga_3way_complete,75,1.0,0.2926829268292683,1.829268292682927
+esca_tcga_pan_can_atlas_2018,esca,"Esophageal Adenocarcinoma (TCGA, PanCancer Atlas)",182,182,182,182,acbc_mskcc_2015_cnaseq,12,acc_tcga_3way_complete,75,1.0,0.06593406593406594,0.41208791208791207
+gbm_tcga_pan_can_atlas_2018,difg,"Glioblastoma Multiforme (TCGA, PanCancer Atlas)",592,397,575,380,acbc_mskcc_2015_cnaseq,12,acc_tcga_3way_complete,75,0.9571788413098237,0.031578947368421054,0.19736842105263158
+hnsc_tcga_pan_can_atlas_2018,hnsc,"Head and Neck Squamous Cell Carcinoma (TCGA, PanCancer Atlas)",523,515,517,509,acbc_mskcc_2015_cnaseq,12,acc_tcga_3way_complete,75,0.9883495145631068,0.023575638506876228,0.14734774066797643
+kich_tcga_pan_can_atlas_2018,chrcc,"Kidney Chromophobe (TCGA, PanCancer Atlas)",65,65,65,65,acbc_mskcc_2015_cnaseq,12,acc_tcga_3way_complete,75,1.0,0.18461538461538463,1.1538461538461537
+kirc_tcga_pan_can_atlas_2018,ccrcc,"Kidney Renal Clear Cell Carcinoma (TCGA, PanCancer Atlas)",512,402,509,400,acbc_mskcc_2015_cnaseq,12,acc_tcga_3way_complete,75,0.9950248756218906,0.03,0.1875
+kirp_tcga_pan_can_atlas_2018,prcc,"Kidney Renal Papillary Cell Carcinoma (TCGA, PanCancer Atlas)",283,276,283,276,acbc_mskcc_2015_cnaseq,12,acc_tcga_3way_complete,75,1.0,0.043478260869565216,0.2717391304347826
+laml_tcga_pan_can_atlas_2018,aml,"Acute Myeloid Leukemia (TCGA, PanCancer Atlas)",200,200,191,191,acbc_mskcc_2015_cnaseq,12,acc_tcga_3way_complete,75,1.0,0.06282722513089005,0.39267015706806285
+lgg_tcga_pan_can_atlas_2018,difg,"Brain Lower Grade Glioma (TCGA, PanCancer Atlas)",514,514,511,511,acbc_mskcc_2015_cnaseq,12,acc_tcga_3way_complete,75,1.0,0.023483365949119372,0.14677103718199608
+lihc_tcga_pan_can_atlas_2018,hcc,"Liver Hepatocellular Carcinoma (TCGA, PanCancer Atlas)",372,366,367,361,acbc_mskcc_2015_cnaseq,12,acc_tcga_3way_complete,75,0.9863387978142076,0.0332409972299169,0.2077562326869806
+luad_tcga_pan_can_atlas_2018,luad,"Lung Adenocarcinoma (TCGA, PanCancer Atlas)",566,566,511,511,acbc_mskcc_2015_cnaseq,12,acc_tcga_3way_complete,75,1.0,0.023483365949119372,0.14677103718199608
+lusc_tcga_pan_can_atlas_2018,lusc,"Lung Squamous Cell Carcinoma (TCGA, PanCancer Atlas)",487,484,487,484,acbc_mskcc_2015_cnaseq,12,acc_tcga_3way_complete,75,1.0,0.024793388429752067,0.15495867768595042
+meso_tcga_pan_can_atlas_2018,plmeso,"Mesothelioma (TCGA, PanCancer Atlas)",87,86,87,86,acbc_mskcc_2015_cnaseq,12,acc_tcga_3way_complete,75,1.0,0.13953488372093023,0.872093023255814
+ov_tcga_pan_can_atlas_2018,hgsoc,"Ovarian Serous Cystadenocarcinoma (TCGA, PanCancer Atlas)",585,523,572,511,acbc_mskcc_2015_cnaseq,12,acc_tcga_3way_complete,75,0.9770554493307839,0.023483365949119372,0.14677103718199608
+paad_tcga_pan_can_atlas_2018,paad,"Pancreatic Adenocarcinoma (TCGA, PanCancer Atlas)",184,179,183,178,acbc_mskcc_2015_cnaseq,12,acc_tcga_3way_complete,75,0.994413407821229,0.06741573033707865,0.42134831460674155
+pcpg_tcga_pan_can_atlas_2018,soft_tissue,"Pheochromocytoma and Paraganglioma (TCGA, PanCancer Atlas)",178,178,161,161,acbc_mskcc_2015_cnaseq,12,acc_tcga_3way_complete,75,1.0,0.07453416149068323,0.4658385093167702
+prad_tcga_pan_can_atlas_2018,prad,"Prostate Adenocarcinoma (TCGA, PanCancer Atlas)",494,494,489,489,acbc_mskcc_2015_cnaseq,12,acc_tcga_3way_complete,75,1.0,0.024539877300613498,0.15337423312883436
+sarc_tcga_pan_can_atlas_2018,soft_tissue,"Sarcoma (TCGA, PanCancer Atlas)",255,255,253,253,acbc_mskcc_2015_cnaseq,12,acc_tcga_3way_complete,75,1.0,0.04743083003952569,0.2964426877470356
+skcm_tcga_pan_can_atlas_2018,skcm,"Skin Cutaneous Melanoma (TCGA, PanCancer Atlas)",448,440,367,363,acbc_mskcc_2015_cnaseq,12,acc_tcga_3way_complete,75,0.989100817438692,0.03305785123966942,0.2066115702479339
+stad_tcga_pan_can_atlas_2018,stad,"Stomach Adenocarcinoma (TCGA, PanCancer Atlas)",440,436,438,434,acbc_mskcc_2015_cnaseq,12,acc_tcga_3way_complete,75,0.9954128440366973,0.027649769585253458,0.1728110599078341
+tgct_tcga_pan_can_atlas_2018,testis,"Testicular Germ Cell Tumors (TCGA, PanCancer Atlas)",149,149,149,149,acbc_mskcc_2015_cnaseq,12,acc_tcga_3way_complete,75,1.0,0.08053691275167785,0.5033557046979866
+thca_tcga_pan_can_atlas_2018,thpa,"Thyroid Carcinoma (TCGA, PanCancer Atlas)",500,490,497,487,acbc_mskcc_2015_cnaseq,12,acc_tcga_3way_complete,75,0.9938775510204082,0.024640657084188913,0.1540041067761807
+thym_tcga_pan_can_atlas_2018,thym,"Thymoma (TCGA, PanCancer Atlas)",123,123,123,123,acbc_mskcc_2015_cnaseq,12,acc_tcga_3way_complete,75,1.0,0.0975609756097561,0.6097560975609756
+ucec_tcga_pan_can_atlas_2018,ucec,"Uterine Corpus Endometrial Carcinoma (TCGA, PanCancer Atlas)",529,517,523,511,acbc_mskcc_2015_cnaseq,12,acc_tcga_3way_complete,75,0.988394584139265,0.023483365949119372,0.14677103718199608
+ucs_tcga_pan_can_atlas_2018,ucs,"Uterine Carcinosarcoma (TCGA, PanCancer Atlas)",57,57,56,56,acbc_mskcc_2015_cnaseq,12,acc_tcga_3way_complete,75,1.0,0.21428571428571427,1.3392857142857142
+uvm_tcga_pan_can_atlas_2018,um,"Uveal Melanoma (TCGA, PanCancer Atlas)",80,80,80,80,acbc_mskcc_2015_cnaseq,12,acc_tcga_3way_complete,75,1.0,0.15,0.9375

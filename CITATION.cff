@@ -1,0 +1,51 @@
+cff-version: 1.2.0
+message: "If you use this dataset or code, please cite both the article (preferred-citation) and this archived record."
+title: "miRBioGenAtlas: Pan-cancer alteration landscape of the miRNA biogenesis machinery"
+abstract: "Curated copy-number-alteration and somatic-mutation frequency tables for 15 miRNA biogenesis pathway genes across 32 TCGA PanCancer Atlas tumour types (n = 10,195), with a reproducible Python retrieval pipeline and an R figure-generation script."
+type: dataset
+version: "1.0.0"
+date-released: "2026-06-12"
+url: "https://github.com/siddugayam/miRBioGenAtlas"
+repository-code: "https://github.com/siddugayam/miRBioGenAtlas"
+license:
+  - MIT
+  - CC-BY-4.0
+keywords:
+  - microRNA biogenesis
+  - copy number alteration
+  - somatic mutation
+  - TCGA PanCancer Atlas
+  - cBioPortal
+  - pan-cancer genomics
+# AUTHORS match the manuscript byline (4 authors).
+authors:
+  - family-names: "Gayam"
+    given-names: "Prasanna Kumar Reddy"
+    orcid: "https://orcid.org/0000-0001-5032-364X"
+    affiliation: "Manipal Academy of Higher Education, Manipal, India"
+  - family-names: "Earny"
+    given-names: "Venkat Abhiram"
+    orcid: "https://orcid.org/0009-0008-6926-553X"
+    affiliation: "Manipal Academy of Higher Education, Manipal, India"
+  - family-names: "Aranjani"
+    given-names: "Jesil Mathew"
+    orcid: "https://orcid.org/0000-0002-7666-3252"
+    affiliation: "Manipal Academy of Higher Education, Manipal, India"
+  - family-names: "SM"
+    given-names: "Fayaz"
+    orcid: "https://orcid.org/0000-0002-1212-7952"
+    affiliation: "Manipal Academy of Higher Education, Manipal, India"
+preferred-citation:
+  type: article
+  title: "Pan-cancer alteration landscape of the miRNA biogenesis machinery across 32 TCGA tumour types"
+  year: 2026
+  journal: "REPLACE_JOURNAL_NAME"
+  authors:
+    - family-names: "Gayam"
+      given-names: "Prasanna Kumar Reddy"
+    - family-names: "Earny"
+      given-names: "Venkat Abhiram"
+    - family-names: "Aranjani"
+      given-names: "Jesil Mathew"
+    - family-names: "SM"
+      given-names: "Fayaz"

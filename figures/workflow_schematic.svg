@@ -1,0 +1,94 @@
+<svg viewBox="0 0 1900 772" xmlns="http://www.w3.org/2000/svg" font-family="Helvetica, Arial, sans-serif">
+<defs>
+      <marker id="arw" markerWidth="12" markerHeight="12" refX="8" refY="4" orient="auto" markerUnits="userSpaceOnUse">
+        <path d="M0,0 L9,4 L0,8 Z" fill="#5A6473"/>
+      </marker>
+    </defs>
+<rect x="0" y="0" width="1900" height="772" rx="0" ry="0" fill="#FFFFFF" stroke="none" stroke-width="0" />
+<rect x="40" y="26" width="1820" height="98" rx="14" ry="14" fill="#FFFFFF" stroke="#D8DEE9" stroke-width="1.5" />
+<rect x="40" y="26" width="10" height="98" rx="5" ry="5" fill="#0E7C7B" stroke="none" stroke-width="0" />
+<text x="70" y="68" font-family="Helvetica, Arial, sans-serif" font-size="30" font-weight="700" fill="#12203A" text-anchor="start" >miRBioGenAtlas  ·  data-generation workflow</text>
+<text x="70" y="100" font-family="Helvetica, Arial, sans-serif" font-size="18" font-weight="400" fill="#4A5568" text-anchor="start" >miRNA biogenesis machinery  ·  15 genes  ·  32 TCGA PanCancer Atlas tumour types  ·  n = 10,195 tumours</text>
+<rect x="1316.0" y="90" width="526.0" height="26" rx="13" ry="13" fill="#FFF7E8" stroke="#E4B35B" stroke-width="1.2" />
+<text x="1579.0" y="108" font-family="Helvetica, Arial, sans-serif" font-size="14.5" font-weight="600" fill="#8A5A00" text-anchor="middle" >Top altered: AGO2 48.2%   |   most-mutated: SMAD4 2.4%</text>
+<rect x="40" y="160" width="328" height="402" rx="12" ry="12" fill="#FBFCFE" stroke="#D8DEE9" stroke-width="1.5" />
+<rect x="40" y="160" width="328" height="44" rx="12" ry="12" fill="#0E7C7B" stroke="none" stroke-width="0" />
+<rect x="40" y="182" width="328" height="22" rx="0" ry="0" fill="#0E7C7B" stroke="none" stroke-width="0" />
+<circle cx="70" cy="182" r="15" fill="#FFFFFF"/>
+<text x="70" y="188" font-family="Helvetica, Arial, sans-serif" font-size="18" font-weight="700" fill="#0E7C7B" text-anchor="middle" >1</text>
+<text x="96" y="188" font-family="Helvetica, Arial, sans-serif" font-size="18.5" font-weight="700" fill="#FFFFFF" text-anchor="start" >Gene set</text>
+<text x="60" y="238" font-family="Helvetica, Arial, sans-serif" font-size="15" font-weight="normal" fill="#26303F" text-anchor="start" >15 curated miRNA biogenesis</text>
+<text x="60" y="260.5" font-family="Helvetica, Arial, sans-serif" font-size="15" font-weight="normal" fill="#26303F" text-anchor="start" >pathway genes</text>
+<text x="60" y="283.0" font-family="Helvetica, Arial, sans-serif" font-size="15" font-weight="normal" fill="#26303F" text-anchor="start" ></text>
+<text x="60" y="305.5" font-family="Helvetica, Arial, sans-serif" font-size="15" font-weight="normal" fill="#26303F" text-anchor="start" >Genes:</text>
+<text x="60" y="328.0" font-family="Helvetica, Arial, sans-serif" font-size="15" font-weight="normal" fill="#26303F" text-anchor="start" >  TP53, AGO2, SMAD4, SMAD2,</text>
+<text x="60" y="350.5" font-family="Helvetica, Arial, sans-serif" font-size="15" font-weight="normal" fill="#26303F" text-anchor="start" >  DGCR8, LIN28B, DICER1, LIN28A</text>
+<text x="60" y="373.0" font-family="Helvetica, Arial, sans-serif" font-size="15" font-weight="normal" fill="#26303F" text-anchor="start" >  (+7 more)</text>
+<line x1="374" y1="361.0" x2="409" y2="361.0" stroke="#5A6473" stroke-width="2.4" marker-end="url(#arw)"/>
+<rect x="413" y="160" width="328" height="402" rx="12" ry="12" fill="#FBFCFE" stroke="#D8DEE9" stroke-width="1.5" />
+<rect x="413" y="160" width="328" height="44" rx="12" ry="12" fill="#0E7C7B" stroke="none" stroke-width="0" />
+<rect x="413" y="182" width="328" height="22" rx="0" ry="0" fill="#0E7C7B" stroke="none" stroke-width="0" />
+<circle cx="443" cy="182" r="15" fill="#FFFFFF"/>
+<text x="443" y="188" font-family="Helvetica, Arial, sans-serif" font-size="18" font-weight="700" fill="#0E7C7B" text-anchor="middle" >2</text>
+<text x="469" y="188" font-family="Helvetica, Arial, sans-serif" font-size="18.5" font-weight="700" fill="#FFFFFF" text-anchor="start" >Cohort &amp; source</text>
+<text x="433" y="238" font-family="Helvetica, Arial, sans-serif" font-size="15" font-weight="normal" fill="#26303F" text-anchor="start" >cBioPortal public REST API</text>
+<text x="433" y="260.5" font-family="Helvetica, Arial, sans-serif" font-size="15" font-weight="normal" fill="#26303F" text-anchor="start" ></text>
+<text x="433" y="283.0" font-family="Helvetica, Arial, sans-serif" font-size="15" font-weight="normal" fill="#26303F" text-anchor="start" >TCGA PanCancer Atlas (2018)</text>
+<text x="433" y="305.5" font-family="Helvetica, Arial, sans-serif" font-size="15" font-weight="normal" fill="#26303F" text-anchor="start" >32 tumour types</text>
+<text x="433" y="328.0" font-family="Helvetica, Arial, sans-serif" font-size="15" font-weight="normal" fill="#26303F" text-anchor="start" >n = 10,195 tumours</text>
+<text x="433" y="350.5" font-family="Helvetica, Arial, sans-serif" font-size="15" font-weight="normal" fill="#26303F" text-anchor="start" ></text>
+<text x="433" y="373.0" font-family="Helvetica, Arial, sans-serif" font-size="15" font-weight="normal" fill="#26303F" text-anchor="start" >public, controlled-access-free</text>
+<text x="433" y="395.5" font-family="Helvetica, Arial, sans-serif" font-size="15" font-weight="normal" fill="#26303F" text-anchor="start" >summary-level data</text>
+<line x1="747" y1="361.0" x2="782" y2="361.0" stroke="#5A6473" stroke-width="2.4" marker-end="url(#arw)"/>
+<rect x="786" y="160" width="328" height="402" rx="12" ry="12" fill="#FBFCFE" stroke="#D8DEE9" stroke-width="1.5" />
+<rect x="786" y="160" width="328" height="44" rx="12" ry="12" fill="#0E7C7B" stroke="none" stroke-width="0" />
+<rect x="786" y="182" width="328" height="22" rx="0" ry="0" fill="#0E7C7B" stroke="none" stroke-width="0" />
+<circle cx="816" cy="182" r="15" fill="#FFFFFF"/>
+<text x="816" y="188" font-family="Helvetica, Arial, sans-serif" font-size="18" font-weight="700" fill="#0E7C7B" text-anchor="middle" >3</text>
+<text x="842" y="188" font-family="Helvetica, Arial, sans-serif" font-size="18.5" font-weight="700" fill="#FFFFFF" text-anchor="start" >Retrieval</text>
+<text x="806" y="238" font-family="Helvetica, Arial, sans-serif" font-size="15" font-weight="normal" fill="#26303F" text-anchor="start" >Python 3.10</text>
+<text x="806" y="260.5" font-family="Helvetica, Arial, sans-serif" font-size="15" font-weight="normal" fill="#26303F" text-anchor="start" >requests · pandas · numpy</text>
+<text x="806" y="283.0" font-family="Helvetica, Arial, sans-serif" font-size="15" font-weight="normal" fill="#26303F" text-anchor="start" ></text>
+<text x="806" y="305.5" font-family="Helvetica, Arial, sans-serif" font-size="15" font-weight="normal" fill="#26303F" text-anchor="start" >Per study, per gene:</text>
+<text x="806" y="328.0" font-family="Helvetica, Arial, sans-serif" font-size="15" font-weight="normal" fill="#26303F" text-anchor="start" >• somatic mutations (MAF)</text>
+<text x="806" y="350.5" font-family="Helvetica, Arial, sans-serif" font-size="15" font-weight="normal" fill="#26303F" text-anchor="start" >• GISTIC2 discrete CNA</text>
+<text x="806" y="373.0" font-family="Helvetica, Arial, sans-serif" font-size="15" font-weight="normal" fill="#26303F" text-anchor="start" >   amp +2 · gain +1</text>
+<text x="806" y="395.5" font-family="Helvetica, Arial, sans-serif" font-size="15" font-weight="normal" fill="#26303F" text-anchor="start" >   shallow −1 · deep −2</text>
+<line x1="1120" y1="361.0" x2="1155" y2="361.0" stroke="#5A6473" stroke-width="2.4" marker-end="url(#arw)"/>
+<rect x="1159" y="160" width="328" height="402" rx="12" ry="12" fill="#FBFCFE" stroke="#D8DEE9" stroke-width="1.5" />
+<rect x="1159" y="160" width="328" height="44" rx="12" ry="12" fill="#0E7C7B" stroke="none" stroke-width="0" />
+<rect x="1159" y="182" width="328" height="22" rx="0" ry="0" fill="#0E7C7B" stroke="none" stroke-width="0" />
+<circle cx="1189" cy="182" r="15" fill="#FFFFFF"/>
+<text x="1189" y="188" font-family="Helvetica, Arial, sans-serif" font-size="18" font-weight="700" fill="#0E7C7B" text-anchor="middle" >4</text>
+<text x="1215" y="188" font-family="Helvetica, Arial, sans-serif" font-size="18.5" font-weight="700" fill="#FFFFFF" text-anchor="start" >Frequency computation</text>
+<text x="1179" y="238" font-family="Helvetica, Arial, sans-serif" font-size="15" font-weight="normal" fill="#26303F" text-anchor="start" >Denominator per study =</text>
+<text x="1179" y="260.5" font-family="Helvetica, Arial, sans-serif" font-size="15" font-weight="normal" fill="#26303F" text-anchor="start" >sequenced ∩ CNA-profiled</text>
+<text x="1179" y="283.0" font-family="Helvetica, Arial, sans-serif" font-size="15" font-weight="normal" fill="#26303F" text-anchor="start" ></text>
+<text x="1179" y="305.5" font-family="Helvetica, Arial, sans-serif" font-size="15" font-weight="normal" fill="#26303F" text-anchor="start" >Any-alteration =</text>
+<text x="1179" y="328.0" font-family="Helvetica, Arial, sans-serif" font-size="15" font-weight="normal" fill="#26303F" text-anchor="start" >mutation ∪ CNA (union)</text>
+<text x="1179" y="350.5" font-family="Helvetica, Arial, sans-serif" font-size="15" font-weight="normal" fill="#26303F" text-anchor="start" ></text>
+<text x="1179" y="373.0" font-family="Helvetica, Arial, sans-serif" font-size="15" font-weight="normal" fill="#26303F" text-anchor="start" >Frequency per gene ×</text>
+<text x="1179" y="395.5" font-family="Helvetica, Arial, sans-serif" font-size="15" font-weight="normal" fill="#26303F" text-anchor="start" >tumour type (mut / CNA / any)</text>
+<line x1="1493" y1="361.0" x2="1528" y2="361.0" stroke="#5A6473" stroke-width="2.4" marker-end="url(#arw)"/>
+<rect x="1532" y="160" width="328" height="402" rx="12" ry="12" fill="#FBFCFE" stroke="#D8DEE9" stroke-width="1.5" />
+<rect x="1532" y="160" width="328" height="44" rx="12" ry="12" fill="#0E7C7B" stroke="none" stroke-width="0" />
+<rect x="1532" y="182" width="328" height="22" rx="0" ry="0" fill="#0E7C7B" stroke="none" stroke-width="0" />
+<circle cx="1562" cy="182" r="15" fill="#FFFFFF"/>
+<text x="1562" y="188" font-family="Helvetica, Arial, sans-serif" font-size="18" font-weight="700" fill="#0E7C7B" text-anchor="middle" >5</text>
+<text x="1588" y="188" font-family="Helvetica, Arial, sans-serif" font-size="18.5" font-weight="700" fill="#FFFFFF" text-anchor="start" >Data Records (CSV)</text>
+<text x="1552" y="238" font-family="Helvetica, Arial, sans-serif" font-size="15" font-weight="normal" fill="#26303F" text-anchor="start" >• any-alteration matrix</text>
+<text x="1552" y="260.5" font-family="Helvetica, Arial, sans-serif" font-size="15" font-weight="normal" fill="#26303F" text-anchor="start" >• CNA matrix · mutation matrix</text>
+<text x="1552" y="283.0" font-family="Helvetica, Arial, sans-serif" font-size="15" font-weight="normal" fill="#26303F" text-anchor="start" >• gene-ranking summary</text>
+<text x="1552" y="305.5" font-family="Helvetica, Arial, sans-serif" font-size="15" font-weight="normal" fill="#26303F" text-anchor="start" >• tumour-burden ranking</text>
+<text x="1552" y="328.0" font-family="Helvetica, Arial, sans-serif" font-size="15" font-weight="normal" fill="#26303F" text-anchor="start" >• top-5 tumours per gene</text>
+<text x="1552" y="350.5" font-family="Helvetica, Arial, sans-serif" font-size="15" font-weight="normal" fill="#26303F" text-anchor="start" >• BRCA deep-dive (n = 1,052)</text>
+<text x="1552" y="373.0" font-family="Helvetica, Arial, sans-serif" font-size="15" font-weight="normal" fill="#26303F" text-anchor="start" >• sample-set summary</text>
+<text x="1552" y="395.5" font-family="Helvetica, Arial, sans-serif" font-size="15" font-weight="normal" fill="#26303F" text-anchor="start" >• + DATA_DICTIONARY.md</text>
+<line x1="950.0" y1="564" x2="950.0" y2="590" stroke="#5A6473" stroke-width="2.4" marker-end="url(#arw)"/>
+<rect x="40" y="594" width="1820" height="132" rx="12" ry="12" fill="#F4F6FA" stroke="#D8DEE9" stroke-width="1.5" />
+<rect x="40" y="594" width="10" height="132" rx="5" ry="5" fill="#0E7C7B" stroke="none" stroke-width="0" />
+<text x="70" y="624" font-family="Helvetica, Arial, sans-serif" font-size="19" font-weight="700" fill="#12203A" text-anchor="start" >Technical validation &amp; release</text>
+<text x="70" y="652" font-family="Helvetica, Arial, sans-serif" font-size="15" font-weight="normal" fill="#26303F" text-anchor="start" >✓  Pipeline re-executed on an independent machine — regenerates every CSV live from the cBioPortal API (~8–12 min).</text>
+<text x="70" y="678" font-family="Helvetica, Arial, sans-serif" font-size="15" font-weight="normal" fill="#26303F" text-anchor="start" >✓  Union-consistency checks on all matrices; known-driver benchmark recovered (SMAD4 mutation 2.4%, top-mutated gene).</text>
+<text x="70" y="704" font-family="Helvetica, Arial, sans-serif" font-size="15" font-weight="normal" fill="#26303F" text-anchor="start" >✓  Deposited on GitHub + Zenodo  ·  data CC BY 4.0  ·  code MIT  ·  figures generated in R 4.5.2 (heatmap, gene &amp; tumour rankings, BRCA deep-dive).</text>
+</svg>

@@ -1,0 +1,33 @@
+======================================================================
+TCGA PanCancer Atlas: Low-Coverage Tumour Types for miRNA Biogenesis Analysis
+======================================================================
+
+Denominator: intersection of sequenced and CNA sample lists
+Total tumour types: 32
+Total samples across all tumour types: 10195
+
+----------------------------------------------------------------------
+Tumour types with N < 100:
+----------------------------------------------------------------------
+  CHOL            N =   36  (chol_tcga_pan_can_atlas_2018)
+  DLBC            N =   41  (dlbc_tcga_pan_can_atlas_2018)
+  UCS             N =   56  (ucs_tcga_pan_can_atlas_2018)
+  KICH            N =   65  (kich_tcga_pan_can_atlas_2018)
+  UVM             N =   80  (uvm_tcga_pan_can_atlas_2018)
+  MESO            N =   86  (meso_tcga_pan_can_atlas_2018)
+  ACC             N =   89  (acc_tcga_pan_can_atlas_2018)
+
+----------------------------------------------------------------------
+Bottom 5 tumour types by N:
+----------------------------------------------------------------------
+  CHOL            N =   36  (chol_tcga_pan_can_atlas_2018)
+  DLBC            N =   41  (dlbc_tcga_pan_can_atlas_2018)
+  UCS             N =   56  (ucs_tcga_pan_can_atlas_2018)
+  KICH            N =   65  (kich_tcga_pan_can_atlas_2018)
+  UVM             N =   80  (uvm_tcga_pan_can_atlas_2018)
+
+----------------------------------------------------------------------
+Note: Low sample counts may reduce statistical power for detecting
+low-frequency alterations. Interpret frequencies from these tumour types
+with caution.
+----------------------------------------------------------------------

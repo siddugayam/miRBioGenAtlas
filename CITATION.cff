@@ -1,11 +1,12 @@
 cff-version: 1.2.0
-message: "If you use this dataset or code, please cite both the article (preferred-citation) and this archived record."
-title: "miRBioGenAtlas: Pan-cancer alteration landscape of the miRNA biogenesis machinery"
-abstract: "Curated copy-number-alteration and somatic-mutation frequency tables for 15 miRNA biogenesis pathway genes across 32 TCGA PanCancer Atlas tumour types (n = 10,195), with a reproducible Python retrieval pipeline and an R figure-generation script."
+message: "If you use this dataset or code, please cite both the Data Descriptor article (preferred-citation) and the versioned Zenodo dataset record."
+title: "miRBioGenAtlas: Sample-level multi-modal somatic alteration landscape of the miRNA biogenesis machinery across 32 TCGA cancer studies"
+abstract: "Frozen, SHA-256-verified sample-level and aggregated multi-omic alteration resource for 15 miRNA biogenesis and regulatory genes across 32 TCGA PanCancer Atlas (2018) studies (33 cancer types; N = 10,195 tumours; 152,925 sample x gene records), with portable Python and R pipelines."
 type: dataset
-version: "1.0.0"
-date-released: "2026-06-12"
-url: "https://github.com/siddugayam/miRBioGenAtlas"
+version: "2.0.0"
+doi: "10.5281/zenodo.24337287"
+date-released: "2026-11-18"
+url: "https://doi.org/10.5281/zenodo.24337287"
 repository-code: "https://github.com/siddugayam/miRBioGenAtlas"
 license:
   - MIT
@@ -17,29 +18,28 @@ keywords:
   - TCGA PanCancer Atlas
   - cBioPortal
   - pan-cancer genomics
-# AUTHORS match the manuscript byline (4 authors).
 authors:
   - family-names: "Gayam"
     given-names: "Prasanna Kumar Reddy"
     orcid: "https://orcid.org/0000-0001-5032-364X"
-    affiliation: "Manipal Academy of Higher Education, Manipal, India"
+    affiliation: "Department of Pharmaceutical Biotechnology, Manipal College of Pharmaceutical Sciences, Manipal Academy of Higher Education, Manipal, India"
   - family-names: "Earny"
     given-names: "Venkat Abhiram"
     orcid: "https://orcid.org/0009-0008-6926-553X"
-    affiliation: "Manipal Academy of Higher Education, Manipal, India"
+    affiliation: "Department of Microbiology, Kasturba Medical College, Manipal Academy of Higher Education, Manipal, India"
   - family-names: "Aranjani"
     given-names: "Jesil Mathew"
     orcid: "https://orcid.org/0000-0002-7666-3252"
-    affiliation: "Manipal Academy of Higher Education, Manipal, India"
-  - family-names: "SM"
-    given-names: "Fayaz"
+    affiliation: "Department of Pharmaceutical Biotechnology, Manipal College of Pharmaceutical Sciences, Manipal Academy of Higher Education, Manipal, India"
+  - family-names: "Mahammad"
+    given-names: "Fayaz Shaik"
     orcid: "https://orcid.org/0000-0002-1212-7952"
-    affiliation: "Manipal Academy of Higher Education, Manipal, India"
+    affiliation: "Manipal Institute of Technology, Manipal Academy of Higher Education, Manipal, India"
 preferred-citation:
   type: article
-  title: "Pan-cancer alteration landscape of the miRNA biogenesis machinery across 32 TCGA tumour types"
+  title: "Pan-cancer alteration landscape of the miRNA biogenesis machinery across 32 TCGA cancer studies"
   year: 2026
-  journal: "REPLACE_JOURNAL_NAME"
+  journal: "Scientific Data"
   authors:
     - family-names: "Gayam"
       given-names: "Prasanna Kumar Reddy"
@@ -47,5 +47,5 @@ preferred-citation:
       given-names: "Venkat Abhiram"
     - family-names: "Aranjani"
       given-names: "Jesil Mathew"
-    - family-names: "SM"
-      given-names: "Fayaz"
+    - family-names: "Mahammad"
+      given-names: "Fayaz Shaik"

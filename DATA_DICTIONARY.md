@@ -1,159 +1,88 @@
-# Data Dictionary — miRBioGenAtlas
+# Data Dictionary — miRBioGenAtlas (v2.0.0)
 
-**Dataset:** Pan-cancer alteration landscape of the miRNA biogenesis machinery (TCGA PanCancer Atlas, 32 tumour types, n = 10,195).
-**Version:** 1.0.0 · **Source:** cBioPortal public REST API (`https://www.cbioportal.org/api`).
+**Dataset:** Pan-cancer alteration landscape of the miRNA biogenesis machinery across 32 TCGA cancer studies (`N = 10,195` matched tumours; `152,925` sample × gene records).  
+**Version:** `2.0.0` · **Zenodo Dataset DOI:** [`10.5281/zenodo.24337287`](https://doi.org/10.5281/zenodo.24337287) · **Source snapshot:** cBioPortal public REST API `v7.2.3` (`DB v3.1.0`; frozen SHA-256-verified archive in `data/raw_snapshot/`).
 
-## Conventions (apply to all files)
+## Global Conventions
 
-- **Encoding / delimiter:** UTF-8, comma-delimited, one header row.
-- **Frequencies (`*_freq`)** are **fractions in [0, 1]**, *not* percentages. Multiply by 100 for a percentage.
-- **Counts (`*_n`)** are non-negative integers; the denominator is always **`N`** for the corresponding study/cohort.
-- **`N` (denominator)** = number of samples in the **intersection of the `_sequenced` and CNA sample lists** for that study (every counted sample contributes both a mutation and a CNA call).
-- **Copy-number classes** follow cBioPortal discrete (GISTIC2) calls:
-  `amp` = high-level amplification (+2), `gain` = low-level gain (+1), `shallow_del` = shallow/heterozygous deletion (−1), `deep_del` = deep/homozygous deletion (−2).
-- **`any_cna`** = sample has **any** of {gain, shallow_del, amp, deep_del} (CN ≠ 0).
-- **`any_alter`** = **union** of mutation and any CNA (a sample with both is counted **once**, not twice).
-- **Genes (15):** DROSHA, DGCR8 (Microprocessor); XPO5 (nuclear export); DICER1, TARBP2, PRKRA (cytoplasmic processing); AGO1–AGO4 (RISC/Argonaute); LIN28A, LIN28B (let-7 regulators); SMAD2, SMAD4 (Microprocessor **accessory** factors); TP53 (**upstream regulator — accessory, not a core biogenesis enzyme**; excluded from biogenesis-burden rankings).
-
----
-
-## 1. `tcga_pancan_miRNA_biogenesis_alteration_freqs_long_FINAL.csv`
-**Master long-format table — 480 rows (15 genes × 32 studies) × 23 columns.** Primary file for downstream analysis.
-
-| Column | Type | Units / range | Definition |
-|---|---|---|---|
-| `tumour_acronym` | string | — | TCGA cancer-type code (e.g. `BRCA`). |
-| `studyId` | string | — | cBioPortal study identifier (e.g. `brca_tcga_pan_can_atlas_2018`). |
-| `studyName` | string | — | Full study name. |
-| `geneSymbol` | string | HGNC | Gene symbol. |
-| `entrezGeneId` | integer | NCBI | Entrez Gene ID. |
-| `N` | integer | samples | Intersection denominator (sequenced ∩ CNA). |
-| `mut_n` | integer | count | Samples with ≥1 non-synonymous somatic mutation. |
-| `mut_freq` | float | [0,1] | `mut_n / N`. |
-| `amp_n` | integer | count | Samples with high-level amplification (+2). |
-| `amp_freq` | float | [0,1] | `amp_n / N`. |
-| `gain_n` | integer | count | Samples with low-level gain (+1). |
-| `gain_freq` | float | [0,1] | `gain_n / N`. |
-| `shallow_del_n` | integer | count | Samples with shallow deletion (−1). |
-| `shallow_del_freq` | float | [0,1] | `shallow_del_n / N`. |
-| `deep_del_n` | integer | count | Samples with deep deletion (−2). |
-| `deep_del_freq` | float | [0,1] | `deep_del_n / N`. |
-| `any_cna_n` | integer | count | Samples with any CNA (gain ∪ shallow_del ∪ amp ∪ deep_del). |
-| `any_cna_freq` | float | [0,1] | `any_cna_n / N`. |
-| `any_alter_n` | integer | count | Samples with any alteration (mutation ∪ any CNA). |
-| `any_alter_freq` | float | [0,1] | `any_alter_n / N`. |
-| `mut_only_n` | integer | count | Samples mutated but no CNA. |
-| `cna_only_n` | integer | count | Samples with CNA but no mutation. |
-| `mut_and_cna_n` | integer | count | Samples with both a mutation and a CNA. |
-
-**Internal check (holds for all 480 rows):** `any_alter_n == mut_only_n + cna_only_n + mut_and_cna_n`.
+- **Encoding / delimiter:** UTF-8, comma-delimited (`.csv` or gzip-compressed `.csv.gz`), single header row.
+- **Frequencies (`*_freq`, `*_prop`):** Exact fractions in `[0, 1]` (not percentages).
+- **Primary sample denominator (`N`):** Per study, `N` is the exact cardinality of `<studyId>_sequenced ∩ <studyId>_cna` (`10,195` tumours across 32 TCGA PanCancer Atlas studies spanning 33 cancer types, with `COAD = 336` and `READ = 196` combined in `COADREAD = 532`).
+- **Nested gene-set tiers (15 genes total):**
+  - **Core-10 (`in_Core10_tier = 1`):** `DROSHA, DGCR8, XPO5, DICER1, TARBP2, PRKRA, AGO1, AGO2, AGO3, AGO4`.
+  - **Extended-12 (`in_Extended12_tier = 1`):** Core-10 + direct pri/pre-let-7 regulators `LIN28A, LIN28B`.
+  - **Panel-14 (`in_Panel14_tier = 1`):** Extended-12 + Microprocessor accessory R-SMAD/Co-SMAD factors `SMAD2, SMAD4`.
+  - **All-15:** Panel-14 + upstream pleiotropic regulator `TP53` (excluded from biogenesis burden summaries).
+- **High-confidence (`strict`) vs broad (`any`) alterations:**
+  - `high_conf` / `strict` = non-synonymous somatic coding mutation **OR** high-level focal GISTIC2 CNA (`+2` amplification or `-2` homozygous deep deletion).
+  - `any_alter` = non-synonymous somatic coding mutation **OR** any discrete GISTIC2 CNA (`-2, -1, +1, +2`).
 
 ---
 
-## 2–4. Matrix files (gene × tumour)
-`tcga_pancan_miRNA_biogenesis_any_alter_freq_matrix.csv` · `..._any_cna_freq_matrix.csv` · `..._mut_freq_matrix.csv`
-**15 data rows (genes) × 33 physical columns** = `geneSymbol` index column **+ 32 tumour-type columns**.
+## 1. Primary Sample-Level & Variant-Level Tables
 
-| Column | Type | Units / range | Definition |
-|---|---|---|---|
-| `geneSymbol` | string | HGNC | Gene symbol (row index). |
-| `ACC`, `BLCA`, … `UVM` (32 columns) | float | [0,1] | Frequency for that gene in that tumour type. Metric depends on the file: **any-alteration** / **CNA-only** / **mutation-only** respectively. |
+### 1.1 `tcga_pancan_miRNA_biogenesis_sample_level_alterations.csv.gz`
+**152,925 rows (`10,195` samples × `15` genes) × 24 columns.**
 
-*Tumour columns (alphabetical):* ACC, BLCA, BRCA, CESC, CHOL, COADREAD, DLBC, ESCA, GBM, HNSC, KICH, KIRC, KIRP, LAML, LGG, LIHC, LUAD, LUSC, MESO, OV, PAAD, PCPG, PRAD, SARC, SKCM, STAD, TGCT, THCA, THYM, UCEC, UCS, UVM.
+| Column | Type | Definition |
+|---|---|---|
+| `tumour_acronym` | string | TCGA study code (`ACC`..`UVM`). |
+| `studyId` | string | cBioPortal study ID (`*_tcga_pan_can_atlas_2018`). |
+| `sampleId` | string | TCGA sample barcode (e.g. `TCGA-A1-A0SB-01`). |
+| `patientId` | string | TCGA participant barcode (e.g. `TCGA-A1-A0SB`). |
+| `geneSymbol` | string | HGNC gene symbol. |
+| `entrezGeneId` | integer | NCBI Entrez Gene ID. |
+| `chrArm` | string | Chromosome arm (`5p`, `22q`, `8q`, `1p`, etc.). |
+| `syntenicCluster` | string | Syntenic locus ID (`1p34.3_AGO1_AGO3_AGO4` groups tandem `AGO1/3/4`; `18q21.1_SMAD2_SMAD4` groups `SMAD2/4`). |
+| `gistic2DiscreteCNA` | integer | Discrete GISTIC2 call (`-2` deep deletion, `-1` shallow deletion, `0` diploid/neutral, `+1` low-level gain, `+2` high-level amplification). |
+| `log2CopyNumber` | float | Continuous `log2` copy-number ratio from `<studyId>_log2CNA`. |
+| `chrArmGisticStatus` | string | Matched chromosome-arm GISTIC status (`Gain`, `Loss`, `Unchanged`, or blank if unassessed) from `<studyId>_armlevel_cna`. |
+| `cnaFocalityClass` | string | `Diploid_Neutral`, `HighLevel_Amp_or_DeepDel`, `Broad_ArmLevel_LowAmp` (`+/-1` concordant with whole-arm gain/loss), `SubArm_LowAmp`, or `LowAmp_ArmUnannotated`. |
+| `nonsynMutationCount` | integer | Number of non-synonymous somatic coding mutations in this sample and gene. |
+| `hasTruncatingLoF` | integer (0/1) | `1` if harbouring nonsense, frameshift indel, canonical splice-site, start-loss, or nonstop variant. |
+| `hasCuratedHotspot` | integer (0/1) | `1` if harbouring a curated functional hotspot codon (`DICER1` S1344/E1705/D1709/R1725/G1809/D1810/E1813; `DROSHA` E1147/D1151/Q1187/E1222; `SMAD4` D351/R361/G386/D537; `TP53` R175/Y220/G245/R248/R249/R273/R282; etc.). |
+| `proteinChanges` | string | Semicolon-delimited HGVSp short protein changes (`D1709N`, `R361H`, etc.). |
+| `consequenceTiers` | string | Semicolon-delimited consequence tiers (`Truncating_LoF`, `Hotspot_Missense_or_InFrame`, `InFrame_Indel`, `Other_Missense`, `Other_Nonsynonymous`). |
+| `hasStructuralVariant` | integer (0/1) | `1` if sample carries a somatic structural variant / gene fusion involving this gene. |
+| `structuralVariantEvents` | string | Semicolon-delimited SV event descriptions. |
+| `hasHighConfAlteration` | integer (0/1) | `1` if `nonsynMutationCount > 0` OR `gistic2DiscreteCNA in {-2, +2}`. |
+| `hasAnyAlteration` | integer (0/1) | `1` if `nonsynMutationCount > 0` OR `gistic2DiscreteCNA != 0`. |
+| `mrnaRsem` | float | Batch-normalized RSEM mRNA expression (`<studyId>_rna_seq_v2_mrna`; blank if no RNA-seq). |
+| `mrnaZscore` | float | mRNA expression Z-score (`<studyId>_rna_seq_v2_mrna_median_all_sample_Zscores`; `n = 9,620` samples). |
+| `sampleIsHypermutated` | integer (0/1) | `1` if `TMB_NONSYNONYMOUS >= 10` mut/Mb (or `MUTATION_COUNT >= 300` where TMB unavailable) or `POLE`/`MSI` hypermutator subtype (`1,385 / 10,195` samples). |
 
----
+### 1.2 `tcga_pancan_miRNA_biogenesis_somatic_mutations_annotated.csv`
+**6,292 rows (individual somatic coding variant calls) × 26 columns.**  
+Contains genomic coordinates (`ncbiBuild = GRCh37`, `chr`, `startPosition`, `endPosition`, `referenceAllele`, `variantAllele`), `variantType`, `mutationType`, `proteinChange`, `proteinPosStart`, `refseqMrnaId`, read depths (`tumorAltCount`, `tumorRefCount`, `tumorVAF`), functional `consequenceTier`, `isCuratedHotspot`, `isTruncatingLoF`, `sampleTmbNonsynonymous`, `sampleIsHypermutated`, and `molecularSubtype`.
 
-## 5. `miRNA_biogenesis_gene_rank_summary.csv`
-**Gene ranking — 15 rows × 9 columns.** Means/maxima taken across the 32 studies.
+### 1.3 `tcga_pancan_miRNA_biogenesis_structural_variants.csv`
+**72 rows × 14 columns.** Somatic structural variants / fusions involving the 15 panel genes across the 10,195 samples (`site1HugoSymbol`, `site2HugoSymbol`, `eventInfo`, breakpoints, frame effect, and `svStatus`).
 
-| Column | Type | Range | Definition |
-|---|---|---|---|
-| `rank` | integer | 1–15 | Rank by `mean_any_alter_freq` (descending). |
-| `geneSymbol` | string | HGNC | Gene symbol. |
-| `mean_any_alter_freq` | float | [0,1] | Mean any-alteration frequency across 32 studies. |
-| `mean_mut_freq` | float | [0,1] | Mean mutation frequency. |
-| `mean_any_cna_freq` | float | [0,1] | Mean any-CNA frequency. |
-| `mean_amp_freq` | float | [0,1] | Mean amplification frequency. |
-| `mean_deep_del_freq` | float | [0,1] | Mean deep-deletion frequency. |
-| `max_any_alter_freq` | float | [0,1] | Maximum any-alteration frequency across studies. |
-| `n_studies` | integer | 32 | Number of studies averaged. |
-
-> **Note:** TP53 ranks #1 here (mean 0.5507). Among **biogenesis** genes (TP53 excluded), **AGO2** is highest (mean 0.4816 ≈ 48.2%). Wording in the manuscript should always read "most-altered biogenesis gene (TP53 excluded)."
-
----
-
-## 6. `miRNA_biogenesis_top5_tumours_per_gene.csv`
-**Top-5 tumour types per gene — 75 rows (15 genes × 5) × 9 columns.**
-
-| Column | Type | Range | Definition |
-|---|---|---|---|
-| `geneSymbol` | string | HGNC | Gene symbol. |
-| `rank` | integer | 1–5 | Rank of the tumour type for this gene (by `any_alter_freq`). |
-| `tumour_acronym` | string | — | Tumour-type code. |
-| `N` | integer | samples | Intersection denominator for that study. |
-| `any_alter_freq` | float | [0,1] | Any-alteration frequency. |
-| `mut_freq` | float | [0,1] | Mutation frequency. |
-| `any_cna_freq` | float | [0,1] | Any-CNA frequency. |
-| `amp_freq` | float | [0,1] | Amplification frequency. |
-| `deep_del_freq` | float | [0,1] | Deep-deletion frequency. |
+### 1.4 `tcga_pancan_miRNA_biogenesis_patient_level_burden.csv`
+**10,195 rows (one per tumour sample) × 29 columns.**  
+Provides sample-level `cancerTypeDetailed` (resolving `COAD` vs `READ`), `molecularSubtype`, `tmbNonsynonymous`, `mutationCountGenomeWide`, `isHypermutated`, `fractionGenomeAltered`, `aneuploidyScore`, binary patient-union indicators (`*_has_strict_alter`, `*_has_mut`, `*_has_focal_cna`, `*_has_any_alter`) across `Core10`, `Extended12`, `Panel14`, and `All15`, syntenic locus counts (`*_syntenic_loci_strict_n`, collapsing co-localized `1p34.3` and `18q21.1` gene clusters), and syntenic concordance flags (`ago1_3_4_concordant_1p34_cna`, `smad2_4_concordant_18q21_cna`).
 
 ---
 
-## 7. `miRNA_biogenesis_top_tumours_excluding_TP53.csv`
-**Tumour-type burden ranking (TP53 excluded) — 32 rows × 7 columns.**
+## 2. Gene Panel Metadata & Rationale Tables
 
-| Column | Type | Range | Definition |
-|---|---|---|---|
-| `rank` | integer | 1–32 | Rank by `mean_any_alter_freq_excl_TP53` (descending; OV = 1, LAML = 32). |
-| `tumour_acronym` | string | — | Tumour-type code. |
-| `mean_any_alter_freq_excl_TP53` | float | [0,1] | Mean any-alteration frequency across the **14** biogenesis genes (TP53 excluded). |
-| `mean_mut_freq_excl_TP53` | float | [0,1] | Mean mutation frequency across 14 genes. |
-| `mean_any_cna_freq_excl_TP53` | float | [0,1] | Mean any-CNA frequency across 14 genes. |
-| `N` | integer | samples | Intersection denominator for that study. |
-| `n_genes` | integer | 14 | Genes averaged (TP53 excluded). |
+- **`miRNA_biogenesis_gene_panel_metadata.csv` (15 rows × 17 columns):** HGNC ID, Entrez ID, Ensembl ID, canonical RefSeq transcript, cytoband, chromosome arm, `syntenicCluster`, canonical CDS length (`cdsLengthBp`), protein length (`proteinLengthAa`), `pathwayStep`, `panelRole`, nested tier membership (`in_Core10_tier`, `in_Extended12_tier`, `in_Panel14_tier`), `curatedHotspotCodons`, and `inclusionRationale`.
+- **`miRNA_biogenesis_excluded_candidates_rationale.csv` (8 rows × 4 columns):** Explicit rationale for excluding pleiotropic RNA helicases (`DDX5`, `DDX17`), downstream uridylyltransferases/exonucleases (`TUT4`, `TUT7`, `DIS3L2`), GW182 silencing scaffolds (`TNRC6A/B/C`), and general transport factors (`RAN`).
 
 ---
 
-## 8. `brca_miRNA_biogenesis_alteration_frequencies.csv`
-**Breast invasive carcinoma deep-dive (15 rows × 15 columns). `N = 1,052`.**
+## 3. Aggregated Gene × Study Tables & Matrices
 
-> **Note:** this deep-dive cohort uses the same BRCA denominator (N = 1,052) as the pan-cancer master table and sample-set summary. Column names in this file are `gene`/`entrez_id` (the master table uses `geneSymbol`/`entrezGeneId`).
-
-| Column | Type | Range | Definition |
-|---|---|---|---|
-| `gene` | string | HGNC | Gene symbol. |
-| `entrez_id` | integer | NCBI | Entrez Gene ID. |
-| `mut_n` | integer | count | Samples with a somatic mutation. |
-| `amp_n` | integer | count | Samples with amplification (+2). |
-| `gain_n` | integer | count | Samples with gain (+1). |
-| `shallow_del_n` | integer | count | Samples with shallow deletion (−1). |
-| `deep_del_n` | integer | count | Samples with deep deletion (−2). |
-| `any_cna_n` | integer | count | Samples with any CNA. |
-| `any_alter_n` | integer | count | Samples with any alteration (mutation ∪ CNA). |
-| `N` | integer | 1052 | Cohort denominator. |
-| `mut_freq` | float | [0,1] | `mut_n / N`. |
-| `amp_freq` | float | [0,1] | `amp_n / N`. |
-| `deep_del_freq` | float | [0,1] | `deep_del_n / N`. |
-| `any_cna_freq` | float | [0,1] | `any_cna_n / N`. |
-| `any_alter_freq` | float | [0,1] | `any_alter_n / N`. |
+- **`tcga_pancan_miRNA_biogenesis_alteration_freqs_long_FINAL.csv` (480 rows × 35 columns):** Master `gene × study` table preserving all 23 v1.0 columns (`mut_n/freq`, `amp_n/freq`, `gain_n/freq`, `shallow_del_n/freq`, `deep_del_n/freq`, `any_cna_n/freq`, `any_alter_n/freq`, `mut_only_n`, `cna_only_n`, `mut_and_cna_n`) plus 12 v2.0 stratified columns (`truncating_mut_n/freq`, `hotspot_mut_n/freq`, `nonhypermut_N`, `nonhypermut_mut_n/freq`, `mut_density_per_cds_kb_per_1000`, `focal_cna_n/freq`, `high_conf_alter_n/freq`).
+- **Five `15 × 32` wide matrices (`*_matrix.csv`):** `any_alter_freq`, `any_cna_freq`, `mut_freq`, `focal_cna_freq`, and `high_conf_alter_freq`.
+- **Summary & cohort tables:** `miRNA_biogenesis_gene_rank_summary.csv` (15 rows × 18 cols), `miRNA_biogenesis_top5_tumours_per_gene.csv` (75 rows × 11 cols), `miRNA_biogenesis_top_tumours_excluding_TP53.csv` (32 rows × 19 cols, ranked by synteny-aware `patient_prop_core10_strict`), `brca_miRNA_biogenesis_alteration_frequencies.csv` (15 rows × 24 cols, `N = 1,052`), `tcga_pancan_atlas_sample_set_summary.csv` (32 rows × 13 cols), and `tcga_low_coverage_tumours_for_miRNA_biogenesis.txt`.
 
 ---
 
-## 9. `tcga_pancan_atlas_sample_set_summary.csv` (CORRECTED — 32 rows × 8 columns)
-Use the regenerated file `tcga_pancan_atlas_sample_set_summary_CORRECTED.csv`. **Six columns were removed** from the original because they contained broadcast placeholder values copied from unrelated studies (`cnaseq_sampleListId`, `cnaseq_n`, `threeway_sampleListId`, `threeway_n`) and two ratios derived from them (`ratio_cnaseq_over_intersection`, `ratio_threeway_over_intersection`). The retained columns are all verified.
+## 4. Technical Validation Audit Tables & Frozen Snapshot
 
-| Column | Type | Range | Definition |
-|---|---|---|---|
-| `studyId` | string | — | cBioPortal study identifier. |
-| `cancerTypeId` | string | OncoTree | OncoTree cancer-type code (note: GBM and LGG both map to `difg` = *diffuse glioma*). |
-| `studyName` | string | — | Full study name. |
-| `sampleCount_all` | integer | samples | All samples in the study. |
-| `sampleCount_sequenced` | integer | samples | Samples in the `_sequenced` list. |
-| `sampleCount_cna` | integer | samples | Samples with CNA data. |
-| `intersection_sequenced_cna_n` | integer | samples | **`N`** used throughout (sequenced ∩ CNA). Sum across 32 studies = **10,195**. |
-| `ratio_intersection_over_min_seq_cna` | float | (0,1] | `intersection_sequenced_cna_n / min(sampleCount_sequenced, sampleCount_cna)`. |
-
----
-
-## 10. `tcga_low_coverage_tumours_for_miRNA_biogenesis.txt`
-Plain-text note listing the **seven** tumour types with `N < 100` (CHOL 36, DLBC 41, UCS 56, KICH 65, UVM 80, MESO 86, ACC 89) and recommending COSMIC supplementation. Not tabular.
+- **`validation_20_cbioportal_spotchecks.csv` (20 rows × 17 cols):** Exact comparison between pipeline outputs and manual cBioPortal web queries across 20 gene–study pairs (`abs_freq_discrepancy = 0.0000` in 20/20 checks).
+- **`validation_denominator_hoadley2018_audit.csv` (32 rows × 9 cols):** Study-by-study reconciliation of `cbioportal_all_n`, `sequenced_n`, `cna_n`, and `mirbiogen_intersection_N` (`10,195`) against Hoadley et al. (2018) *Cell* (`10,793` total cases across the 32 studies).
+- **`validation_cis_mrna_dosage_concordance.csv` (15 rows × 14 cols):** Median mRNA Z-scores across GISTIC2 states `-2, -1, 0, +1, +2` and Spearman `rho` (`log2CNA` vs `mRNA Z-score`) across `n = 9,620` matched tumours.
+- **`validation_arm_vs_focal_cna_decomposition.csv` (15 rows × 12 cols):** Pan-cancer decomposition of discrete GISTIC2 calls against matched chromosome-arm GISTIC status.
+- **`data/raw_snapshot/` (`33` `.json.gz` files + `snapshot_manifest.json`, `9.07 MB`):** Frozen cBioPortal API responses verified by SHA-256 checksums before every build.

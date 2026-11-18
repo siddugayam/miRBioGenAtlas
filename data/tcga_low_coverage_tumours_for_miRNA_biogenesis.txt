@@ -1,33 +1,29 @@
-======================================================================
-TCGA PanCancer Atlas: Low-Coverage Tumour Types for miRNA Biogenesis Analysis
-======================================================================
+================================================================================
+TCGA PanCancer Atlas (2018) — Low-Coverage Studies Note (miRBioGenAtlas v2.0.0)
+================================================================================
 
-Denominator: intersection of sequenced and CNA sample lists
-Total tumour types: 32
-Total samples across all tumour types: 10195
+Primary study denominator (N): intersection of `<studyId>_sequenced` and
+`<studyId>_cna` sample lists in cBioPortal v7.2.3 (DB v3.1.0).
+Total cancer studies: 32 (spanning 33 TCGA cancer types; COAD=336, READ=196).
+Total intersection tumour samples across 32 studies: 10,195.
 
-----------------------------------------------------------------------
-Tumour types with N < 100:
-----------------------------------------------------------------------
-  CHOL            N =   36  (chol_tcga_pan_can_atlas_2018)
-  DLBC            N =   41  (dlbc_tcga_pan_can_atlas_2018)
-  UCS             N =   56  (ucs_tcga_pan_can_atlas_2018)
-  KICH            N =   65  (kich_tcga_pan_can_atlas_2018)
-  UVM             N =   80  (uvm_tcga_pan_can_atlas_2018)
-  MESO            N =   86  (meso_tcga_pan_can_atlas_2018)
-  ACC             N =   89  (acc_tcga_pan_can_atlas_2018)
+Seven studies have N < 100 samples in the sequenced AND CNA intersection:
+--------------------------------------------------------------------------------
+  1. CHOL  (chol_tcga_pan_can_atlas_2018)   N = 36   (minimum detectable 1/N = 2.78%)
+  2. DLBC  (dlbc_tcga_pan_can_atlas_2018)   N = 41   (minimum detectable 1/N = 2.44%)
+  3. UCS   (ucs_tcga_pan_can_atlas_2018)    N = 56   (minimum detectable 1/N = 1.79%)
+  4. KICH  (kich_tcga_pan_can_atlas_2018)   N = 65   (minimum detectable 1/N = 1.54%)
+  5. UVM   (uvm_tcga_pan_can_atlas_2018)    N = 80   (minimum detectable 1/N = 1.25%)
+  6. MESO  (meso_tcga_pan_can_atlas_2018)   N = 86   (minimum detectable 1/N = 1.16%)
+  7. ACC   (acc_tcga_pan_can_atlas_2018)    N = 89   (minimum detectable 1/N = 1.12%)
+--------------------------------------------------------------------------------
 
-----------------------------------------------------------------------
-Bottom 5 tumour types by N:
-----------------------------------------------------------------------
-  CHOL            N =   36  (chol_tcga_pan_can_atlas_2018)
-  DLBC            N =   41  (dlbc_tcga_pan_can_atlas_2018)
-  UCS             N =   56  (ucs_tcga_pan_can_atlas_2018)
-  KICH            N =   65  (kich_tcga_pan_can_atlas_2018)
-  UVM             N =   80  (uvm_tcga_pan_can_atlas_2018)
-
-----------------------------------------------------------------------
-Note: Low sample counts may reduce statistical power for detecting
-low-frequency alterations. Interpret frequencies from these tumour types
-with caution.
-----------------------------------------------------------------------
+Usage guidance:
+- In all figures, these seven cohorts are marked with an asterisk (*).
+- In `tcga_pancan_atlas_sample_set_summary.csv` and
+  `miRNA_biogenesis_top_tumours_excluding_TP53.csv`, they carry
+  `low_coverage_flag_N_lt_100 = 1` / `low_coverage_N_lt_100 = 1`.
+- Rare somatic point-mutation frequencies (<2%) have wide binomial confidence
+  intervals in cohorts with N < 100; supplementation with targeted sequencing
+  series (e.g. COSMIC or AACR Project GENIE) is recommended for rare-variant
+  inference in these tumour types.

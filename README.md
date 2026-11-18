@@ -1,199 +1,89 @@
-# miRBioGenAtlas
+# miRBioGenAtlas (v2.0.0)
 
-**Pan-cancer alteration landscape of the miRNA biogenesis machinery**
+**Sample-level and aggregated multi-modal somatic alteration dataset of the miRNA biogenesis machinery across 32 TCGA cancer studies (`N = 10,195` tumours)**
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![Data: TCGA](https://img.shields.io/badge/Data-TCGA%20PanCancer%20Atlas-green)](https://www.cbioportal.org)
-[![R version](https://img.shields.io/badge/R-%3E%3D4.2-blue)](https://www.r-project.org)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.24337287.svg)](https://doi.org/10.5281/zenodo.24337287)
+[![Code License: MIT](https://img.shields.io/badge/Code_License-MIT-blue.svg)](LICENSE)
+[![Data License: CC BY 4.0](https://img.shields.io/badge/Data_License-CC_BY_4.0-green.svg)](LICENSE-data.md)
+[![cBioPortal Snapshot](https://img.shields.io/badge/cBioPortal-v7.2.3_(DB_3.1.0)-informational)](https://www.cbioportal.org)
 
 ---
 
 ## Overview
 
-**miRBioGenAtlas** is a reproducible data resource and analysis pipeline that systematically quantifies copy number alteration (CNA) and somatic mutation frequencies for **15 miRNA biogenesis pathway genes** across **32 TCGA PanCancer Atlas tumour types** (n = 10,195 samples).
+**miRBioGenAtlas (v2.0.0)** provides a frozen, SHA-256-verified, sample-level and study-level multi-omic dataset covering **15 canonical microRNA (miRNA) biogenesis and regulatory genes** across **32 TCGA PanCancer Atlas (2018) studies** (spanning 33 cancer types; `COAD = 336` and `READ = 196` combined in `COADREAD = 532`; total matched `sequenced ∩ CNA` denominator **`N = 10,195` tumours**).
 
-This repository accompanies the manuscript:
-
-> Gayam PKR, Earny VA, Aranjani JM, Fayaz SM. *Pan-cancer alteration landscape of the miRNA biogenesis machinery across 32 TCGA tumour types.* [Journal name, 2026]
-
----
-
-## Key findings
-
-- **AGO2** is the most frequently altered **biogenesis** gene (excluding the accessory regulator TP53, which ranks highest overall; mean **48.2%**), driven predominantly by copy number gain
-- **Copy number alteration dominates** over somatic mutation across all 15 biogenesis genes
-- **Ovarian serous cystadenocarcinoma (OV)** shows the highest pan-biogenesis alteration burden (**65.8%**)
-- **Thyroid carcinoma (THCA)** and **acute myeloid leukaemia (LAML)** show the lowest burden (3.1% and 3.0%)
-- In breast cancer (BRCA, n=1,052), **AGO2 amplification** was detected in **11.0%** of samples
+### What is included in v2.0.0
+1. **Frozen input archive (`data/raw_snapshot/`, 9.07 MB):** Versioned, SHA-256-checksummed cBioPortal REST API (`v7.2.3`, DB `3.1.0`) responses across 6 modalities (`mutations`, discrete `gistic`, continuous `log2CNA`, chromosome-arm `armlevel_cna`, `structural_variants`, matched `rna_seq_v2_mrna` RSEM/Z-scores, and sample/patient clinical/TMB/aneuploidy attributes).
+2. **Sample-level multi-modal table (`152,925` rows = `10,195` samples × `15` genes):** Discrete GISTIC2 (`-2..+2`), continuous `log2` copy-number ratio, matched chromosome-arm CNA status (`Broad_ArmLevel_LowAmp` vs `HighLevel_Amp_or_DeepDel`), functional variant counts/flags, structural variants, matched mRNA expression (`n = 9,620` tumours), and sample hypermutator status.
+3. **Annotated somatic variants (`6,292` coding calls) & structural variants (`72` calls):** Stratified into `Truncating_LoF`, `Hotspot_Missense_or_InFrame` (e.g. `DICER1` RNase IIIa `S1344` & RNase IIIb `E1705/D1709/G1809/D1810/E1813`, `SMAD4` MH2 `R361/D351/D537`), `InFrame_Indel`, and unannotated `Other_Missense` (VUS), paired with tumour VAF and sample `TMB`/MSI/`POLE` hypermutator flags.
+4. **Synteny-aware patient-level pathway burden (`10,195` samples):** Proportion of patients carrying $\ge 1$ high-confidence (`mutation ∪ GISTIC2 ±2`) or broad alteration across three nested gene-set tiers (**Core-10**, **Extended-12**, **Panel-14**), collapsing tandemly clustered loci (`1p34.3 AGO1/AGO3/AGO4`; `18q21.1 SMAD2/SMAD4`) to prevent double-counting.
+5. **Aggregated frequency tables & 4 technical validation audit tables:** Full backward compatibility with v1.0 gene × study matrices plus cBioPortal 20-pair verification, Hoadley et al. (2018) denominator audit, *cis*-CNA-to-mRNA dosage concordance, and arm-vs-focal CNA decomposition.
 
 ---
 
-## Repository structure
+## Repository Structure
 
-```
+```text
 miRBioGenAtlas/
-│
-├── data/                          # All CSV data files
-│   ├── tcga_pancan_miRNA_biogenesis_alteration_freqs_long_FINAL.csv
-│   ├── tcga_pancan_miRNA_biogenesis_any_alter_freq_matrix.csv
-│   ├── tcga_pancan_miRNA_biogenesis_any_cna_freq_matrix.csv
-│   ├── tcga_pancan_miRNA_biogenesis_mut_freq_matrix.csv
-│   ├── miRNA_biogenesis_gene_rank_summary.csv
-│   ├── miRNA_biogenesis_top5_tumours_per_gene.csv
-│   ├── miRNA_biogenesis_top_tumours_excluding_TP53.csv
-│   ├── brca_miRNA_biogenesis_alteration_frequencies.csv
-│   ├── tcga_pancan_atlas_sample_set_summary.csv
-│   └── tcga_low_coverage_tumours_for_miRNA_biogenesis.txt
-│
+├── data/
+│   ├── raw_snapshot/                                                  # Frozen SHA-256-verified API inputs (9.07 MB)
+│   ├── tcga_pancan_miRNA_biogenesis_sample_level_alterations.csv.gz   # 152,925 sample x gene multi-modal rows
+│   ├── tcga_pancan_miRNA_biogenesis_somatic_mutations_annotated.csv   # 6,292 annotated somatic variant calls
+│   ├── tcga_pancan_miRNA_biogenesis_structural_variants.csv           # 72 somatic structural variants / fusions
+│   ├── tcga_pancan_miRNA_biogenesis_patient_level_burden.csv          # 10,195 patient-level burden & TMB/FGA records
+│   ├── miRNA_biogenesis_gene_panel_metadata.csv                       # 15-gene coordinates, CDS length, tiers & rationale
+│   ├── miRNA_biogenesis_excluded_candidates_rationale.csv             # Exclusion rationale for non-core candidates
+│   ├── tcga_pancan_miRNA_biogenesis_alteration_freqs_long_FINAL.csv   # 480-row gene x study master summary table
+│   ├── tcga_pancan_miRNA_biogenesis_*_matrix.csv                      # 5 wide (15 x 32) frequency matrices
+│   ├── miRNA_biogenesis_gene_rank_summary.csv                         # Gene-level summary & CDS-normalized densities
+│   ├── miRNA_biogenesis_top_tumours_excluding_TP53.csv                # Study-level patient-burden & FGA summary
+│   ├── miRNA_biogenesis_top5_tumours_per_gene.csv                     # Top 5 studies per gene
+│   ├── brca_miRNA_biogenesis_alteration_frequencies.csv               # Breast carcinoma cohort summary (N = 1,052)
+│   ├── tcga_pancan_atlas_sample_set_summary.csv                       # Study denominators & hypermutator counts
+│   ├── tcga_low_coverage_tumours_for_miRNA_biogenesis.txt             # Flagged low-N cohorts (N < 100)
+│   └── validation_*.csv                                               # 4 technical validation audit tables
+├── scripts/
+│   ├── fetch_cbioportal_snapshot.py                                   # Live API snapshot retriever (Python stdlib)
+│   └── build_mirbiogen_v2_dataset.py                                  # Deterministic offline dataset builder (<10 s)
 ├── notebooks/
-│   └── notebook.ipynb             # Python data retrieval pipeline (cBioPortal API)
-│
-├── figures/                       # 300-DPI TIFF data figures + editable workflow_schematic.svg
-│   ├── Fig1_pancan_heatmap.tiff
-│   ├── Fig2_gene_ranking.tiff
-│   ├── Fig3_tumour_burden_ranking.tiff
-│   ├── Fig4_BRCA_deepdive.tiff
-│   └── Fig_combined_panel.tiff
-│
-├── miRBioGenAtlas_figures.R       # R figure generation script
-├── README.md
-└── LICENSE
+│   └── notebook.ipynb                                                 # Portable standalone Jupyter pipeline
+├── figures/
+│   └── Figure_1..Figure_4 (.pdf, .tiff, .png)                         # Vector PDF + 450-DPI TIFF + 300-DPI PNG figures
+├── miRBioGenAtlas_figures.R                                           # R >= 4.2 figure-generation script
+├── DATA_DICTIONARY.md                                                 # Complete column-by-column schema
+├── CITATION.cff                                                       # Citation metadata
+├── .zenodo.json                                                       # Zenodo deposit metadata
+├── requirements.txt                                                   # Python environment specification
+├── LICENSE                                                            # MIT License (code)
+└── LICENSE-data.md                                                    # CC BY 4.0 License (data)
 ```
 
 ---
 
-## Genes analysed
+## Reproducing the Dataset & Figures
 
-| Category | Genes |
-|---|---|
-| Microprocessor complex | DROSHA, DGCR8, SMAD2, SMAD4 |
-| Nuclear export | XPO5 |
-| Cytoplasmic processing | DICER1, TARBP2 (TRBP), PRKRA (PACT) |
-| RISC / Argonaute | AGO1, AGO2, AGO3, AGO4 |
-| LIN28 regulators | LIN28A, LIN28B |
-| Upstream regulator | TP53 |
-
----
-
-## Reproducing the figures
-
-### Requirements
-
-- R ≥ 4.2
-- Packages: `tidyverse`, `pheatmap`, `RColorBrewer`, `ggpubr`, `scales`, `cowplot`, `viridis`, `ggtext`, `patchwork`
-
-### Steps
-
-```r
-# 1. Clone this repository
-# git clone https://github.com/siddugayam/miRBioGenAtlas.git
-# cd miRBioGenAtlas
-
-# 2. Open R and run
-source("miRBioGenAtlas_figures.R")
-
-# Output: 5 TIFF files in the figures/ directory
-```
-
-All packages are automatically installed if not already present.
-
----
-
-## Reproducing the data retrieval
-
-The Python notebook (`notebooks/notebook.ipynb`) retrieves data directly from the **cBioPortal public API** and is fully reproducible.
-
-### Requirements
-
+### 1. Deterministic offline rebuild from frozen snapshot (~8 seconds, no internet required)
 ```bash
-pip install requests pandas jupyter
+python3 scripts/build_mirbiogen_v2_dataset.py
 ```
+Or open and run `notebooks/notebook.ipynb` (`EXECUTION_MODE = "FROZEN_SNAPSHOT"`). Both scripts use only the Python $\ge 3.9$ standard library with relative `pathlib` paths.
 
-### Steps
-
+### 2. Optional live re-query against cBioPortal REST API (~60–90 seconds)
 ```bash
-cd notebooks
-jupyter notebook notebook.ipynb
-# Run all cells — data is downloaded from cBioPortal API
+python3 scripts/fetch_cbioportal_snapshot.py
+python3 scripts/build_mirbiogen_v2_dataset.py
 ```
 
-> No login or API key required. cBioPortal data is publicly available.
-
----
-
-## Data description
-
-| File | Description | Rows | Columns |
-|---|---|---|---|
-| `*_long_FINAL.csv` | Master long-format table | 480 | 23 (see `DATA_DICTIONARY.md`) |
-| `*_any_alter_freq_matrix.csv` | Gene × tumour matrix (any alteration) | 15 | 32 |
-| `*_any_cna_freq_matrix.csv` | Gene × tumour matrix (CNA only) | 15 | 32 |
-| `*_mut_freq_matrix.csv` | Gene × tumour matrix (mutation only) | 15 | 32 |
-| `gene_rank_summary.csv` | Gene ranking across 32 studies | 15 | 8 |
-| `top5_tumours_per_gene.csv` | Top 5 tumours per gene | 75 | 9 |
-| `top_tumours_excluding_TP53.csv` | Tumour burden ranking (14 genes) | 32 | 7 |
-| `brca_*.csv` | BRCA deep-dive (n=1,052) | 15 | 14 |
-| `sample_set_summary.csv` | Study metadata and sample counts | 32 | 14 |
-
----
-
-## Tumour type abbreviations
-
-| Code | Cancer type | N |
-|---|---|---|
-| OV | Ovarian serous cystadenocarcinoma | 511 |
-| BRCA | Breast invasive carcinoma | 1,052 |
-| LUSC | Lung squamous cell carcinoma | 484 |
-| LUAD | Lung adenocarcinoma | 511 |
-| COADREAD | Colorectal adenocarcinoma | 532 |
-| STAD | Stomach adenocarcinoma | 434 |
-| ESCA | Oesophageal adenocarcinoma | 182 |
-| HNSC | Head and neck squamous cell carcinoma | 509 |
-| UCEC | Uterine corpus endometrial carcinoma | 511 |
-| GBM | Glioblastoma multiforme | 380 |
-| *...and 22 more* | | |
-
-Full list in `data/tcga_pancan_atlas_sample_set_summary.csv`
-
----
-
-## Citation
-
-If you use this data or code, please cite:
-
-```bibtex
-@article{gayam2026mirbiogenatlas,
-  title   = {Pan-cancer alteration landscape of the {miRNA} biogenesis machinery:
-             a {TCGA} analysis across 32 tumour types},
-  author  = {Gayam, Prasanna Kumar Reddy and Earny, Venkat Abhiram and Aranjani, Jesil Mathew and SM, Fayaz},
-  journal = {[Journal name]},
-  year    = {2026}
-}
+### 3. Regenerating all publication figures (Vector PDF + 450-DPI LZW TIFF)
+Requires R $\ge 4.2$ with `tidyverse`, `cowplot`, `patchwork`, `scales`, and `ragg`:
+```bash
+Rscript miRBioGenAtlas_figures.R
 ```
 
-Please also cite the cBioPortal:
-
-> Cerami E, et al. The cBio Cancer Genomics Portal: An open platform for exploring multidimensional cancer genomics data. *Cancer Discov.* 2012;2(5):401–404.
-
 ---
 
-## Data availability
+## Licensing
 
-All underlying data were obtained from publicly available TCGA PanCancer Atlas studies via the cBioPortal API. No individual patient data are included.
-
----
-
-## License
-
-Code is licensed under the **MIT License** ([LICENSE](LICENSE)); data files are licensed under **CC BY 4.0** ([LICENSE-data](LICENSE-data.md)). Every column is documented in [`DATA_DICTIONARY.md`](DATA_DICTIONARY.md).
-
----
-
-## Contact
-
-**Gayam Prasanna Kumar Reddy**
-Manipal Academy of Higher Education, India
-gayam.prasanna@learner.manipal.edu
-siddugayam1994@gmail.com
-
-*Issues and pull requests welcome.*
+- **Data files (`data/`):** Creative Commons Attribution 4.0 International ([CC BY 4.0](LICENSE-data.md))
+- **Source code (`scripts/`, `notebooks/`, `miRBioGenAtlas_figures.R`):** [MIT License](LICENSE)

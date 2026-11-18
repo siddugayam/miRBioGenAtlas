@@ -1,15 +1,14 @@
-# miRBioGenAtlas — Python data-retrieval/processing pipeline
-# Target: Python 3.10 (notebook executed on CPython 3.10.14)
-# Versions match the manuscript Methods (requests 2.28, pandas 1.5).
-# Used by: notebooks/notebook.ipynb
+# miRBioGenAtlas v2.0.0 — Python environment specification
+# Target: Python >= 3.9 (tested on Python 3.9, 3.10, 3.11, and 3.12)
 #
-# Install:  pip install -r requirements.txt
-
-requests==2.28.2
-pandas==1.5.3
-numpy==1.23.5
-
-# Needed only to open/run the Jupyter notebook (not imported by the pipeline itself):
-jupyter==1.0.0
-
-# Standard-library modules also used (no install required): json, os, subprocess, time
+# Core pipeline scripts (`scripts/fetch_cbioportal_snapshot.py` and
+# `scripts/build_mirbiogen_v2_dataset.py`) and `notebooks/notebook.ipynb`
+# use ONLY the Python standard library (`csv`, `gzip`, `hashlib`, `json`,
+# `math`, `pathlib`, `statistics`, `urllib.request`) so they run out-of-the-box
+# in any clean Python >= 3.9 environment with zero third-party binary issues.
+#
+# Optional interactive/notebook analysis packages:
+jupyterlab>=4.0.0
+pandas>=2.0.0
+numpy>=1.24.0
+requests>=2.31.0

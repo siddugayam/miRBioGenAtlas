@@ -1,408 +1,106 @@
 ################################################################################
-##                                                                            ##
-##   miRBioGenAtlas — Pan-cancer miRNA Biogenesis Gene Alteration Landscape   ##
-##   Figure Generation Script (Publication-ready, 300 DPI TIFF)               ##
-##                                                                            ##
-##   Author  : Gayam Prasanna Kumar Reddy                                     ##
-##   Affil.  : Manipal Academy of Higher Education, India                     ##
-##   GitHub  : https://github.com/siddugayam/miRBioGenAtlas                   ##
-##   DOI     : https://doi.org/10.5281/zenodo.20068007                        ##
-##   Data    : TCGA PanCancer Atlas 2018 via cBioPortal API                   ##
-##   License : MIT                                                            ##
-##                                                                            ##
-##   Figures generated:                                                       ##
-##     Fig1 — Pan-cancer heatmap (gene x tumour, any-alteration freq)         ##
-##     Fig2 — Gene ranking by mean alteration frequency (stacked bar)         ##
-##     Fig3 — Tumour type burden ranking (horizontal bar)                     ##
-##     Fig4 — BRCA deep-dive alteration class breakdown                       ##
-##                                                                            ##
-##   Output: TIFF files at 300 DPI, publication-ready                         ##
-##                                                                            ##
+##   miRBioGenAtlas v2.0 — Publication & Technical Validation Figures         ##
+##   Generates Vector PDF + 450-DPI LZW TIFF + 300-DPI PNG                    ##
 ################################################################################
-
-
-## ── 0. Install and load packages ────────────────────────────────────────────
-
-packages <- c("tidyverse", "pheatmap", "RColorBrewer", "ggpubr",
-              "scales", "cowplot", "viridis", "ggtext", "patchwork")
-
-installed <- rownames(installed.packages())
-to_install <- packages[!packages %in% installed]
-if (length(to_install) > 0) {
-  install.packages(to_install, repos = "https://cloud.r-project.org")
-}
 
 suppressPackageStartupMessages({
   library(tidyverse)
-  library(pheatmap)
-  library(RColorBrewer)
-  library(ggpubr)
-  library(scales)
   library(cowplot)
-  library(viridis)
-  library(ggtext)
   library(patchwork)
+  library(scales)
+  library(ragg)
 })
 
-theme_set(theme_cowplot(font_size = 11, font_family = "sans"))
+theme_set(theme_cowplot(font_size = 10, font_family = "sans"))
+data_dir   <- "data"
+output_dir <- "figures"
+dir.create(output_dir, showWarnings = FALSE, recursive = TRUE)
 
+save_pub_figure <- function(plot_obj, stem, width_in, height_in) {
+  ggsave(filename = file.path(output_dir, paste0(stem, '.pdf')), plot = plot_obj, width = width_in, height = height_in, units = 'in', device = pdf, useDingbats = FALSE)
+  agg_tiff(filename = file.path(output_dir, paste0(stem, '.tiff')), width = width_in, height = height_in, units = 'in', res = 450, compression = 'lzw', background = 'white')
+  print(plot_obj); invisible(dev.off())
+  agg_png(filename = file.path(output_dir, paste0(stem, '.png')), width = width_in, height = height_in, units = 'in', res = 300, background = 'white')
+  print(plot_obj); invisible(dev.off())
+  cat(sprintf('  Saved %s (.pdf, .tiff [450 DPI], .png [300 DPI])\n', stem))
+}
 
-## ── 1. Paths — set your working directory to the repo root ──────────────────
+long_df     <- read_csv(file.path(data_dir, 'tcga_pancan_miRNA_biogenesis_alteration_freqs_long_FINAL.csv'), show_col_types = FALSE)
+gene_meta   <- read_csv(file.path(data_dir, 'miRNA_biogenesis_gene_panel_metadata.csv'), show_col_types = FALSE)
+gene_rank   <- read_csv(file.path(data_dir, 'miRNA_biogenesis_gene_rank_summary.csv'), show_col_types = FALSE)
+tumour_rank <- read_csv(file.path(data_dir, 'miRNA_biogenesis_top_tumours_excluding_TP53.csv'), show_col_types = FALSE)
+arm_decomp  <- read_csv(file.path(data_dir, 'validation_arm_vs_focal_cna_decomposition.csv'), show_col_types = FALSE)
+dosage_df   <- read_csv(file.path(data_dir, 'validation_cis_mrna_dosage_concordance.csv'), show_col_types = FALSE)
+mut_annot   <- read_csv(file.path(data_dir, 'tcga_pancan_miRNA_biogenesis_somatic_mutations_annotated.csv'), show_col_types = FALSE)
 
-data_dir   <- "data"          # folder containing all CSV files
-output_dir <- "figures"       # output folder for TIFF files
-dir.create(output_dir, showWarnings = FALSE)
+LOW_N_TUMOURS <- c('CHOL', 'DLBC', 'UCS', 'KICH', 'UVM', 'MESO', 'ACC')
+GENE_ORDER <- c('DROSHA', 'DGCR8', 'XPO5', 'DICER1', 'TARBP2', 'PRKRA', 'AGO1', 'AGO2', 'AGO3', 'AGO4', 'LIN28A', 'LIN28B', 'SMAD2', 'SMAD4', 'TP53')
 
-
-## ── 2. Load data ─────────────────────────────────────────────────────────────
-
-long_df   <- read_csv(file.path(data_dir,
-               "tcga_pancan_miRNA_biogenesis_alteration_freqs_long_FINAL.csv"),
-               show_col_types = FALSE)
-
-matrix_any <- read_csv(file.path(data_dir,
-               "tcga_pancan_miRNA_biogenesis_any_alter_freq_matrix.csv"),
-               show_col_types = FALSE)
-
-gene_rank  <- read_csv(file.path(data_dir,
-               "miRNA_biogenesis_gene_rank_summary.csv"),
-               show_col_types = FALSE)
-
-tumour_rank <- read_csv(file.path(data_dir,
-               "miRNA_biogenesis_top_tumours_excluding_TP53.csv"),
-               show_col_types = FALSE)
-
-brca_df    <- read_csv(file.path(data_dir,
-               "brca_miRNA_biogenesis_alteration_frequencies.csv"),
-               show_col_types = FALSE)
-
-sample_summary <- read_csv(file.path(data_dir,
-               "tcga_pancan_atlas_sample_set_summary.csv"),
-               show_col_types = FALSE)
-
-
-## ── 3. Define constants ───────────────────────────────────────────────────────
-
-LOW_N_TUMOURS <- c("CHOL", "DLBC", "UCS", "KICH", "UVM", "MESO", "ACC")
-
-# Ordered gene list (biogenesis pathway order)
-GENE_ORDER <- c("DROSHA", "DGCR8", "XPO5", "DICER1", "TARBP2", "PRKRA",
-                "AGO1", "AGO2", "AGO3", "AGO4",
-                "LIN28A", "LIN28B", "SMAD2", "SMAD4", "TP53")
-
-# Colour palette (publication-safe, colourblind-friendly)
-COL_MUTATION  <- "#A32D2D"
-COL_CNA       <- "#185FA5"
-COL_AMP       <- "#3B6D11"
-COL_DEL       <- "#E24B4A"
-COL_CNA_OTHER <- "#85B7EB"
-
-# Heatmap colour scale (white → deep blue)
-HEATMAP_COLS <- colorRampPalette(c("#FFFFFF", "#E6F1FB", "#85B7EB",
-                                    "#185FA5", "#042C53"))(100)
-
-
-## ── Figure 1: Pan-cancer heatmap ─────────────────────────────────────────────
-##
-##   Gene × tumour-type matrix of any-alteration frequency
-##   pheatmap with custom colour scale, row/col clustering disabled,
-##   annotation for low-N tumour types
-##
-
-cat("Generating Figure 1 — pan-cancer heatmap...\n")
-
-# Prepare matrix
-mat <- matrix_any %>%
-  column_to_rownames("geneSymbol") %>%
-  as.matrix()
-
-# Reorder rows to pathway order
-mat <- mat[GENE_ORDER[GENE_ORDER %in% rownames(mat)], ]
-
-# Build column annotation: low N flag
-col_annot <- data.frame(
-  Sample_size = ifelse(colnames(mat) %in% LOW_N_TUMOURS, "N < 100", "N ≥ 100"),
-  row.names = colnames(mat)
-)
-annot_colours <- list(
-  Sample_size = c("N < 100" = "#EF9F27", "N ≥ 100" = "#B5D4F4")
-)
-
-# Build row annotation: pathway group
-row_annot <- data.frame(
-  Pathway_step = case_when(
-    rownames(mat) %in% c("DROSHA", "DGCR8", "SMAD2", "SMAD4") ~ "Microprocessor",
-    rownames(mat) %in% c("XPO5")                               ~ "Nuclear export",
-    rownames(mat) %in% c("DICER1", "TARBP2", "PRKRA")         ~ "Cytoplasmic processing",
-    rownames(mat) %in% c("AGO1", "AGO2", "AGO3", "AGO4")      ~ "RISC/AGO",
-    rownames(mat) %in% c("LIN28A", "LIN28B")                   ~ "LIN28 regulators",
-    rownames(mat) == "TP53"                                     ~ "Upstream regulator",
-    TRUE                                                        ~ "Other"
-  ),
-  row.names = rownames(mat)
-)
-annot_colours$Pathway_step <- c(
-  "Microprocessor"        = "#534AB7",
-  "Nuclear export"        = "#1D9E75",
-  "Cytoplasmic processing"= "#D85A30",
-  "RISC/AGO"             = "#185FA5",
-  "LIN28 regulators"     = "#D4537E",
-  "Upstream regulator"   = "#888780"
-)
-
-tiff(file.path(output_dir, "Fig1_pancan_heatmap.tiff"),
-     width = 12, height = 6, units = "in", res = 300, compression = "lzw")
-
-pheatmap(
-  mat,
-  color            = HEATMAP_COLS,
-  breaks           = seq(0, 1, length.out = 101),
-  cluster_rows     = FALSE,
-  cluster_cols     = FALSE,
-  annotation_col   = col_annot,
-  annotation_row   = row_annot,
-  annotation_colors= annot_colours,
-  display_numbers  = TRUE,
-  number_format    = "%.2f",
-  number_color     = ifelse(mat > 0.55, "white", "black"),
-  fontsize         = 8,
-  fontsize_number  = 5.5,
-  fontsize_row     = 9,
-  fontsize_col     = 8,
-  angle_col        = 45,
-  border_color     = "grey92",
-  legend_breaks    = c(0, 0.25, 0.50, 0.75, 1.0),
-  legend_labels    = c("0%", "25%", "50%", "75%", "100%"),
-  main             = ""
-)
-
-dev.off()
-cat("  --> figures/Fig1_pancan_heatmap.tiff\n")
-
-
-## ── Figure 2: Gene ranking (stacked bar) ─────────────────────────────────────
-##
-##   Mean alteration frequency per gene, coloured by alteration class
-##   Excludes TP53 for cleaner biogenesis-specific view
-##
-
-cat("Generating Figure 2 — gene ranking stacked bar...\n")
-
-fig2_df <- gene_rank %>%
-  filter(geneSymbol != "TP53") %>%
-  arrange(mean_any_alter_freq) %>%
-  mutate(
-    geneSymbol  = factor(geneSymbol, levels = geneSymbol),
-    mut_pct     = mean_mut_freq * 100,
-    amp_pct     = mean_amp_freq * 100,
-    del_pct     = mean_deep_del_freq * 100,
-    cna_other   = pmax(0, (mean_any_cna_freq - mean_amp_freq - mean_deep_del_freq)) * 100
-  ) %>%
-  select(geneSymbol, mut_pct, amp_pct, del_pct, cna_other) %>%
-  pivot_longer(-geneSymbol, names_to = "class", values_to = "freq") %>%
-  mutate(class = factor(class,
-    levels = c("del_pct", "amp_pct", "cna_other", "mut_pct"),
-    labels = c("Deep deletion", "Amplification", "Other CNA", "Somatic mutation")))
-
-fig2 <- ggplot(fig2_df, aes(x = freq, y = geneSymbol, fill = class)) +
-  geom_col(width = 0.72, position = "stack") +
-  scale_fill_manual(
-    values = c(
-      "Somatic mutation" = COL_MUTATION,
-      "Other CNA"        = COL_CNA,
-      "Amplification"    = COL_AMP,
-      "Deep deletion"    = COL_DEL
-    ),
-    name = "Alteration class"
-  ) +
-  scale_x_continuous(
-    labels = percent_format(scale = 1),
-    expand = expansion(mult = c(0, 0.02))
-  ) +
-  labs(
-    x = "Mean alteration frequency (%)",
-    y = NULL,
-    caption = "n = 32 TCGA PanCancer Atlas studies · TP53 excluded"
-  ) +
-  theme(
-    legend.position   = "bottom",
-    legend.key.size   = unit(0.35, "cm"),
-    legend.text       = element_text(size = 9),
-    legend.title      = element_text(size = 9, face = "bold"),
-    axis.text.y       = element_text(face = "italic", size = 10),
-    axis.text.x       = element_text(size = 9),
-    axis.title.x      = element_text(size = 10),
-    plot.caption      = element_text(size = 8, colour = "grey50"),
-    panel.grid.major.x= element_line(colour = "grey90", linewidth = 0.4),
-    panel.grid.major.y= element_blank()
-  ) +
-  guides(fill = guide_legend(nrow = 2, byrow = TRUE))
-
-ggsave(file.path(output_dir, "Fig2_gene_ranking.tiff"),
-       fig2, width = 7, height = 5.5, dpi = 300,
-       device = "tiff", compression = "lzw")
-cat("  --> figures/Fig2_gene_ranking.tiff\n")
-
-
-## ── Figure 3: Tumour type burden ranking ─────────────────────────────────────
-##
-##   Mean alteration frequency across 14 biogenesis genes (TP53 excluded)
-##   Ranked highest → lowest, with low-N annotation
-##
-
-cat("Generating Figure 3 — tumour burden ranking...\n")
-
-fig3_df <- tumour_rank %>%
-  arrange(mean_any_alter_freq_excl_TP53) %>%
-  mutate(
-    tumour_acronym = factor(tumour_acronym, levels = tumour_acronym),
-    low_n          = tumour_acronym %in% LOW_N_TUMOURS,
-    label          = if_else(low_n,
-                             paste0(as.character(tumour_acronym), " ⚠"),
-                             as.character(tumour_acronym)),
-    label          = factor(label, levels = label),
-    cna_pct        = pmax(0, mean_any_alter_freq_excl_TP53 -
-                               mean_mut_freq_excl_TP53) * 100,
-    mut_pct        = mean_mut_freq_excl_TP53 * 100
-  ) %>%
-  select(label, low_n, cna_pct, mut_pct) %>%
-  pivot_longer(c(cna_pct, mut_pct),
-               names_to = "class", values_to = "freq") %>%
-  mutate(class = factor(class,
-    levels = c("mut_pct", "cna_pct"),
-    labels = c("Somatic mutation", "CNA")))
-
-fig3 <- ggplot(fig3_df, aes(x = freq, y = label, fill = class)) +
-  geom_col(width = 0.75, position = "stack") +
-  scale_fill_manual(
-    values = c("Somatic mutation" = COL_CNA_OTHER, "CNA" = COL_CNA),
-    name = "Alteration class"
-  ) +
-  scale_x_continuous(
-    labels = percent_format(scale = 1),
-    limits = c(0, 75),
-    expand = expansion(mult = c(0, 0.02))
-  ) +
-  labs(
-    x       = "Mean alteration frequency, 14 biogenesis genes (%)",
-    y       = NULL,
-    caption = "TP53 excluded · ⚠ N < 100 samples"
-  ) +
-  theme(
-    legend.position    = "bottom",
-    legend.key.size    = unit(0.35, "cm"),
-    legend.text        = element_text(size = 9),
-    legend.title       = element_text(size = 9, face = "bold"),
-    axis.text.y        = element_text(size = 8.5),
-    axis.text.x        = element_text(size = 9),
-    axis.title.x       = element_text(size = 10),
-    plot.caption       = element_text(size = 8, colour = "grey50"),
-    panel.grid.major.x = element_line(colour = "grey90", linewidth = 0.4),
-    panel.grid.major.y = element_blank()
+## FIGURE 1 — Methods workflow
+boxes <- tibble(
+  xmin = c(0.2, 3.6, 7.0, 0.2, 5.3), xmax = c(3.2, 6.6, 10.0, 4.9, 10.0),
+  ymin = c(3.3, 3.3, 3.3, 0.3, 0.3), ymax = c(5.8, 5.8, 5.8, 2.6, 2.6),
+  hdr_fill = c('#0F5499', '#0F5499', '#0F5499', '#1B7340', '#7A3E00'),
+  box_fill = c('#F4F8FD', '#F4F8FD', '#F4F8FD', '#F3FAF6', '#FDF8F3'),
+  title = c('1. Panel & Cohort Scope', '2. Frozen API Snapshot', '3. Sample-Level Harmonisation', '4. Deposited Data Records (v2.0.0)', '5. Technical Validation Suite'),
+  body = c(
+    paste('- 15 curated genes in 3 nested tiers:', '  Core-10 enzymes/cofactors/AGO1-4,', '  Extended-12 (+LIN28A/B),', '  Panel-14 (+SMAD2/4), +TP53 context', '- 32 TCGA PanCancer Atlas studies', '  (33 cancer types; COAD+READ=532)', '- N = 10,195 matched samples', '  (sequenced AND CNA intersection)', sep = '\n'),
+    paste('- cBioPortal REST API v7.2.3 (DB 3.1.0)', '- 6 modalities archived in raw_snapshot/:', '  1) Somatic mutations (MAF detailed)', '  2) Discrete GISTIC2 CNA (-2 to +2)', '  3) Continuous log2 copy-number ratio', '  4) Chromosome-arm GISTIC status', '  5) Structural variants / fusions', '  6) Matched mRNA RSEM & Z-scores + TMB', sep = '\n'),
+    paste('- 152,925 sample x gene records', '- CNA focality: focal (+/-2) vs broad', '  arm-concordant (+/-1) via arm status', '- 6,292 variants classified: Truncating,', '  Hotspot (RNase IIIa/b, MH2, DBD), VUS', '- Sample TMB/MSI/POLE hypermutator flag', '- Synteny-aware patient union burden', '  (1p34.3 AGO1/3/4; 18q21.1 SMAD2/4)', sep = '\n'),
+    paste('- Sample-level multi-modal table (.csv.gz, 152,925 rows)', '- Annotated somatic variants (.csv, 6,292 calls) & SVs (72 calls)', '- Patient-level synteny-aware burden (.csv, 10,195 samples)', '- Gene panel metadata & exclusion rationale tables', '- Aggregated gene x study long table (480 rows) & 5 matrices', '- SHA-256 checksummed raw_snapshot/ (offline rebuild <10 s)', sep = '\n'),
+    paste('- 20-pair cBioPortal web vs pipeline audit (0.0000 diff)', '- Hoadley et al. (2018) denominator reconciliation (32 studies)', '- Orthogonal cis-CNA vs mRNA dosage check (n = 9,620 tumours)', '- Chromosome-arm vs focal CNA & FGA/aneuploidy benchmark', '- Hypermutator (n = 1,385) & CDS-length mutation calibration', '- Deterministic cross-platform verification (5,280/5,280 cells)', sep = '\n')
   )
+)
+arrows_df <- tibble(x = c(3.22, 6.62, 8.50, 4.92), xend = c(3.58, 6.98, 8.50, 5.28), y = c(4.55, 4.55, 3.26, 1.45), yend = c(4.55, 4.55, 2.66, 1.45))
+fig1 <- ggplot() +
+  geom_rect(data = boxes, aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax, fill = box_fill), colour = '#B8C4D0', linewidth = 0.5) +
+  geom_rect(data = boxes, aes(xmin = xmin, xmax = xmax, ymin = ymax - 0.48, ymax = ymax, fill = hdr_fill), colour = NA) +
+  scale_fill_identity() +
+  geom_text(data = boxes, aes(x = xmin + 0.14, y = ymax - 0.24, label = title), hjust = 0, vjust = 0.5, colour = 'white', fontface = 'bold', size = 3.7, family = 'sans') +
+  geom_text(data = boxes, aes(x = xmin + 0.14, y = ymax - 0.62, label = body), hjust = 0, vjust = 1, colour = '#1A2430', size = 3.05, lineheight = 1.18, family = 'sans') +
+  geom_segment(data = arrows_df, aes(x = x, xend = xend, y = y, yend = yend), arrow = arrow(length = unit(0.20, 'cm'), type = 'closed'), colour = '#334E68', linewidth = 0.7) +
+  coord_cartesian(xlim = c(0.1, 10.1), ylim = c(0.15, 5.95), expand = FALSE) + theme_void() + theme(plot.margin = margin(6, 6, 6, 6))
+save_pub_figure(fig1, 'Figure_1', width_in = 11.5, height_in = 6.2)
 
-ggsave(file.path(output_dir, "Fig3_tumour_burden_ranking.tiff"),
-       fig3, width = 7, height = 9, dpi = 300,
-       device = "tiff", compression = "lzw")
-cat("  --> figures/Fig3_tumour_burden_ranking.tiff\n")
+## FIGURE 2 — Data Overview
+study_labels <- long_df %>% distinct(tumour_acronym, N) %>% arrange(tumour_acronym) %>% mutate(tumour_label = if_else(tumour_acronym %in% LOW_N_TUMOURS, paste0(tumour_acronym, '*'), tumour_acronym))
+label_map <- setNames(study_labels$tumour_label, study_labels$tumour_acronym)
+heat_df <- long_df %>% mutate(tumour_label = factor(label_map[tumour_acronym], levels = study_labels$tumour_label), geneSymbol = factor(geneSymbol, levels = rev(GENE_ORDER)), txt_col = if_else(any_alter_freq >= 0.52, 'white', '#102A43'))
+tier_strip_df <- gene_meta %>% mutate(geneSymbol = factor(geneSymbol, levels = rev(GENE_ORDER)), tier_group = factor(case_when(in_Core10_tier == 1 ~ 'Core-10 machinery', in_Extended12_tier == 1 ~ 'Let-7 regulators', in_Panel14_tier == 1 ~ 'SMAD accessory', TRUE ~ 'Upstream TP53'), levels = c('Core-10 machinery', 'Let-7 regulators', 'SMAD accessory', 'Upstream TP53')))
+p2a_strip <- ggplot(tier_strip_df, aes(x = 1, y = geneSymbol, fill = tier_group)) + geom_tile(colour = 'white', linewidth = 0.4) + scale_fill_manual(values = c('Core-10 machinery' = '#185FA5', 'Let-7 regulators' = '#D4537E', 'SMAD accessory' = '#D97706', 'Upstream TP53' = '#6B7280'), name = 'Panel tier') + scale_y_discrete(labels = function(x) parse(text = paste0("italic('", x, "')"))) + labs(x = NULL, y = NULL) + theme_minimal(base_size = 9.5, base_family = 'sans') + theme(axis.text.x = element_blank(), axis.ticks = element_blank(), panel.grid = element_blank(), axis.text.y = element_text(size = 9, colour = '#102A43'), legend.position = 'bottom', legend.title = element_text(size = 8.5, face = 'bold'), legend.text = element_text(size = 8), legend.key.size = unit(0.35, 'cm'), plot.margin = margin(4, 0, 4, 4))
+p2a_heat <- ggplot(heat_df, aes(x = tumour_label, y = geneSymbol, fill = any_alter_freq)) + geom_tile(colour = 'grey92', linewidth = 0.25) + geom_text(aes(label = sprintf('%.2f', any_alter_freq), colour = txt_col), size = 2.25, family = 'sans') + scale_colour_identity() + scale_fill_gradientn(colours = c('#FFFFFF', '#E6F1FB', '#85B7EB', '#185FA5', '#042C53'), limits = c(0, 1), breaks = c(0, 0.25, 0.50, 0.75, 1.00), labels = c('0.00', '0.25', '0.50', '0.75', '1.00'), name = 'Alteration frequency (0-1)') + labs(x = NULL, y = NULL) + theme_minimal(base_size = 9.5, base_family = 'sans') + theme(axis.text.y = element_blank(), axis.ticks.y = element_blank(), axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1, size = 8.2, colour = '#102A43'), panel.grid = element_blank(), legend.position = 'bottom', legend.title = element_text(size = 8.5, face = 'bold'), legend.text = element_text(size = 8), legend.key.width = unit(1.0, 'cm'), legend.key.height = unit(0.32, 'cm'), plot.margin = margin(4, 6, 4, 1))
+gene_order_14 <- gene_rank %>% filter(geneSymbol != 'TP53') %>% arrange(mean_any_cna_freq) %>% pull(geneSymbol)
+cna_split_df <- gene_rank %>% filter(geneSymbol != 'TP53') %>% mutate(geneSymbol = factor(geneSymbol, levels = gene_order_14), low_level_cna = pmax(0, mean_any_cna_freq - mean_amp_freq - mean_deep_del_freq)) %>% select(geneSymbol, mean_amp_freq, mean_deep_del_freq, low_level_cna) %>% pivot_longer(-geneSymbol, names_to = 'cna_class', values_to = 'freq') %>% mutate(cna_class = factor(cna_class, levels = c('low_level_cna', 'mean_deep_del_freq', 'mean_amp_freq'), labels = c('Low-level gain/loss (GISTIC +/-1)', 'Deep deletion (GISTIC -2)', 'Focal amplification (GISTIC +2)')))
+p2b_cna <- ggplot(cna_split_df, aes(x = freq, y = geneSymbol, fill = cna_class)) + geom_col(width = 0.70, position = position_stack(reverse = TRUE)) + scale_fill_manual(values = c('Focal amplification (GISTIC +2)' = '#2E7D32', 'Deep deletion (GISTIC -2)' = '#D9383A', 'Low-level gain/loss (GISTIC +/-1)' = '#90CAF9'), name = 'CNA class') + scale_x_continuous(limits = c(0, 0.52), breaks = seq(0, 0.50, by = 0.10), labels = number_format(accuracy = 0.01), expand = expansion(mult = c(0, 0.02))) + scale_y_discrete(labels = function(x) parse(text = paste0("italic('", x, "')"))) + labs(title = 'Copy-number alteration layer (0.00-0.50 scale)', x = 'Mean CNA frequency across 32 studies (fraction)', y = NULL) + theme_cowplot(font_size = 9.5) + theme(plot.title = element_text(size = 9.5, face = 'bold'), axis.text.y = element_text(size = 9), axis.text.x = element_text(size = 8.5), axis.title.x = element_text(size = 9), panel.grid.major.x = element_line(colour = 'grey90', linewidth = 0.35), legend.position = 'bottom', legend.title = element_text(size = 8, face = 'bold'), legend.text = element_text(size = 7.8), legend.key.size = unit(0.32, 'cm')) + guides(fill = guide_legend(nrow = 2, byrow = TRUE))
+mut_split_df <- gene_rank %>% filter(geneSymbol != 'TP53') %>% mutate(geneSymbol = factor(geneSymbol, levels = gene_order_14), other_coding_mut = pmax(0, mean_mut_freq - mean_truncating_mut_freq - mean_hotspot_mut_freq)) %>% select(geneSymbol, mean_truncating_mut_freq, mean_hotspot_mut_freq, other_coding_mut) %>% pivot_longer(-geneSymbol, names_to = 'mut_class', values_to = 'freq') %>% mutate(mut_class = factor(mut_class, levels = c('other_coding_mut', 'mean_hotspot_mut_freq', 'mean_truncating_mut_freq'), labels = c('Other missense / in-frame (VUS)', 'Curated domain hotspot', 'Truncating LoF (nonsense/frameshift/splice)')))
+p2c_mut <- ggplot(mut_split_df, aes(x = freq, y = geneSymbol, fill = mut_class)) + geom_col(width = 0.70, position = position_stack(reverse = TRUE)) + scale_fill_manual(values = c('Truncating LoF (nonsense/frameshift/splice)' = '#8B1E1E', 'Curated domain hotspot' = '#E67E22', 'Other missense / in-frame (VUS)' = '#F2B880'), name = 'Somatic mutation class') + scale_x_continuous(limits = c(0, 0.026), breaks = seq(0, 0.025, by = 0.005), labels = number_format(accuracy = 0.001), expand = expansion(mult = c(0, 0.02))) + labs(title = 'Somatic mutation layer (zoomed 0.000-0.025 scale)', x = 'Mean somatic mutation frequency across 32 studies (fraction)', y = NULL) + theme_cowplot(font_size = 9.5) + theme(plot.title = element_text(size = 9.5, face = 'bold'), axis.text.y = element_blank(), axis.ticks.y = element_blank(), axis.text.x = element_text(size = 8.5), axis.title.x = element_text(size = 9), panel.grid.major.x = element_line(colour = 'grey90', linewidth = 0.35), legend.position = 'bottom', legend.title = element_text(size = 8, face = 'bold'), legend.text = element_text(size = 7.8), legend.key.size = unit(0.32, 'cm')) + guides(fill = guide_legend(nrow = 2, byrow = TRUE))
+top_row_fig2 <- (p2a_strip + p2a_heat + plot_layout(widths = c(0.045, 0.955), guides = 'collect')) & theme(legend.position = 'bottom', legend.box = 'horizontal', legend.margin = margin(2, 10, 2, 10))
+fig2 <- plot_grid(top_row_fig2, (p2b_cna | p2c_mut), ncol = 1, rel_heights = c(1.12, 0.98), labels = c('a', 'b'), label_size = 12, label_fontface = 'bold', label_fontfamily = 'sans')
+save_pub_figure(fig2, 'Figure_2', width_in = 12.0, height_in = 9.8)
 
+## FIGURE 3 — Technical Validation I
+arm_plot_df <- arm_decomp %>% mutate(gene_arm = factor(paste0(geneSymbol, ' (', chrArm, ')'), levels = rev(paste0(GENE_ORDER, ' (', gene_meta$chrArm[match(GENE_ORDER, gene_meta$geneSymbol)], ')'))), Broad_arm = broad_arm_level_lowamp_n / total_samples, Subarm_low = (subarm_lowamp_n + lowamp_arm_unannotated_n) / total_samples, Focal_high = high_level_amp_or_deepdel_n / total_samples) %>% select(gene_arm, Focal_high, Subarm_low, Broad_arm) %>% pivot_longer(-gene_arm, names_to = 'focality', values_to = 'prop') %>% mutate(focality = factor(focality, levels = c('Broad_arm', 'Subarm_low', 'Focal_high'), labels = c('Arm-concordant +/-1 (broad)', 'Sub-arm / other +/-1', 'High-level focal +/-2 (amp/deep del)')))
+p3a <- ggplot(arm_plot_df, aes(x = prop, y = gene_arm, fill = focality)) + geom_col(width = 0.72, position = position_stack(reverse = TRUE)) + scale_fill_manual(values = c('High-level focal +/-2 (amp/deep del)' = '#1B5E20', 'Sub-arm / other +/-1' = '#64B5F6', 'Arm-concordant +/-1 (broad)' = '#BBDEFB'), name = 'CNA focality') + scale_x_continuous(limits = c(0, 0.55), labels = number_format(accuracy = 0.05), expand = expansion(mult = c(0, 0.02))) + labs(title = 'Arm-level vs high-level focal CNA', x = 'Proportion of pan-cancer cohort (n = 10,195)', y = NULL) + theme_cowplot(font_size = 9.5) + theme(plot.title = element_text(size = 10, face = 'bold'), axis.text.y = element_text(size = 8.5), panel.grid.major.x = element_line(colour = 'grey90', linewidth = 0.35), legend.position = 'bottom', legend.title = element_text(size = 8, face = 'bold'), legend.text = element_text(size = 7.6), legend.key.size = unit(0.30, 'cm')) + guides(fill = guide_legend(nrow = 2, byrow = TRUE))
+dosage_long <- dosage_df %>% mutate(geneSymbol = factor(geneSymbol, levels = rev(GENE_ORDER))) %>% select(geneSymbol, spearman_rho_log2CNA_vs_mrnaZ, `-2` = median_z_deep_del_m2, `-1` = median_z_shallow_del_m1, `0` = median_z_diploid_0, `+1` = median_z_gain_p1, `+2` = median_z_amp_p2) %>% pivot_longer(c(`-2`, `-1`, `0`, `+1`, `+2`), names_to = 'gistic_state', values_to = 'median_z') %>% mutate(gistic_state = factor(gistic_state, levels = c('-2', '-1', '0', '+1', '+2')), median_z = as.numeric(median_z))
+rho_labels <- dosage_df %>% mutate(geneSymbol = factor(geneSymbol, levels = rev(GENE_ORDER)), rho_lbl = sprintf('rho = %+.2f', spearman_rho_log2CNA_vs_mrnaZ))
+p3b <- ggplot(dosage_long, aes(x = gistic_state, y = geneSymbol, fill = median_z)) + geom_tile(colour = 'white', linewidth = 0.4) + geom_text(aes(label = ifelse(is.na(median_z), 'n<3', sprintf('%+.2f', median_z)), colour = ifelse(!is.na(median_z) & abs(median_z) > 1.15, 'white', '#102A43')), size = 2.6, family = 'sans') + geom_text(data = rho_labels, aes(x = 5.65, y = geneSymbol, label = rho_lbl), inherit.aes = FALSE, hjust = 0, size = 2.75, fontface = 'bold', colour = '#102A43', family = 'sans') + scale_colour_identity() + scale_fill_gradient2(low = '#2166AC', mid = '#F7F7F7', high = '#B2182B', midpoint = 0, limits = c(-2.5, 2.5), oob = squish, name = 'Median mRNA Z-score') + scale_x_discrete(expand = expansion(add = c(0.5, 1.55))) + scale_y_discrete(labels = function(x) parse(text = paste0("italic('", x, "')"))) + labs(title = 'Orthogonal cis-CNA vs mRNA dosage (n = 9,620)', x = 'Discrete GISTIC2 copy-number state', y = NULL) + theme_cowplot(font_size = 9.5) + theme(plot.title = element_text(size = 10, face = 'bold'), axis.text.y = element_text(size = 8.8), legend.position = 'bottom', legend.title = element_text(size = 8, face = 'bold'), legend.text = element_text(size = 7.8), legend.key.width = unit(0.85, 'cm'), legend.key.height = unit(0.30, 'cm'))
+fga_df <- tumour_rank %>% filter(!is.na(median_fraction_genome_altered)) %>% mutate(disp = if_else(low_coverage_N_lt_100 == 1, paste0(tumour_acronym, '*'), tumour_acronym), highlight = tumour_acronym %in% c('TGCT', 'OV', 'UCS', 'LAML', 'UCEC', 'SKCM', 'BRCA', 'LUSC'))
+tgct_row <- filter(fga_df, tumour_acronym == 'TGCT')
+p3c <- ggplot(fga_df, aes(x = median_fraction_genome_altered)) + geom_smooth(aes(y = patient_prop_core10_any_alter), method = 'lm', formula = y ~ x, se = FALSE, colour = '#90CAF9', linetype = 'dashed', linewidth = 0.7) + geom_smooth(aes(y = patient_prop_core10_strict), method = 'lm', formula = y ~ x, se = FALSE, colour = '#1B5E20', linetype = 'solid', linewidth = 0.7) + geom_segment(aes(xend = median_fraction_genome_altered, y = patient_prop_core10_strict, yend = patient_prop_core10_any_alter), colour = 'grey80', linewidth = 0.45) + geom_point(aes(y = patient_prop_core10_any_alter, colour = 'Broad Core-10 union (mut OR GISTIC != 0)'), size = 2.3) + geom_point(aes(y = patient_prop_core10_strict, colour = 'Strict Core-10 union (mut OR GISTIC +/-2)'), size = 2.5) + geom_text(data = filter(fga_df, highlight), aes(y = patient_prop_core10_strict, label = disp), nudge_y = -0.048, size = 2.65, fontface = 'bold', colour = '#102A43') + annotate('segment', x = 0.455, xend = tgct_row$median_fraction_genome_altered + 0.005, y = 0.80, yend = tgct_row$patient_prop_core10_any_alter - 0.015, colour = '#0F5499', linewidth = 0.45) + annotate('text', x = 0.46, y = 0.79, label = 'TGCT: 0.99 broad vs 0.04 strict', hjust = 0, size = 2.75, colour = '#0F5499', fontface = 'italic') + scale_colour_manual(values = c('Broad Core-10 union (mut OR GISTIC != 0)' = '#42A5F5', 'Strict Core-10 union (mut OR GISTIC +/-2)' = '#1B5E20'), name = 'Patient-level metric') + scale_x_continuous(breaks = seq(0, 0.6, 0.2), labels = number_format(accuracy = 0.1)) + scale_y_continuous(breaks = seq(0, 1, 0.25), labels = number_format(accuracy = 0.01)) + coord_cartesian(xlim = c(-0.02, 0.63), ylim = c(-0.07, 1.04)) + labs(title = 'Genome-wide FGA vs patient-level Core-10 burden', x = 'Study median Fraction Genome Altered (FGA)', y = 'Proportion of patients altered (0-1)') + theme_cowplot(font_size = 9.5) + theme(plot.title = element_text(size = 10, face = 'bold'), panel.grid.major = element_line(colour = 'grey92', linewidth = 0.35), legend.position = 'bottom', legend.title = element_text(size = 8, face = 'bold'), legend.text = element_text(size = 7.8)) + guides(colour = guide_legend(nrow = 1))
+fig3 <- plot_grid(plot_grid(p3a, p3b, ncol = 2, rel_widths = c(0.95, 1.05), labels = c('a', 'b'), label_size = 12), p3c, ncol = 1, rel_heights = c(1.15, 0.88), labels = c('', 'c'), label_size = 12)
+save_pub_figure(fig3, 'Figure_3', width_in = 12.0, height_in = 9.5)
 
-## ── Figure 4: BRCA deep-dive ─────────────────────────────────────────────────
-##
-##   Per-gene alteration class breakdown in breast invasive carcinoma (n=1,052)
-##   Stacked horizontal bar with four alteration classes
-##
-
-cat("Generating Figure 4 — BRCA deep-dive...\n")
-
-fig4_df <- brca_df %>%
-  arrange(any_alter_freq) %>%
-  mutate(
-    gene       = factor(gene, levels = gene),
-    mut_pct    = mut_freq * 100,
-    amp_pct    = amp_freq * 100,
-    del_pct    = deep_del_freq * 100,
-    cna_other  = pmax(0, any_cna_freq - amp_freq - deep_del_freq) * 100
-  ) %>%
-  select(gene, mut_pct, amp_pct, del_pct, cna_other) %>%
-  pivot_longer(-gene, names_to = "class", values_to = "freq") %>%
-  mutate(class = factor(class,
-    levels = c("del_pct", "amp_pct", "cna_other", "mut_pct"),
-    labels = c("Deep deletion", "Amplification",
-               "CNA gain / shallow deletion", "Somatic mutation")))
-
-fig4 <- ggplot(fig4_df, aes(x = freq, y = gene, fill = class)) +
-  geom_col(width = 0.72, position = "stack") +
-  scale_fill_manual(
-    values = c(
-      "Somatic mutation"           = COL_MUTATION,
-      "CNA gain / shallow deletion"= COL_CNA_OTHER,
-      "Amplification"              = COL_AMP,
-      "Deep deletion"              = COL_DEL
-    ),
-    name = "Alteration class"
-  ) +
-  scale_x_continuous(
-    labels = percent_format(scale = 1),
-    expand = expansion(mult = c(0, 0.02))
-  ) +
-  labs(
-    x       = "Alteration frequency (%)",
-    y       = NULL,
-    caption = "Breast invasive carcinoma (BRCA) · n = 1,052 samples · TCGA PanCancer Atlas 2018"
-  ) +
-  theme(
-    legend.position    = "bottom",
-    legend.key.size    = unit(0.35, "cm"),
-    legend.text        = element_text(size = 9),
-    legend.title       = element_text(size = 9, face = "bold"),
-    axis.text.y        = element_text(face = "italic", size = 10),
-    axis.text.x        = element_text(size = 9),
-    axis.title.x       = element_text(size = 10),
-    plot.caption       = element_text(size = 8, colour = "grey50"),
-    panel.grid.major.x = element_line(colour = "grey90", linewidth = 0.4),
-    panel.grid.major.y = element_blank()
-  ) +
-  guides(fill = guide_legend(nrow = 2, byrow = TRUE))
-
-ggsave(file.path(output_dir, "Fig4_BRCA_deepdive.tiff"),
-       fig4, width = 7, height = 6, dpi = 300,
-       device = "tiff", compression = "lzw")
-cat("  --> figures/Fig4_BRCA_deepdive.tiff\n")
-
-
-## ── Bonus: Combined panel figure (for supplementary or preprint) ─────────────
-
-cat("Generating combined panel figure...\n")
-
-combined <- (fig2 | fig4) / (fig3 + theme(plot.margin = unit(c(0,1,0,0),"cm"))) +
-  plot_layout(heights = c(1, 1.6)) +
-  plot_annotation(
-    title   = "miRBioGenAtlas: Pan-cancer miRNA biogenesis gene alteration landscape",
-    subtitle= "TCGA PanCancer Atlas 2018 · 15 genes · 32 tumour types · n = 10,195",
-    caption = "Data: cBioPortal public API · github.com/prasannareddy/miRBioGenAtlas",
-    theme   = theme(
-      plot.title    = element_text(size = 13, face = "bold"),
-      plot.subtitle = element_text(size = 10, colour = "grey40"),
-      plot.caption  = element_text(size = 8,  colour = "grey50")
-    )
-  )
-
-ggsave(file.path(output_dir, "Fig_combined_panel.tiff"),
-       combined, width = 14, height = 14, dpi = 300,
-       device = "tiff", compression = "lzw")
-cat("  --> figures/Fig_combined_panel.tiff\n")
-
-
-## ── Session info (for reproducibility) ───────────────────────────────────────
-
-cat("\n── Session info ────────────────────────────────────────────────────────\n")
-sessionInfo()
-
-cat("\n── All figures saved to:", output_dir, "──────────────────────────────────\n")
-cat("Files:\n")
-cat("  Fig1_pancan_heatmap.tiff       — 300 DPI, LZW compressed\n")
-cat("  Fig2_gene_ranking.tiff         — 300 DPI, LZW compressed\n")
-cat("  Fig3_tumour_burden_ranking.tiff— 300 DPI, LZW compressed\n")
-cat("  Fig4_BRCA_deepdive.tiff        — 300 DPI, LZW compressed\n")
-cat("  Fig_combined_panel.tiff        — 300 DPI, combined panel\n")
+## FIGURE 4 — Technical Validation II
+mut_cal_order <- gene_rank %>% filter(geneSymbol != 'TP53') %>% arrange(mean_mut_freq) %>% pull(geneSymbol)
+mut_cal_df <- gene_rank %>% filter(geneSymbol != 'TP53') %>% mutate(gene_cds_lbl = sprintf('%s (%.1f kb)', geneSymbol, cdsLengthBp / 1000), geneSymbol = factor(geneSymbol, levels = mut_cal_order))
+lvl_cds <- mut_cal_df$gene_cds_lbl[match(mut_cal_order, mut_cal_df$geneSymbol)]
+mut_cal_df$gene_cds_lbl <- factor(mut_cal_df$gene_cds_lbl, levels = lvl_cds)
+mut_cal_long <- mut_cal_df %>% select(gene_cds_lbl, `All samples (n = 10,195)` = mean_mut_freq, `Non-hypermutated only (n = 8,810)` = mean_nonhypermut_mut_freq) %>% pivot_longer(-gene_cds_lbl, names_to = 'cohort_subset', values_to = 'freq')
+p4a_left <- ggplot(mut_cal_long, aes(x = freq, y = gene_cds_lbl, fill = cohort_subset)) + geom_col(position = position_dodge(width = 0.72), width = 0.65) + scale_fill_manual(values = c('All samples (n = 10,195)' = '#C0392B', 'Non-hypermutated only (n = 8,810)' = '#2C3E50'), name = 'Sample stratification') + scale_x_continuous(limits = c(0, 0.026), labels = number_format(accuracy = 0.005), expand = expansion(mult = c(0, 0.03))) + labs(title = 'Hypermutator stratification', x = 'Mean mutation frequency (0-1)', y = NULL) + theme_cowplot(font_size = 9) + theme(plot.title = element_text(size = 9.5, face = 'bold'), axis.text.y = element_text(size = 8.3), panel.grid.major.x = element_line(colour = 'grey90', linewidth = 0.35), legend.position = 'bottom', legend.title = element_text(size = 7.8, face = 'bold'), legend.text = element_text(size = 7.5), legend.key.size = unit(0.30, 'cm')) + guides(fill = guide_legend(nrow = 2, byrow = TRUE))
+p4a_right <- ggplot(mut_cal_df, aes(x = mean_mut_density_per_kb_per_1000, y = gene_cds_lbl, fill = panelRole)) + geom_vline(xintercept = median(mut_cal_df$mean_mut_density_per_kb_per_1000[mut_cal_df$panelRole != 'Pleiotropic_Accessory']), linetype = 'dashed', colour = 'grey45', linewidth = 0.45) + geom_col(width = 0.65) + scale_fill_manual(values = c('Core_Enzyme' = '#185FA5', 'Core_Cofactor' = '#42A5F5', 'Core_Transporter' = '#26A69A', 'Core_Effector' = '#5C6BC0', 'Direct_Biogenesis_Regulator' = '#D4537E', 'Pleiotropic_Accessory' = '#D97706'), labels = c('Core_Enzyme' = 'Core enzyme', 'Core_Cofactor' = 'Core cofactor', 'Core_Transporter' = 'Nuclear export', 'Core_Effector' = 'RISC effector', 'Direct_Biogenesis_Regulator' = 'Let-7 regulator', 'Pleiotropic_Accessory' = 'SMAD accessory'), name = 'Role') + scale_x_continuous(limits = c(0, 16), expand = expansion(mult = c(0, 0.03))) + labs(title = 'CDS-length normalized density', x = 'Mutations / kb CDS / 1,000 samples', y = NULL) + theme_cowplot(font_size = 9) + theme(plot.title = element_text(size = 9.5, face = 'bold'), axis.text.y = element_blank(), axis.ticks.y = element_blank(), panel.grid.major.x = element_line(colour = 'grey90', linewidth = 0.35), legend.position = 'bottom', legend.title = element_text(size = 7.8, face = 'bold'), legend.text = element_text(size = 7.3), legend.key.size = unit(0.28, 'cm'), plot.margin = margin(6, 12, 6, 2)) + guides(fill = guide_legend(ncol = 2, byrow = TRUE))
+tb_plot_df <- tumour_rank %>% arrange(patient_prop_core10_strict) %>% mutate(tumour_lbl = if_else(low_coverage_N_lt_100 == 1, paste0(tumour_acronym, '*'), tumour_acronym), tumour_lbl = factor(tumour_lbl, levels = tumour_lbl))
+tb_long <- tb_plot_df %>% select(tumour_lbl, `Core-10` = patient_prop_core10_strict, `Extended-12` = patient_prop_extended12_strict, `Panel-14` = patient_prop_panel14_strict) %>% pivot_longer(-tumour_lbl, names_to = 'tier', values_to = 'prop') %>% mutate(tier = factor(tier, levels = c('Core-10', 'Extended-12', 'Panel-14')))
+p4b <- ggplot(tb_long, aes(x = prop, y = tumour_lbl, colour = tier, shape = tier)) + geom_line(aes(group = tumour_lbl), colour = 'grey80', linewidth = 0.5) + geom_point(size = 2.35, alpha = 0.92) + scale_colour_manual(values = c('Core-10' = '#0F5499', 'Extended-12' = '#D4537E', 'Panel-14' = '#D97706'), name = 'Nested tier') + scale_shape_manual(values = c(16, 17, 15), name = 'Nested tier') + scale_x_continuous(limits = c(0, 0.56), breaks = seq(0, 0.50, 0.10), labels = number_format(accuracy = 0.01), expand = expansion(mult = c(0, 0.03))) + labs(title = 'Synteny-aware patient burden (* N < 100)', x = 'Patients with >=1 mutation or GISTIC2 +/-2 (0-1)', y = NULL) + theme_cowplot(font_size = 9) + theme(plot.title = element_text(size = 9.5, face = 'bold'), axis.text.y = element_text(size = 8.0), panel.grid.major.x = element_line(colour = 'grey90', linewidth = 0.35), panel.grid.major.y = element_line(colour = 'grey96', linewidth = 0.25), legend.position = 'bottom', legend.title = element_text(size = 8, face = 'bold'), legend.text = element_text(size = 7.8), plot.margin = margin(6, 10, 6, 10))
+fig4 <- plot_grid((p4a_left | p4a_right) + plot_layout(widths = c(1.08, 0.92)), p4b, ncol = 2, rel_widths = c(1.08, 0.92), labels = c('a', 'b'), label_size = 12)
+save_pub_figure(fig4, 'Figure_4', width_in = 12.6, height_in = 7.4)
+cat('\nAll 4 publication figures generated cleanly in:', output_dir, '\n')

@@ -1,0 +1,65 @@
+name: Build & Verify miRBioGenAtlas v2.0.0
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/build_v2_atlas.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  build-v2-atlas:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Clean legacy v1 files (.DS_Store and v1 Fig*.tiff)
+        run: |
+          git rm -f --ignore-unmatch .DS_Store
+          git rm -f --ignore-unmatch figures/Fig1_pancan_heatmap.tiff figures/Fig2_gene_ranking.tiff figures/Fig3_tumour_burden_ranking.tiff figures/Fig4_BRCA_deepdive.tiff figures/Fig_combined_panel.tiff figures/workflow_schematic.svg figures/workflow_schematic.tiff
+
+      - name: Retrieve frozen cBioPortal snapshot & build v2.0.0 dataset
+        run: |
+          python3 scripts/fetch_cbioportal_snapshot.py
+          python3 scripts/build_mirbiogen_v2_dataset.py
+
+      - name: Set up R and binary CRAN packages
+        uses: r-lib/actions/setup-r@v2
+        with:
+          use-public-rspm: true
+
+      - name: Install R visualization packages
+        uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          packages: |
+            any::tidyverse
+            any::cowplot
+            any::patchwork
+            any::scales
+            any::ragg
+
+      - name: Generate vector PDF, 450-DPI LZW TIFF, and 300-DPI PNG figures
+        run: |
+          Rscript miRBioGenAtlas_figures.R
+
+      - name: Commit v2.0.0 data records, snapshot, figures & tag v2.0.0
+        run: |
+          git config user.name "Prasanna Kumar Reddy Gayam"
+          git config user.email "siddugayam@users.noreply.github.com"
+          git add -A data/ figures/
+          if ! git diff --cached --quiet; then
+            git commit -m "Build & archive complete miRBioGenAtlas v2.0.0 dataset, snapshot & figures [skip ci]"
+            git push origin HEAD:main
+          fi
+          git tag -f -a v2.0.0 -m "miRBioGenAtlas v2.0.0 (Zenodo Dataset DOI: 10.5281/zenodo.24337287)"
+          git push -f origin v2.0.0

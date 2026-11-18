@@ -1,0 +1,9 @@
+candidateGene,cytoband,molecularFunction,exclusionRationale
+DDX5,17q23.3,Microprocessor DEAD-box helicase (p68),"Excluded from core panel because DDX5 functions broadly across pre-mRNA splicing, ribosome biogenesis, and transcriptional co-activation."
+DDX17,22q13.1,Microprocessor DEAD-box helicase (p72),Excluded owing to broad pleiotropic roles in alternative splicing and general RNA metabolism beyond pri-miRNA cleavage.
+TUT4 (ZCCHC11),1p32.3,Terminal uridylyltransferase,Downstream pre-miRNA tailing/decay effector recruited by LIN28A rather than canonical maturation machinery.
+TUT7 (ZCCHC6),9q21.33,Terminal uridylyltransferase,Downstream pre-miRNA tailing/decay effector redundant with TUT4.
+DIS3L2,2q37.1,3'-5' exoribonuclease,Degrades oligouridylated pre-let-7 (miRNA turnover/decay pathway rather than canonical biogenesis).
+TNRC6A/B/C,16p12.1 / 22q13.1 / 17q25.3,GW182 RISC-silencing scaffolds,Downstream mRNA deadenylation/translational repression effectors acting after miRNA biogenesis and RISC loading.
+RAN,12q24.33,Small GTPase cofactor of XPO5,"Housekeeping nucleocytoplasmic transport GTPase required for all karyopherin pathways, not miRNA-specific."
+KHSRP / HNRNPA1 / SRSF3,Multiple,Sequence-specific pri-miRNA RBPs,Context-dependent RNA-binding splicing factors acting on small subsets of pri-miRNAs.

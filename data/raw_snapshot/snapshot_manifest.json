@@ -1,0 +1,176 @@
+{
+  "dataset": "miRBioGenAtlas",
+  "snapshot_version": "2.0.0",
+  "retrieved_utc": "2026-11-18T10:06:02Z",
+  "cbioportal_portal_version": "v7.2.3",
+  "cbioportal_db_version": "3.1.0",
+  "n_studies": 32,
+  "n_genes": 15,
+  "files": [
+    {
+      "path": "data/raw_snapshot/portal_and_genes_metadata.json.gz",
+      "size_bytes": 6545,
+      "sha256": "b37f9632801b3db297a597d22c6c31bbe631385b100b2097b4e89d0edc5b2431"
+    },
+    {
+      "path": "data/raw_snapshot/studies/acc_tcga_pan_can_atlas_2018.json.gz",
+      "size_bytes": 85791,
+      "sha256": "305fe668a91c06b162a8105f83617348ad4f40c1090d87efe764660f2441a9e6"
+    },
+    {
+      "path": "data/raw_snapshot/studies/blca_tcga_pan_can_atlas_2018.json.gz",
+      "size_bytes": 393846,
+      "sha256": "abfe107f0c8ddff46b707af86347f08023e8671d1420e7a99dbacf8c3e26f2e2"
+    },
+    {
+      "path": "data/raw_snapshot/studies/brca_tcga_pan_can_atlas_2018.json.gz",
+      "size_bytes": 961541,
+      "sha256": "71d868a9a1dd25ce52befd8e3eb1a910b67c2038a3dc8e8f074505c8c57f1903"
+    },
+    {
+      "path": "data/raw_snapshot/studies/cesc_tcga_pan_can_atlas_2018.json.gz",
+      "size_bytes": 272656,
+      "sha256": "72398ec9dccecce915d19199c1d271b05792ae4bb77c16f1835c0215d8d8c257"
+    },
+    {
+      "path": "data/raw_snapshot/studies/chol_tcga_pan_can_atlas_2018.json.gz",
+      "size_bytes": 39977,
+      "sha256": "1b40aa9416352cbef4f92b7740c6458fd601ed260fb977f021e8afd2d4526ae5"
+    },
+    {
+      "path": "data/raw_snapshot/studies/coadread_tcga_pan_can_atlas_2018.json.gz",
+      "size_bytes": 536623,
+      "sha256": "f368169f10b3381aface7c6fd4d355cf136368277c3d99d8536ddcba76996be0"
+    },
+    {
+      "path": "data/raw_snapshot/studies/dlbc_tcga_pan_can_atlas_2018.json.gz",
+      "size_bytes": 44370,
+      "sha256": "767a574caa05899a891b2451f24a0b2db279418631fb01e11781a3f73113d0a4"
+    },
+    {
+      "path": "data/raw_snapshot/studies/esca_tcga_pan_can_atlas_2018.json.gz",
+      "size_bytes": 181743,
+      "sha256": "99f93c21c09dd638576db0b7953d061c2f27983b2b81f82f94963d241016b045"
+    },
+    {
+      "path": "data/raw_snapshot/studies/gbm_tcga_pan_can_atlas_2018.json.gz",
+      "size_bytes": 291206,
+      "sha256": "8686e9dd81869f3608a5836c16f07d957fdccdceb90fd0131d82de306f1c3b04"
+    },
+    {
+      "path": "data/raw_snapshot/studies/hnsc_tcga_pan_can_atlas_2018.json.gz",
+      "size_bytes": 493238,
+      "sha256": "62a801a9e65ab82f7395fa55eb56a5e55bd34baee128054a2016ed52426db45a"
+    },
+    {
+      "path": "data/raw_snapshot/studies/kich_tcga_pan_can_atlas_2018.json.gz",
+      "size_bytes": 68339,
+      "sha256": "e7e7a6ca079b16750f15e670556f4520a2f255438b0ff962d265ae4ce84a6e2f"
+    },
+    {
+      "path": "data/raw_snapshot/studies/kirc_tcga_pan_can_atlas_2018.json.gz",
+      "size_bytes": 365950,
+      "sha256": "d05440ef47ca5e8297f97e2cf8786be4ee4bda793639f138ca1e0a06052cc2f0"
+    },
+    {
+      "path": "data/raw_snapshot/studies/kirp_tcga_pan_can_atlas_2018.json.gz",
+      "size_bytes": 262699,
+      "sha256": "6857f8a1f2389e72c85dbc4adfc84037fcf6ebbdcae96550db9e4a5c381dc330"
+    },
+    {
+      "path": "data/raw_snapshot/studies/laml_tcga_pan_can_atlas_2018.json.gz",
+      "size_bytes": 138837,
+      "sha256": "623252aac11a096957c6c7484b68578a4f10f19420653c164926823bb3307b7c"
+    },
+    {
+      "path": "data/raw_snapshot/studies/lgg_tcga_pan_can_atlas_2018.json.gz",
+      "size_bytes": 482189,
+      "sha256": "0f4754f133685058bd29a4e9c8b16c91565717fe10efd59bd97a3240e0e853e7"
+    },
+    {
+      "path": "data/raw_snapshot/studies/lihc_tcga_pan_can_atlas_2018.json.gz",
+      "size_bytes": 345099,
+      "sha256": "e281e398de4e4905bb513aff69b4a72669d7a0969cf88c7f612c8f1b2306a0a4"
+    },
+    {
+      "path": "data/raw_snapshot/studies/luad_tcga_pan_can_atlas_2018.json.gz",
+      "size_bytes": 492963,
+      "sha256": "4c5f057de155ed3529d092469857a6b748c34e552b385d1c68e9d40e1a05b530"
+    },
+    {
+      "path": "data/raw_snapshot/studies/lusc_tcga_pan_can_atlas_2018.json.gz",
+      "size_bytes": 476317,
+      "sha256": "9fe505b83dd04af7437fe91cdd1b489c75b97af5b2c39c2889b6f2e9659302f9"
+    },
+    {
+      "path": "data/raw_snapshot/studies/meso_tcga_pan_can_atlas_2018.json.gz",
+      "size_bytes": 83730,
+      "sha256": "ee1238e669b8cd3748c7384e509d76ec32ab970a9e8c4b62d95d7791db2cfddc"
+    },
+    {
+      "path": "data/raw_snapshot/studies/ov_tcga_pan_can_atlas_2018.json.gz",
+      "size_bytes": 399395,
+      "sha256": "cf4c9fee12cf191d8786edd81e29f7a905c90a2be4922a0ff2a78164ddff69fc"
+    },
+    {
+      "path": "data/raw_snapshot/studies/paad_tcga_pan_can_atlas_2018.json.gz",
+      "size_bytes": 172707,
+      "sha256": "435451c156b0eef30fd9828c5110516d62242a72272dac0dd0803cce9153d829"
+    },
+    {
+      "path": "data/raw_snapshot/studies/pcpg_tcga_pan_can_atlas_2018.json.gz",
+      "size_bytes": 153819,
+      "sha256": "18877ee7d7ce15e712c62728424e5dc697ce18e1bd674da1cc49500eb90425a9"
+    },
+    {
+      "path": "data/raw_snapshot/studies/prad_tcga_pan_can_atlas_2018.json.gz",
+      "size_bytes": 437248,
+      "sha256": "3bdcc80f62a47a0a7c6577754a7ab24be1720686a5633576323253979cc376f6"
+    },
+    {
+      "path": "data/raw_snapshot/studies/sarc_tcga_pan_can_atlas_2018.json.gz",
+      "size_bytes": 237067,
+      "sha256": "a37fae4fe7e6fcc037c0d66332f025c27f0e40df148d35b45bdc0269564f3ba9"
+    },
+    {
+      "path": "data/raw_snapshot/studies/skcm_tcga_pan_can_atlas_2018.json.gz",
+      "size_bytes": 350628,
+      "sha256": "2773de0094d6385d5be4dcd339ef0096f3bd3a1db3338215fc426dbf51c2c4e8"
+    },
+    {
+      "path": "data/raw_snapshot/studies/stad_tcga_pan_can_atlas_2018.json.gz",
+      "size_bytes": 413265,
+      "sha256": "8d3efd4bd431b4982260339555522644b6478f48af109a3ee424af92a2d07009"
+    },
+    {
+      "path": "data/raw_snapshot/studies/tgct_tcga_pan_can_atlas_2018.json.gz",
+      "size_bytes": 145090,
+      "sha256": "64ef2de927bd5e88fe669049591531331e6288e28fbf5cd208297923fd666411"
+    },
+    {
+      "path": "data/raw_snapshot/studies/thca_tcga_pan_can_atlas_2018.json.gz",
+      "size_bytes": 423666,
+      "sha256": "bb4a9874c86bdafaeaeec11d6b0f20d3d12a0c6b2564bf29fac489a562e7eb53"
+    },
+    {
+      "path": "data/raw_snapshot/studies/thym_tcga_pan_can_atlas_2018.json.gz",
+      "size_bytes": 109431,
+      "sha256": "d91e60d7cdd5e5741beb9290cd11aea9abe132c3ceb08c2c71800b49e4b003b1"
+    },
+    {
+      "path": "data/raw_snapshot/studies/ucec_tcga_pan_can_atlas_2018.json.gz",
+      "size_bytes": 499682,
+      "sha256": "3027ea8e6f355454447d7d059c5bf7cfd8cfb3bf692048f6bda48246219f6a50"
+    },
+    {
+      "path": "data/raw_snapshot/studies/ucs_tcga_pan_can_atlas_2018.json.gz",
+      "size_bytes": 60997,
+      "sha256": "849f512061d40c3feec517231663229710ae39bde7fa4d23b78726fff5169924"
+    },
+    {
+      "path": "data/raw_snapshot/studies/uvm_tcga_pan_can_atlas_2018.json.gz",
+      "size_bytes": 77250,
+      "sha256": "78eb2eac9b3f5dad48e21d765878f2ae5715068c7d16e8ec2aab67f81a03950b"
+    }
+  ]
+}

@@ -1,18 +1,5 @@
 #!/usr/bin/env python3
-"""
-miRBioGenAtlas v2.0.0 — Zero-Dependency CLI Variant & Codon Triage Utility
-==========================================================================
-Instant structural, protein-language-model, germline-constraint, ClinVar,
-TCGA PanCancer Atlas (N = 10,195), and MSK-IMPACT (N = 10,945) lookup across
-all 213,940 possible single-amino-acid substitutions in the 15 canonical
-microRNA biogenesis and regulatory proteins.
-
-Examples:
-    python3 scripts/query_variant.py DICER1 E1705K
-    python3 scripts/query_variant.py AGO2 p.Gly604Arg
-    python3 scripts/query_variant.py --codon DROSHA 1147
-    python3 scripts/query_variant.py DICER1 E1705K --json
-"""
+"""Command-line lookup for variant and codon annotations across the 213,940-variant atlas."""
 
 import argparse
 import csv
@@ -165,7 +152,7 @@ def query_single_variant(gene: str, raw_var: str, as_json: bool = False):
         return
 
     print("=" * 78)
-    print(f"miRBioGenAtlas v2.0.0 — Structural & Clinical Variant Triage: {sym} p.{var}")
+    print(f"miRBioGenAtlas — Structural & Clinical Variant Triage: {sym} p.{var}")
     print("=" * 78)
     print(f"  Gene / UniProt / Step : {sym} ({payload['uniprotAccession']}) | {payload['pathwayStep']}")
     print(f"  3D Structure & Conf   : Experimental PDB: {payload['pdbComplexId'] or 'AlphaFold v6'} | AFDB pLDDT={payload['afdbPlddt']}")
@@ -216,7 +203,7 @@ def query_codon_profile(gene: str, codon: int, as_json: bool = False):
 
 
 def main():
-    ap = argparse.ArgumentParser(description="Query miRBioGenAtlas v2.0.0 structural, PLM, clinical, and somatic profiles.")
+    ap = argparse.ArgumentParser(description="Query miRBioGenAtlas v2.0.1 structural, PLM, clinical, and somatic profiles.")
     ap.add_argument("gene", nargs="?", help="Gene symbol (e.g. DICER1, DROSHA, AGO2)")
     ap.add_argument("variant", nargs="?", help="Missense substitution (e.g. E1705K or p.Glu1705Lys)")
     ap.add_argument("--codon", nargs=2, metavar=("GENE", "POS"), help="List all 19 single-AA substitutions at a codon (e.g. --codon DICER1 1705)")

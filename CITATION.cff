@@ -1,12 +1,12 @@
 cff-version: 1.2.0
-message: "If you use this dataset, web explorer, or code, please cite both the Data Descriptor article (preferred-citation) and the versioned Zenodo dataset record (10.5281/zenodo.24337287)."
+message: "If you use this dataset, web explorer, or code, please cite both the Data Descriptor article (preferred-citation) and the versioned Zenodo dataset record (10.5281/zenodo.24393421)."
 title: "miRBioGenAtlas: Sample-level multi-modal somatic alteration landscape of the miRNA biogenesis machinery across 32 TCGA cancer studies"
 abstract: "Frozen, SHA-256-verified multi-consortium genomic, transcriptomic, 3D structural, 213,940-variant saturation-mutagenesis, mature miRNA-seq, CPTAC proteogenomic, DepMap CRISPR-dependency, gnomAD/GTEx/ClinVar, and MSK-IMPACT (N = 10,945) clinical-replication resource for 15 miRNA biogenesis and regulatory genes across 32 TCGA PanCancer Atlas (2018) studies (33 cancer types; N = 10,195 primary tumours; 21,140 tumours combined), accompanied by portable Python/R pipelines, CLI variant triage, and an interactive web explorer."
 type: dataset
-version: "2.0.0"
-doi: "10.5281/zenodo.24337287"
+version: "2.0.1"
+doi: "10.5281/zenodo.24393421"
 date-released: "2026-11-20"
-url: "https://doi.org/10.5281/zenodo.24337287"
+url: "https://doi.org/10.5281/zenodo.24393421"
 repository-code: "https://github.com/siddugayam/miRBioGenAtlas"
 license:
   - MIT

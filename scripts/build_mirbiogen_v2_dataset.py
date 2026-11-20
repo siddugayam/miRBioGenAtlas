@@ -1,24 +1,5 @@
 #!/usr/bin/env python3
-"""
-miRBioGenAtlas v2.0 — Deterministic Offline Multi-Modal Dataset Builder
-=======================================================================
-Reads the frozen, SHA-256-verified cBioPortal API snapshot in
-`data/raw_snapshot/` and builds:
-  1. Sample-level multi-modal table (10,195 samples x 15 genes = 152,925 rows)
-  2. Annotated somatic variant table (all coding variants with consequence tiers,
-     catalytic/domain hotspot flags, VAF, and sample hypermutator flags)
-  3. Patient-level synteny-aware pathway alteration burden table (10,195 samples,
-     across 10-gene Core, 12-gene Extended, and 14-gene Accessory-inclusive tiers,
-     separating high-confidence focal/functional alterations from broad CNAs)
-  4. Gene panel metadata & inclusion/exclusion rationale tables
-  5. Upgraded gene x study long table (480 rows) + class-specific wide matrices
-  6. Technical validation audit tables (20-pair cBioPortal verification table,
-     denominator reconciliation table, cis-CNA-to-mRNA dosage validation table,
-     synteny co-alteration check, and hypermutator/CDS-length sensitivity table)
-
-Uses only the Python 3 standard library + math/statistics for zero-dependency
-portability across fresh environments.
-"""
+"""Build sample-level, variant-level, aggregated, and validation tables from data/raw_snapshot/."""
 
 import csv
 import gzip
@@ -529,7 +510,6 @@ def main():
         excl_rows,
     )
 
-    # Iterate through all 32 studies
     study_files = sorted(STUDIES_SNAP_DIR.glob("*_tcga_pan_can_atlas_2018.json.gz"))
     assert len(study_files) == 32, f"Expected 32 study snapshots, found {len(study_files)}"
 
@@ -861,7 +841,6 @@ def main():
                         dosage_pairs[sym][0].append(l2_val)
                         dosage_pairs[sym][1].append(mz_val)
 
-                # Update gene-level sets
                 if has_mut:
                     per_gene_sets[sym]["mut"].add(s_id)
                     if s_id in nonhyper_samples:
@@ -883,7 +862,7 @@ def main():
                 if has_focal_cna:
                     per_gene_sets[sym]["focal_cna"].add(s_id)
 
-                # Update patient-level tiers (union automatically avoids double-counting!)
+                # Update patient-level alteration flags across gene tiers
                 for tname, flag in (
                     ("Core10", ginfo["inCore10"]),
                     ("Extended12", ginfo["inExtended12"]),
@@ -1030,7 +1009,7 @@ def main():
             "diff_intersection_vs_all": N - cnts["all_n"],
         })
 
-        # Gene x Study long-format rows (480 rows, keeping all 23 v1 columns + adding v2 strict/functional columns!)
+        # Build 480-row gene-by-study summary table
         for ginfo in GENE_PANEL:
             sym = ginfo["geneSymbol"]
             gs = per_gene_sets[sym]
@@ -1070,7 +1049,6 @@ def main():
                 "mut_only_n": len(mut_only),
                 "cna_only_n": len(cna_only),
                 "mut_and_cna_n": len(mut_and_cna),
-                # v2.0 high-confidence & stratified columns:
                 "truncating_mut_n": len(gs["trunc"]),
                 "truncating_mut_freq": round(len(gs["trunc"]) / N, 8),
                 "hotspot_mut_n": len(gs["hotspot"]),
@@ -1085,25 +1063,8 @@ def main():
                 "high_conf_alter_freq": round(len(strict_s) / N, 8),
             })
 
-    # Sort long_rows identically to v1 (tumour_acronym, geneSymbol)
     long_rows.sort(key=lambda r: (r["tumour_acronym"], r["geneSymbol"]))
 
-    # Compare v2 counts against archived v1 long table to verify 100% concordance!
-    v1_long_path = REPO_ROOT.parent.parent / "appeal_v2_submission" / "archive_v1" / "data" / "tcga_pancan_miRNA_biogenesis_alteration_freqs_long_FINAL.csv"
-    v1_diffs = 0
-    if v1_long_path.exists():
-        with open(v1_long_path, "r", encoding="utf-8") as f:
-            v1_map = {(r["tumour_acronym"], r["geneSymbol"]): r for r in csv.DictReader(f)}
-        for r in long_rows:
-            k = (r["tumour_acronym"], r["geneSymbol"])
-            v1r = v1_map[k]
-            for col in ("N", "mut_n", "amp_n", "gain_n", "shallow_del_n", "deep_del_n", "any_cna_n", "any_alter_n", "mut_only_n", "cna_only_n", "mut_and_cna_n"):
-                if int(r[col]) != int(v1r[col]):
-                    v1_diffs += 1
-                    print(f"   DIFF {k} {col}: v1={v1r[col]} vs v2={r[col]}")
-        print(f"   Concordance check vs v1 480-row master table: {480*11 - v1_diffs}/{480*11} count cells identical!")
-
-    # Write primary sample-level & variant-level tables
     print("3. Writing sample-level, variant-level, and patient-burden tables ...")
     write_csv_gz(
         DATA_DIR / "tcga_pancan_miRNA_biogenesis_sample_level_alterations.csv.gz",
@@ -1131,7 +1092,6 @@ def main():
         long_rows,
     )
 
-    # Write wide matrices (any_alter, any_cna, mut, focal_cna, high_conf_alter)
     acronyms_sorted = sorted({r["tumour_acronym"] for r in long_rows})
     for metric_col, fname in [
         ("any_alter_freq", "tcga_pancan_miRNA_biogenesis_any_alter_freq_matrix.csv"),
@@ -1149,7 +1109,7 @@ def main():
             mat_rows.append(mr)
         write_csv(DATA_DIR / fname, ["geneSymbol"] + acronyms_sorted, mat_rows)
 
-    # Gene rank summary (upgraded with high_conf_alter, focal_cna, truncating_mut, nonhypermut_mut, mut_density)
+    # Gene rank summary across all 32 studies
     by_gene = defaultdict(list)
     for r in long_rows:
         by_gene[r["geneSymbol"]].append(r)
@@ -1203,7 +1163,7 @@ def main():
             })
     write_csv(DATA_DIR / "miRNA_biogenesis_top5_tumours_per_gene.csv", list(top5_rows[0].keys()), top5_rows)
 
-    # Tumour burden ranking table — NOW with TRUE patient-level union burden across Core10, Extended12, Panel14 + FGA/Aneuploidy!
+    # Tumour burden ranking table — patient-level union burden across Core10, Extended12, Panel14 + FGA/Aneuploidy
     pb_by_acro = defaultdict(list)
     for r in patient_burden_rows:
         pb_by_acro[r["tumour_acronym"]].append(r)
@@ -1231,14 +1191,13 @@ def main():
             "patient_prop_extended12_strict": round(sum(x["extended12_has_strict_alter"] for x in pbs) / N_ac, 6),
             "patient_prop_panel14_strict": round(sum(x["panel14_has_strict_alter"] for x in pbs) / N_ac, 6),
             "patient_prop_panel14_any_alter": round(sum(x["panel14_has_any_alter"] for x in pbs) / N_ac, 6),
-            # Legacy v1 marginal-mean columns preserved for backward compatibility:
             "mean_any_alter_freq_excl_TP53": round(statistics.mean(x["any_alter_freq"] for x in l14), 6),
             "mean_mut_freq_excl_TP53": round(statistics.mean(x["mut_freq"] for x in l14), 6),
             "mean_any_cna_freq_excl_TP53": round(statistics.mean(x["any_cna_freq"] for x in l14), 6),
             "median_fraction_genome_altered": round(statistics.median(fgas), 4) if fgas else "",
             "median_aneuploidy_score": round(statistics.median(aneus), 1) if aneus else "",
             "ago1_3_4_1p34_concordant_cna_prop": round(sum(x["ago1_3_4_concordant_1p34_cna"] for x in pbs) / N_ac, 6),
-            "smad2_4_18q21_concordant_cna_prop": round(sum(x["smad2_4_18q21_concordant_cna_prop" if "smad2_4_18q21_concordant_cna_prop" in x else "smad2_4_18q21_cna" if "smad2_4_18q21_cna" in x else "smad2_4_concordant_18q21_cna"] for x in pbs) / N_ac, 6),
+            "smad2_4_18q21_concordant_cna_prop": round(sum(x["smad2_4_concordant_18q21_cna"] for x in pbs) / N_ac, 6),
             "n_genes": 14,
         })
     tumour_burden_rows.sort(key=lambda r: r["patient_prop_core10_strict"], reverse=True)
@@ -1247,7 +1206,7 @@ def main():
     tb_cols = ["rank_core10_strict"] + [k for k in tumour_burden_rows[0].keys() if k != "rank_core10_strict"]
     write_csv(DATA_DIR / "miRNA_biogenesis_top_tumours_excluding_TP53.csv", tb_cols, tumour_burden_rows)
 
-    # Regenerate BRCA deep-dive CSV deterministically from long_rows (with union decomposition + high-conf columns!)
+    # Export BRCA study summary table
     brca_rows = []
     for r in sorted([x for x in long_rows if x["tumour_acronym"] == "BRCA"], key=lambda x: x["any_alter_freq"], reverse=True):
         brca_rows.append({
@@ -1374,8 +1333,7 @@ def main():
         arm_decomp_rows,
     )
 
-    # Print rich summary statistics for verification & manuscript reporting
-    print("\n=== SUMMARY FOR MANUSCRIPT & TECHNICAL VALIDATION ===")
+    print("\nSummary:")
     print(f"Total intersection samples (N): {sum(r['intersection_sequenced_cna_n'] for r in study_summary_rows)}")
     print(f"Total sample x gene rows: {len(sample_level_rows)}")
     print(f"Total structural variant / fusion calls across 15 genes: {len(structural_variant_rows)}")
@@ -1400,7 +1358,7 @@ def main():
         1 for s_idx in range(0, len(sample_level_rows), 15)
         if any(sample_level_rows[s_idx + k]["gistic2DiscreteCNA"] != 0 for k in (6, 8, 9))
     )
-    print(f"Synteny check AGO1/AGO3/AGO4 (1p34.3): {ago_any_cna_samples}/{ago_either_cna} ({ago_any_cna_samples/ago_either_cna*100:.1f}%) of 1p34.3 CNA-altered samples share identical GISTIC call across all 3 genes!")
+    print(f"Synteny check AGO1/AGO3/AGO4 (1p34.3): {ago_any_cna_samples}/{ago_either_cna} ({ago_any_cna_samples/ago_either_cna*100:.1f}%) of 1p34.3 CNA-altered samples share identical GISTIC call across all 3 genes.")
 
     print("\nTop 5 tumours by Core-10 strict high-confidence patient burden:")
     for r in tumour_burden_rows[:5]:

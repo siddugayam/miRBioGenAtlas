@@ -1,14 +1,5 @@
 #!/usr/bin/env python3
-"""
-miRBioGenAtlas v2.0 — Frozen Multi-Modal cBioPortal Snapshot Retriever
-======================================================================
-Retrieves and archives a versioned, SHA-256-checksummed raw snapshot of
-sample-level genomic, transcriptomic, and clinical/TMB/aneuploidy data for
-15 miRNA biogenesis and regulatory genes across all 32 TCGA PanCancer Atlas
-(2018) studies via the public cBioPortal REST API.
-
-Uses only the Python 3 standard library for maximum portability.
-"""
+"""Retrieve and archive SHA-256-verified TCGA PanCancer Atlas snapshots from the cBioPortal API."""
 
 import concurrent.futures
 import datetime
@@ -230,7 +221,7 @@ def fetch_one_study(study_row):
         else (f"{sid}_rna_seq_v2_mrna_median_Zscores" if f"{sid}_rna_seq_v2_mrna_median_Zscores" in mp_by_id else None)
     )
 
-    # 2) Sample lists (study-scoped endpoint!)
+    # 2) Sample lists (study-scoped endpoint)
     sample_lists = http_json("GET", f"/studies/{sid}/sample-lists", params={"projection": "SUMMARY"})
     sl_ids_by_suffix = {}
     for sl in sample_lists:
@@ -489,7 +480,7 @@ def main():
 
     manifest = {
         "dataset": "miRBioGenAtlas",
-        "snapshot_version": "2.0.0",
+        "snapshot_version": "2.0.1",
         "retrieved_utc": datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "cbioportal_portal_version": info.get("portalVersion"),
         "cbioportal_db_version": info.get("dbVersion"),

@@ -1,8 +1,8 @@
-# miRBioGenAtlas (v2.0.0)
+# miRBioGenAtlas (v2.0.1)
 
 **Multi-consortium, structurally and clinically calibrated pan-cancer atlas of the miRNA biogenesis machinery across 21,140 human tumours (`10,195` TCGA PanCanAtlas + `10,945` MSK-IMPACT), matched mature `miRNA-seq` (`N = 9,578`), `13.37M`-pair `miRNA × mRNA` target couplings (`N = 9,353`), `213,940`-variant `ESM-2 3B` / `ESM-1v` / `ESM-IF1` 3D saturation mutagenesis + 16 Cryo-EM/X-ray complexes, `16,569` NCBI ClinVar records (`ROC-AUC = 0.978`), `gnomAD v4`, `GTEx` 54-tissue baselines, `CPTAC` proteomics (`N = 1,002`), and `Broad DepMap` CRISPR (`N = 1,208`)**
 
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.24337287.svg)](https://doi.org/10.5281/zenodo.24337287)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.24393421.svg)](https://doi.org/10.5281/zenodo.24393421)
 [![Interactive Web Explorer](https://img.shields.io/badge/Web_Explorer-Live_GitHub_Pages-0f5499.svg)](https://siddugayam.github.io/miRBioGenAtlas/)
 [![CI Reproducibility](https://github.com/siddugayam/miRBioGenAtlas/actions/workflows/ci_verify_and_deploy.yml/badge.svg)](https://github.com/siddugayam/miRBioGenAtlas/actions/workflows/ci_verify_and_deploy.yml)
 [![Code License: MIT](https://img.shields.io/badge/Code_License-MIT-blue.svg)](LICENSE)
@@ -17,9 +17,9 @@
 
 ## Overview
 
-**miRBioGenAtlas (v2.0.0)** provides a frozen, SHA-256-verified, sample-level, variant-level, saturation-mutagenesis, and multi-consortium dataset covering **15 canonical microRNA (miRNA) biogenesis and regulatory genes** across **32 TCGA PanCancer Atlas (2018) studies** (33 cancer types; `COAD = 336` and `READ = 196` combined in `COADREAD = 532`; matched `sequenced ∩ CNA` denominator **`N = 10,195` primary tumours**) replicated across **`N = 10,945` prospective clinical patients** in Memorial Sloan Kettering `MSK-IMPACT` (**`21,140` tumours combined**).
+**miRBioGenAtlas (v2.0.1)** provides a frozen, SHA-256-verified, sample-level, variant-level, saturation-mutagenesis, and multi-consortium dataset covering **15 canonical microRNA (miRNA) biogenesis and regulatory genes** across **32 TCGA PanCancer Atlas (2018) studies** (33 cancer types; `COAD = 336` and `READ = 196` combined in `COADREAD = 532`; matched `sequenced ∩ CNA` denominator **`N = 10,195` primary tumours**) replicated across **`N = 10,945` prospective clinical patients** in Memorial Sloan Kettering `MSK-IMPACT` (**`21,140` tumours combined**).
 
-### Key Integrative Layers in v2.0.0
+### Key Integrative Layers in v2.0.1
 1. **Frozen SHA-256-verified snapshot archive (`data/raw_snapshot/`, `45` verified archives):** Rebuilds every sample-level, variant-level, benchmark, and interactive explorer file **100% offline in ~10 seconds** using only the Python $\ge 3.9$ standard library.
 2. **Sample-level TCGA multi-modal table (`152,925` rows = `10,195` samples × `15` genes) + TCGA-CDR Multivariable Survival & Thorsson PanImmune (`10,195 × 62`):** Discrete GISTIC2 (`-2..+2`), continuous `log2CNA`, matched chromosome-arm status (`1p–22q`), somatic mutation tiers, structural variants (`72` calls), matched mRNA `RSEM`/`Z-scores` (`n = 9,620`), hypermutator status (`n = 1,385`), curated TCGA-CDR `OS/DSS/PFI` survival & AJCC stage (evaluated via both cancer-type-stratified Mantel–Haenszel log-rank and exact Breslow multivariable Cox proportional hazards adjusting for age, sex, AJCC stage, and hypermutator status), and Thorsson `C1–C6` immune subtypes, leukocyte fraction, `IFN-gamma`/`TGF-beta` scores, and `HRD` (`n = 9,899`).
 3. **Matched TCGA mature `miRNA-seq` (`n = 9,578`) & `13.37M`-pair `miRNA × mRNA` target couplings (`n = 9,353` dual-profiled tumours):** Pre-computed `5p:3p` duplex ratios across `192` batch-corrected canonical `-5p`/`-3p` duplexes (`-0.59 log2` `5p` shift in *DICER1* RNase IIIb 3D pocket variants at $p = 1.46 \times 10^{-15}$ vs $p = 0.35$ for likely benign missense; AGO2-dependent `miR-451a` control $p = 0.97$), plus selective elevation of `5p` `let-7` target mRNAs ($p = 6.53 \times 10^{-5}$; `3p` `miR-200` targets $p = 0.35$) and *LIN28A/B* target mRNAs ($p = 1.75 \times 10^{-31}$).
@@ -53,9 +53,9 @@ python3 scripts/query_variant.py --codon DICER1 1705
 Rscript miRBioGenAtlas_figures.R
 ```
 
-### 4. Optional GPU saturation-mutagenesis & correlation regeneration (`ESM-IF1` 3D + `213,940`-variant `ESM-2 3B` / `ESM-1v` + `13.37M` pairs on 16 GB VRAM GPU)
+### 4. Optional saturation-mutagenesis & target-coupling regeneration (`ESM-IF1` 3D + `213,940`-variant `ESM-2 3B` / `ESM-1v` + `13.37M` pairs)
 ```bash
-python3 scripts/run_rtx_a4000_deep_atlas.py
+python3 scripts/compute_plm_saturation_and_couplings.py --device auto
 python3 scripts/build_mirbiogen_v2_dataset.py
 ```
 

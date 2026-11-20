@@ -1,4 +1,4 @@
-sampleId,gpu_mirnaome_pc1_score,gpu_mirnaome_pc2_score,gpu_mirnaome_rms_deviation
+sampleId,mirnaome_pc1_score,mirnaome_pc2_score,mirnaome_rms_deviation
 TCGA-04-1331-01,-6.94519,-7.81015,1.67035
 TCGA-04-1336-01,-10.44155,-6.7798,2.15987
 TCGA-04-1337-01,-7.01877,-6.26266,1.66336

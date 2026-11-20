@@ -1,5 +1,5 @@
 ================================================================================
-TCGA PanCancer Atlas (2018) — Low-Coverage Studies Note (miRBioGenAtlas v2.0.0)
+TCGA PanCancer Atlas (2018) — Low-Coverage Studies Note (miRBioGenAtlas v2.0.1)
 ================================================================================
 
 Primary study denominator (N): intersection of `<studyId>_sequenced` and

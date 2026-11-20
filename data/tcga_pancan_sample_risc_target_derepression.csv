@@ -1,4 +1,4 @@
-sampleId,let7_target_oncofetal_mrna_z,mir200_target_emt_mrna_z,empirical_5p_target_derepression_z,global_risc_target_derepression_z,gpu_full662_mirnaome_pc1
+sampleId,let7_target_oncofetal_mrna_z,mir200_target_emt_mrna_z,empirical_5p_target_derepression_z,global_risc_target_derepression_z,full662_mirnaome_pc1
 TCGA-OR-A5J1-01,0.11025,0.03654,0.14525,-0.04722,1.84109
 TCGA-OR-A5J2-01,0.36076,0.6728,0.48814,0.06264,-3.92875
 TCGA-OR-A5J3-01,-0.52775,0.06768,0.40515,0.17064,-1.69969

@@ -1,11 +1,5 @@
 #!/usr/bin/env python3
-"""
-miRBioGenAtlas v2.0 — Pure-Stdlib Clinical, Germline Constraint, ClinVar ROC-AUC,
-GTEx/HPA/OpenTargets, MSK-IMPACT (N=10,945), TCGA-CDR Survival & Thorsson PanImmune Module
-==========================================================================================
-Integrates frozen, SHA-256-verified snapshots from `data/raw_snapshot/external/`
-using ONLY the Python 3 standard library (`csv`, `gzip`, `json`, `math`, `statistics`).
-"""
+"""Integrate germline constraint, ClinVar, GTEx, HPA, Open Targets, MSK-IMPACT, survival, and immune layers."""
 
 import csv
 import gzip
@@ -29,17 +23,12 @@ def load_gz_json(path: pathlib.Path):
 
 
 def compute_roc_pr_auc(y_true, scores, mann_whitney_fn):
-    """
-    Exact tie-handled ROC-AUC + Hanley-McNeil 95% CI + Average-Precision PR-AUC
-    in pure Python stdlib. `y_true` in {0, 1}, higher `scores` => positive class (1).
-    """
     pos = [s for y, s in zip(y_true, scores) if y == 1]
     neg = [s for y, s in zip(y_true, scores) if y == 0]
     n1, n0 = len(pos), len(neg)
     if n1 < 3 or n0 < 3:
         return None
-    r_rb, z_val, p_val = mann_whitney_fn(pos, neg)
-    # Note: r_rb = 2 * AUC - 1 => AUC = (r_rb + 1) / 2!
+    r_rb, _, p_val = mann_whitney_fn(pos, neg)
     auc = (r_rb + 1.0) / 2.0
     q1 = auc / (2.0 - auc) if auc < 1.0 else 1.0
     q2 = 2.0 * (auc ** 2) / (1.0 + auc)
@@ -48,52 +37,43 @@ def compute_roc_pr_auc(y_true, scores, mann_whitney_fn):
     ci_lo = max(0.0, auc - 1.96 * se)
     ci_hi = min(1.0, auc + 1.96 * se)
 
-    # Exact Average Precision (PR-AUC) sorting descending by score (tie-averaged)
     pairs = sorted(zip(scores, y_true), key=lambda t: -t[0])
     tp = 0.0
     fp = 0.0
     ap_sum = 0.0
     i = 0
-    N = len(pairs)
-    while i < N:
+    n_tot = len(pairs)
+    while i < n_tot:
         j = i
         pos_tie = 0
         neg_tie = 0
-        while j < N and pairs[j][0] == pairs[i][0]:
+        while j < n_tot and pairs[j][0] == pairs[i][0]:
             if pairs[j][1] == 1:
                 pos_tie += 1
             else:
                 neg_tie += 1
             j += 1
         if pos_tie > 0:
-            # Average precision across tied items
             tp_end = tp + pos_tie
             fp_end = fp + neg_tie
-            prec_at_tie = tp_end / (tp_end + fp_end)
-            ap_sum += pos_tie * prec_at_tie
+            ap_sum += pos_tie * (tp_end / (tp_end + fp_end))
         tp += pos_tie
         fp += neg_tie
         i = j
-    pr_auc = ap_sum / n1
-    baseline_prev = n1 / (n1 + n0)
+
     return {
         "n_pos": n1,
         "n_neg": n0,
         "roc_auc": round(auc, 4),
         "roc_ci95_low": round(ci_lo, 4),
         "roc_ci95_high": round(ci_hi, 4),
-        "pr_auc": round(pr_auc, 4),
-        "pr_baseline": round(baseline_prev, 4),
+        "pr_auc": round(ap_sum / n1, 4),
+        "pr_baseline": round(n1 / (n1 + n0), 4),
         "mann_whitney_p": f"{p_val:.3e}",
     }
 
 
 def stratified_logrank_and_hr(records):
-    """
-    Exact cancer-type-stratified Mantel-Haenszel / Peto log-rank test and
-    one-step hazard ratio in pure Python stdlib.
-    `records`: list of (stratum, time_months, event_01, group_01) with group=1 (altered) vs 0 (control).
-    """
     by_stratum = defaultdict(list)
     n1_tot, n0_tot, ev1_tot, ev0_tot = 0, 0, 0, 0
     for st, tm, ev, grp in records:
@@ -110,25 +90,23 @@ def stratified_logrank_and_hr(records):
     if n1_tot < 5 or n0_tot < 5 or (ev1_tot + ev0_tot) < 5:
         return None
 
-    O_minus_E_sum = 0.0
-    V_sum = 0.0
+    o_minus_e = 0.0
+    var_sum = 0.0
     active_strata = 0
 
-    for st, items in by_stratum.items():
+    for items in by_stratum.values():
         r1 = sum(1 for _, _, g in items if g == 1)
         r0 = sum(1 for _, _, g in items if g == 0)
         if r1 == 0 or r0 == 0:
             continue
         active_strata += 1
         items.sort(key=lambda x: x[0])
-        n_risk_1 = r1
-        n_risk_0 = r0
+        n_risk_1, n_risk_0 = r1, r0
         idx = 0
         m = len(items)
         while idx < m:
             t_cur = items[idx][0]
-            d1, d0 = 0, 0
-            c1, c0 = 0, 0
+            d1, d0, c1, c0 = 0, 0, 0, 0
             while idx < m and items[idx][0] == t_cur:
                 _, ev, grp = items[idx]
                 if grp == 1:
@@ -147,68 +125,62 @@ def stratified_logrank_and_hr(records):
             if d > 0 and n_risk > 1 and n_risk_1 > 0 and n_risk_0 > 0:
                 e1 = n_risk_1 * (d / n_risk)
                 v1 = (n_risk_1 * n_risk_0 * d * (n_risk - d)) / ((n_risk ** 2) * (n_risk - 1))
-                O_minus_E_sum += (d1 - e1)
-                V_sum += v1
-            n_risk_1 -= (d1 + c1)
-            n_risk_0 -= (d0 + c0)
+                o_minus_e += d1 - e1
+                var_sum += v1
+            n_risk_1 -= d1 + c1
+            n_risk_0 -= d0 + c0
 
-    if V_sum <= 1e-9:
+    if var_sum <= 1e-9:
         return None
-    z = O_minus_E_sum / math.sqrt(V_sum)
+    z = o_minus_e / math.sqrt(var_sum)
     p_two = math.erfc(abs(z) / math.sqrt(2.0))
-    log_hr = O_minus_E_sum / V_sum
-    se_log_hr = 1.0 / math.sqrt(V_sum)
-    hr = math.exp(max(-10.0, min(10.0, log_hr)))
-    hr_lo = math.exp(max(-10.0, min(10.0, log_hr - 1.96 * se_log_hr)))
-    hr_hi = math.exp(max(-10.0, min(10.0, log_hr + 1.96 * se_log_hr)))
+    log_hr = o_minus_e / var_sum
+    se_log_hr = 1.0 / math.sqrt(var_sum)
     return {
         "n_altered": n1_tot,
         "events_altered": ev1_tot,
         "n_control": n0_tot,
         "events_control": ev0_tot,
         "n_informative_strata": active_strata,
-        "hazard_ratio_stratified": round(hr, 4),
-        "hr_ci95_low": round(hr_lo, 4),
-        "hr_ci95_high": round(hr_hi, 4),
+        "hazard_ratio_stratified": round(math.exp(max(-10.0, min(10.0, log_hr))), 4),
+        "hr_ci95_low": round(math.exp(max(-10.0, min(10.0, log_hr - 1.96 * se_log_hr))), 4),
+        "hr_ci95_high": round(math.exp(max(-10.0, min(10.0, log_hr + 1.96 * se_log_hr))), 4),
         "logrank_z": round(z, 4),
         "p_value_two_sided": f"{p_two:.3e}",
     }
 
 
-def _solve_linear_system(A, b):
-    """Gauss-Jordan elimination with partial pivoting in pure Python stdlib."""
-    k = len(b)
-    M = [row[:] + [b[i]] for i, row in enumerate(A)]
+def _solve_linear_system(a_mat, b_vec):
+    k = len(b_vec)
+    aug = [row[:] + [b_vec[i]] for i, row in enumerate(a_mat)]
     for col in range(k):
-        piv = max(range(col, k), key=lambda r: abs(M[r][col]))
-        if abs(M[piv][col]) < 1e-12:
+        piv = max(range(col, k), key=lambda r: abs(aug[r][col]))
+        if abs(aug[piv][col]) < 1e-12:
             return None
-        M[col], M[piv] = M[piv], M[col]
-        div = M[col][col]
+        aug[col], aug[piv] = aug[piv], aug[col]
+        div = aug[col][col]
         for j in range(col, k + 1):
-            M[col][j] /= div
+            aug[col][j] /= div
         for r in range(k):
-            if r != col and M[r][col] != 0.0:
-                fac = M[r][col]
+            if r != col and aug[r][col] != 0.0:
+                fac = aug[r][col]
                 for j in range(col, k + 1):
-                    M[r][j] -= fac * M[col][j]
-    return [M[i][k] for i in range(k)]
+                    aug[r][j] -= fac * aug[col][j]
+    return [aug[i][k] for i in range(k)]
 
 
-def _invert_matrix(A):
-    k = len(A)
-    inv_cols = []
+def _invert_matrix(a_mat):
+    k = len(a_mat)
+    cols = []
     for col in range(k):
-        e = [1.0 if i == col else 0.0 for i in range(k)]
-        sol = _solve_linear_system(A, e)
+        sol = _solve_linear_system(a_mat, [1.0 if i == col else 0.0 for i in range(k)])
         if sol is None:
             return None
-        inv_cols.append(sol)
-    return [[inv_cols[j][i] for j in range(k)] for i in range(k)]
+        cols.append(sol)
+    return [[cols[j][i] for j in range(k)] for i in range(k)]
 
 
 def _parse_ajcc_stage_indicators(st_raw):
-    """Returns (stage_III_IV_advanced, stage_unstaged_or_nonAJCC) with Stage I/II as reference (0, 0)."""
     s = (st_raw or "").strip().upper()
     if not s or s in (
         "STAGE X", "[DISCREPANCY]", "[NOT AVAILABLE]", "I/II NOS",
@@ -223,13 +195,7 @@ def _parse_ajcc_stage_indicators(st_raw):
 
 
 def stratified_multivar_cox_breslow(records, covariates_desc, max_iter=35, tol=1e-8):
-    """
-    Exact Breslow-tied cancer-type-stratified multivariable Cox proportional hazards
-    regression via Newton-Raphson partial-likelihood maximization in pure Python stdlib.
-    Cross-verified to 6 decimal places against R `survival::coxph(..., ties='breslow')`.
-    `records`: list of (stratum, time_months, event_01, x_vec), where x_vec[0] is the
-    primary binary exposure (1 = altered, 0 = control).
-    """
+    """Stratified Cox proportional hazards regression with Breslow tie handling."""
     by_st = defaultdict(list)
     for st, tm, ev, x in records:
         if tm is None or ev not in (0, 1) or tm <= 0:
@@ -258,8 +224,7 @@ def stratified_multivar_cox_breslow(records, covariates_desc, max_iter=35, tol=1
             active_cols.append(j)
 
     proj_strata = {}
-    n_tot = 0
-    ev_tot = 0
+    n_tot, ev_tot = 0, 0
     for st, items in strata.items():
         proj_strata[st] = [(tm, ev, [x[j] for j in active_cols]) for tm, ev, x in items]
         n_tot += len(items)
@@ -274,9 +239,9 @@ def stratified_multivar_cox_breslow(records, covariates_desc, max_iter=35, tol=1
         info = [[0.0] * k for _ in range(k)]
         for items in proj_strata.values():
             m = len(items)
-            S0 = 0.0
-            S1 = [0.0] * k
-            S2 = [[0.0] * k for _ in range(k)]
+            s0 = 0.0
+            s1 = [0.0] * k
+            s2 = [[0.0] * k for _ in range(k)]
             idx = m - 1
             while idx >= 0:
                 t_cur = items[idx][0]
@@ -285,28 +250,26 @@ def stratified_multivar_cox_breslow(records, covariates_desc, max_iter=35, tol=1
                 x_ev_sum = [0.0] * k
                 while j >= 0 and items[j][0] == t_cur:
                     _, ev, x = items[j]
-                    eta = max(-50.0, min(50.0, sum(b[c] * x[c] for c in range(k))))
-                    w = math.exp(eta)
-                    S0 += w
+                    w = math.exp(max(-50.0, min(50.0, sum(b[c] * x[c] for c in range(k)))))
+                    s0 += w
                     for c in range(k):
                         wx = w * x[c]
-                        S1[c] += wx
+                        s1[c] += wx
                         for c2 in range(c, k):
-                            S2[c][c2] += wx * x[c2]
+                            s2[c][c2] += wx * x[c2]
                     if ev == 1:
                         d += 1
                         for c in range(k):
                             x_ev_sum[c] += x[c]
                     j -= 1
-                if d > 0 and S0 > 0.0:
-                    ll += sum(b[c] * x_ev_sum[c] for c in range(k)) - d * math.log(S0)
-                    inv_s0 = 1.0 / S0
-                    mean_x = [S1[c] * inv_s0 for c in range(k)]
+                if d > 0 and s0 > 0.0:
+                    ll += sum(b[c] * x_ev_sum[c] for c in range(k)) - d * math.log(s0)
+                    inv_s0 = 1.0 / s0
+                    mean_x = [s1[c] * inv_s0 for c in range(k)]
                     for c in range(k):
                         grad[c] += x_ev_sum[c] - d * mean_x[c]
                         for c2 in range(c, k):
-                            cov_cc2 = S2[c][c2] * inv_s0 - mean_x[c] * mean_x[c2]
-                            info[c][c2] += d * cov_cc2
+                            info[c][c2] += d * (s2[c][c2] * inv_s0 - mean_x[c] * mean_x[c2])
                 idx = j
         for c in range(k):
             for c2 in range(c):
@@ -352,7 +315,7 @@ def stratified_multivar_cox_breslow(records, covariates_desc, max_iter=35, tol=1
     }
 
 
-def run_v21_clinical_and_external_enrichment(
+def integrate_clinical_and_external(
     repo_root: pathlib.Path,
     data_dir: pathlib.Path,
     gene_panel: list,
@@ -372,16 +335,14 @@ def run_v21_clinical_and_external_enrichment(
     imm_gz = ext_dir / "thorsson_panimmune_tcga.json.gz"
 
     if not (gc_gz.exists() and cv_gz.exists() and msk_gz.exists() and imm_gz.exists()):
-        print("   [Note] v2.1 clinical/external snapshots not present; skipping v2.1 extensions.")
         return
 
-    print("\n5. Integrating gnomAD, GTEx (54 tissues), HPA, Open Targets, ClinVar, MSK-IMPACT (N=10,945), TCGA-CDR & Thorsson PanImmune...")
+    print("\n5. Integrating gnomAD, GTEx, HPA, Open Targets, ClinVar, MSK-IMPACT, survival, and immune layers...")
     gc_snap = load_gz_json(gc_gz)
     cv_snap = load_gz_json(cv_gz)
     msk_snap = load_gz_json(msk_gz)
     imm_snap = load_gz_json(imm_gz)
 
-    # Load 213,940 saturation mutagenesis lookup so EVERY ClinVar & MSK-IMPACT missense variant gets instant PLM/3D/IF1 scores!
     sat_lookup = {}
     sat_gz = data_dir / "miRNA_biogenesis_saturation_mutagenesis_213940_atlas.csv.gz"
     if sat_gz.exists():
@@ -389,9 +350,6 @@ def run_v21_clinical_and_external_enrichment(
             for r in csv.DictReader(f):
                 sat_lookup[(r["geneSymbol"], r["variant"])] = r
 
-    # -------------------------------------------------------------------------
-    # 1. Enrich Gene Panel Metadata (15 genes) + Export GTEx 54-Tissue Table (810 rows)
-    # -------------------------------------------------------------------------
     for prow in panel_rows:
         sym = prow["geneSymbol"]
         gi = gc_snap["genes"].get(sym, {})
@@ -428,10 +386,6 @@ def run_v21_clinical_and_external_enrichment(
             gtex_rows,
         )
 
-    # -------------------------------------------------------------------------
-    # 2. ClinVar Somatic Cross-Annotation + Non-Circular Human Clinical ROC-AUC Benchmarks
-    # -------------------------------------------------------------------------
-    # Deduplicate ClinVar coding variants per (geneSymbol, proteinChange), preferring highest reviewStars & unambiguous labels
     sig_priority = {
         "Pathogenic_or_Likely_Pathogenic": 4,
         "Benign_or_Likely_Benign": 3,
@@ -446,7 +400,6 @@ def run_v21_clinical_and_external_enrichment(
         if key not in cv_best or rank > cv_best[key][0]:
             cv_best[key] = (rank, cv)
 
-    # Cross-annotate TCGA 6,292 somatic mutations
     tcga_clinvar_overlap_n = 0
     tcga_obs_set = Counter((m["geneSymbol"], (m["proteinChange"] or "").lstrip("p.")) for m in annotated_mut_rows)
     for mrow in annotated_mut_rows:
@@ -471,7 +424,6 @@ def run_v21_clinical_and_external_enrichment(
         annotated_mut_rows,
     )
 
-    # Export annotated ClinVar coding variants table & compute ROC-AUC / PR-AUC across predictors!
     clinvar_export_rows = []
     for (_, _), (_, cv) in sorted(cv_best.items(), key=lambda kv: (kv[0][0], kv[1][1]["codonPos"], kv[0][1])):
         sym = cv["geneSymbol"]
@@ -512,7 +464,6 @@ def run_v21_clinical_and_external_enrichment(
             clinvar_export_rows,
         )
 
-    # Evaluate ClinVar Missense Pathogenic/Likely_Pathogenic (y=1) vs Benign/Likely_Benign (y=0)
     core10_set = {"DROSHA", "DGCR8", "XPO5", "DICER1", "TARBP2", "PRKRA", "AGO1", "AGO2", "AGO3", "AGO4"}
     benchmark_subsets = [
         ("ClinVar_All15_Missense_AllStars", lambda r: True),
@@ -551,11 +502,7 @@ def run_v21_clinical_and_external_enrichment(
                     scs.append(sv)
             res = compute_roc_pr_auc(ys, scs, mann_whitney_fn)
             if res:
-                roc_rows.append({
-                    "benchmark_subset": sub_name,
-                    "predictor": pred_name,
-                    **res,
-                })
+                roc_rows.append({"benchmark_subset": sub_name, "predictor": pred_name, **res})
     if roc_rows:
         write_csv_fn(
             data_dir / "validation_clinvar_roc_auc_benchmarks.csv",
@@ -563,13 +510,10 @@ def run_v21_clinical_and_external_enrichment(
             roc_rows,
         )
 
-    # -------------------------------------------------------------------------
-    # 3. MSK-IMPACT (N=10,945) Independent Clinical Sequencing Replication
-    # -------------------------------------------------------------------------
     gene_meta_by_sym = {g["geneSymbol"]: g for g in gene_panel}
-    msk_samples = msk_snap["samples"]  # sid -> [cancerType, sampleType, panelSuffix, tmb, osStatus, osMonths]
-    N_msk = msk_snap["n_sequenced_and_cna"]
-    msk_profiled = msk_snap["profiled_genes_all_10945"]  # ["DICER1", "SMAD2", "SMAD4", "TP53"]
+    msk_samples = msk_snap["samples"]
+    n_msk = msk_snap["n_sequenced_and_cna"]
+    msk_profiled = msk_snap["profiled_genes_all_10945"]
 
     msk_cna_by_gene = defaultdict(lambda: {"amp": set(), "dpdel": set(), "any_cna": set()})
     for sid, sym, val in msk_snap["cna_nonzero"]:
@@ -590,7 +534,7 @@ def run_v21_clinical_and_external_enrichment(
         "calls_n": 0,
     })
     msk_cancer_dicer = defaultdict(lambda: {"N": 0, "mut": set(), "r3b_hotspot": set(), "trunc": set()})
-    for sid, sdata in msk_samples.items():
+    for sdata in msk_samples.values():
         msk_cancer_dicer[sdata[0]]["N"] += 1
 
     msk_nonhyper_n = sum(1 for sdata in msk_samples.values() if sdata[3] is None or sdata[3] < 10.0)
@@ -602,8 +546,7 @@ def run_v21_clinical_and_external_enrichment(
         sym = m["g"]
         if sid not in msk_samples or sym not in msk_profiled:
             continue
-        sdata = msk_samples[sid]
-        ctype, stype, _, tmb, _, _ = sdata
+        ctype, stype, _, tmb, _, _ = msk_samples[sid]
         is_hyper = tmb is not None and tmb >= 10.0
         pch = (m.get("p") or "").lstrip("p.")
         pos = int(m["pos"]) if str(m.get("pos") or "").isdigit() else 0
@@ -638,7 +581,6 @@ def run_v21_clinical_and_external_enrichment(
             if pos in hs_set or (1690 <= pos <= 1830 and is_3dp):
                 msk_cancer_dicer[ctype]["r3b_hotspot"].add(sid)
 
-    # Compare against TCGA (N=10,195) pan-cancer pooled counts across the exact same genes!
     tcga_pooled = defaultdict(lambda: {"mut": set(), "trunc": set(), "hs3d": set(), "amp": set(), "dpdel": set(), "hc": set()})
     for sl in sample_level_rows:
         sym = sl["geneSymbol"]
@@ -657,7 +599,7 @@ def run_v21_clinical_and_external_enrichment(
         if mr["isCuratedHotspot"] == 1 or mr["functionalVariantTierV2"] == "3D_Catalytic_or_Substrate_Pocket_Driver":
             tcga_pooled[mr["geneSymbol"]]["hs3d"].add(mr["sampleId"])
 
-    N_tcga = len(patient_burden_rows)
+    n_tcga = len(patient_burden_rows)
     msk_rep_rows = []
     for sym in msk_profiled:
         gs = msk_mut_by_gene[sym]
@@ -666,22 +608,22 @@ def run_v21_clinical_and_external_enrichment(
         tp = tcga_pooled[sym]
         msk_rep_rows.append({
             "geneSymbol": sym,
-            "msk_N_profiled": N_msk,
+            "msk_N_profiled": n_msk,
             "msk_mut_calls_n": gs["calls_n"],
             "msk_mut_samples_n": len(gs["mut_samples"]),
-            "msk_mut_freq": round(len(gs["mut_samples"]) / N_msk, 5),
-            "tcga_mut_freq_N10195": round(len(tp["mut"]) / N_tcga, 5),
+            "msk_mut_freq": round(len(gs["mut_samples"]) / n_msk, 5),
+            "tcga_mut_freq_N10195": round(len(tp["mut"]) / n_tcga, 5),
             "msk_nonhypermut_mut_freq": round(len(gs["nonhyper_mut_samples"]) / msk_nonhyper_n, 5),
             "msk_truncating_n": len(gs["trunc_samples"]),
-            "msk_truncating_freq": round(len(gs["trunc_samples"]) / N_msk, 5),
-            "tcga_truncating_freq": round(len(tp["trunc"]) / N_tcga, 5),
+            "msk_truncating_freq": round(len(gs["trunc_samples"]) / n_msk, 5),
+            "tcga_truncating_freq": round(len(tp["trunc"]) / n_tcga, 5),
             "msk_3dpocket_or_hotspot_n": len(gs["hotspot_or_3dpocket_samples"]),
-            "msk_3dpocket_or_hotspot_freq": round(len(gs["hotspot_or_3dpocket_samples"]) / N_msk, 5),
-            "tcga_3dpocket_or_hotspot_freq": round(len(tp["hs3d"]) / N_tcga, 5),
+            "msk_3dpocket_or_hotspot_freq": round(len(gs["hotspot_or_3dpocket_samples"]) / n_msk, 5),
+            "tcga_3dpocket_or_hotspot_freq": round(len(tp["hs3d"]) / n_tcga, 5),
             "msk_amp_p2_n": len(cs["amp"]),
             "msk_deep_del_m2_n": len(cs["dpdel"]),
-            "msk_high_conf_alter_freq": round(len(hc_msk) / N_msk, 5),
-            "tcga_high_conf_alter_freq": round(len(tp["hc"]) / N_tcga, 5),
+            "msk_high_conf_alter_freq": round(len(hc_msk) / n_msk, 5),
+            "tcga_high_conf_alter_freq": round(len(tp["hc"]) / n_tcga, 5),
             "msk_primary_mut_freq": round(len(gs["primary_mut_samples"]) / msk_prim_n, 5) if msk_prim_n else 0.0,
             "msk_metastasis_mut_freq": round(len(gs["met_mut_samples"]) / msk_met_n, 5) if msk_met_n else 0.0,
         })
@@ -712,9 +654,6 @@ def run_v21_clinical_and_external_enrichment(
         dicer_ct_rows,
     )
 
-    # -------------------------------------------------------------------------
-    # 4. Align Thorsson PanImmune onto 10,195 TCGA Patients + Survival & Immune Benchmarks
-    # -------------------------------------------------------------------------
     imm_map = imm_snap["samples"]
     for pb in patient_burden_rows:
         im = imm_map.get(pb["sampleId"], {})
@@ -733,7 +672,6 @@ def run_v21_clinical_and_external_enrichment(
         patient_burden_rows,
     )
 
-    # Build fast sample-level gene alteration lookup for survival & immune tests
     sl_by_sg = {(r["sampleId"], r["geneSymbol"]): r for r in sample_level_rows}
 
     surv_rows = []
@@ -787,7 +725,6 @@ def run_v21_clinical_and_external_enrichment(
                 })
             surv_rows.append(row_out)
 
-    # Cancer-type-stratified TCGA-CDR survival benchmarks (controlling 100% for cancer type across 32 studies!)
     add_surv_test(
         "S1_Core10_StrictAlter_Stratified_OS", "TCGA_PanCanAtlas_Stratified32", "OS", "osMonths", "osEvent",
         "Core10_Strict_Altered_Mut_or_FocalCNA", "Core10_No_Strict_Alteration",
@@ -845,7 +782,6 @@ def run_v21_clinical_and_external_enrichment(
         lambda pb: 1 if sl_by_sg[(pb["sampleId"], "TP53")]["hasHighConfAlteration"] == 1 else (0 if sl_by_sg[(pb["sampleId"], "TP53")]["hasAnyAlteration"] == 0 else -1),
     )
 
-    # Also replicate survival in MSK-IMPACT (N=7,574 OS-evaluable clinical patients stratified by cancer type!)
     for sym in ("DICER1", "SMAD4", "TP53"):
         alt_set = msk_mut_by_gene[sym]["am_or_plm_path_samples"] | msk_cna_by_gene[sym]["dpdel"]
         msk_surv_recs = []
@@ -902,7 +838,6 @@ def run_v21_clinical_and_external_enrichment(
         surv_rows,
     )
 
-    # Thorsson PanImmune microenvironment & HRD associations (non-hypermutated & pan-cancer)
     imm_bench_rows = []
     def add_imm_test(tid, metric_col, grp_a_lbl, grp_b_lbl, pred_a, pred_b):
         va = [float(pb[metric_col]) for pb in patient_burden_rows if pb.get(metric_col, "") != "" and pred_a(pb)]
@@ -980,20 +915,5 @@ def run_v21_clinical_and_external_enrichment(
         imm_bench_rows,
     )
 
-    # Print rich summary!
-    print(f"   [ClinVar] Annotated {len(clinvar_export_rows)} unique coding variants; overlapped {tcga_clinvar_overlap_n} TCGA somatic calls.")
-    for rr in roc_rows:
-        print(f"     ROC-AUC | {rr['benchmark_subset']:<44} | {rr['predictor']:<30} | AUC={rr['roc_auc']:.4f} [{rr['roc_ci95_low']:.4f}-{rr['roc_ci95_high']:.4f}] | PR={rr['pr_auc']:.4f} | p={rr['mann_whitney_p']}")
-    print(f"   [MSK-IMPACT N={N_msk}] Independent clinical cohort replication:")
-    for mr in msk_rep_rows:
-        print(f"     {mr['geneSymbol']:<8} | MSK mut={mr['msk_mut_freq']*100:5.2f}% vs TCGA={mr['tcga_mut_freq_N10195']*100:5.2f}% | MSK 3D/hs={mr['msk_3dpocket_or_hotspot_n']:3d} ({mr['msk_3dpocket_or_hotspot_freq']*100:5.2f}%) vs TCGA={mr['tcga_3dpocket_or_hotspot_freq']*100:5.2f}%")
-    print("   [Survival — Cancer-Type-Stratified Log-Rank & Multivariable Breslow Cox]:")
-    for sr in surv_rows:
-        mv_str = (
-            f" | Multivar Cox HR={sr['multivar_cox_hr']:.3f} [{sr['multivar_ci95_low']:.3f}-{sr['multivar_ci95_high']:.3f}] (p={sr['multivar_p_value']})"
-            if sr.get("multivar_cox_hr", "") != "" else ""
-        )
-        print(f"     {sr['test_id']:<48} | LogRank HR={sr['hazard_ratio_stratified']:.3f} (p={sr['p_value_two_sided']}){mv_str}")
-    print("   [Thorsson PanImmune & HRD Associations]:")
-    for ir in imm_bench_rows:
-        print(f"     {ir['benchmark_id']:<52} | medA={ir['median_group_A']:+8.4f} vs medB={ir['median_group_B']:+8.4f} | p={ir['p_value_two_sided']}")
+    print(f"   ClinVar coding variants: {len(clinvar_export_rows)} (TCGA overlap: {tcga_clinvar_overlap_n})")
+    print(f"   MSK-IMPACT profiled patients: {n_msk}; survival tests: {len(surv_rows)}; immune tests: {len(imm_bench_rows)}")

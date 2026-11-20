@@ -1,13 +1,5 @@
 #!/usr/bin/env python3
-"""
-miRBioGenAtlas v2.0 — Pure-Stdlib Multi-Consortium, 3D Structural, AlphaMissense,
-Mature miRNA-seq, CPTAC Proteomic, DepMap CRISPR, & Optional RTX A4000 Integrator
-=================================================================================
-Called by `scripts/build_mirbiogen_v2_dataset.py` after verifying all SHA-256
-snapshot checksums. Uses ONLY the Python 3 standard library (`csv`, `gzip`,
-`json`, `math`, `statistics`) so clean-room CI and offline reproduction require
-zero third-party packages.
-"""
+"""Integrate 3D structural distances, AlphaMissense, PLM/IF1 scores, mature miRNA-seq, CPTAC, and DepMap layers."""
 
 import csv
 import gzip
@@ -22,19 +14,19 @@ MISSENSE_PARSE_RE = re.compile(r"^p?\.?([A-Z]\d+[A-Z])$")
 
 
 def mann_whitney_z_and_p(xs, ys):
-    """Normal-approximation two-sided Mann-Whitney U test (tie-corrected) in pure Python."""
+    """Tie-corrected two-sided Mann-Whitney U normal approximation."""
     nx, ny = len(xs), len(ys)
     if nx < 2 or ny < 2:
         return float("nan"), float("nan"), float("nan")
     combined = [(v, 0) for v in xs] + [(v, 1) for v in ys]
     combined.sort(key=lambda t: t[0])
-    N = nx + ny
-    ranks = [0.0] * N
+    n_tot = nx + ny
+    ranks = [0.0] * n_tot
     tie_sum = 0.0
     i = 0
-    while i < N:
+    while i < n_tot:
         j = i
-        while j + 1 < N and combined[j + 1][0] == combined[i][0]:
+        while j + 1 < n_tot and combined[j + 1][0] == combined[i][0]:
             j += 1
         t = j - i + 1
         if t > 1:
@@ -43,15 +35,14 @@ def mann_whitney_z_and_p(xs, ys):
         for k in range(i, j + 1):
             ranks[k] = avg_r
         i = j + 1
-    r_x = sum(ranks[idx] for idx in range(N) if combined[idx][1] == 0)
+    r_x = sum(ranks[idx] for idx in range(n_tot) if combined[idx][1] == 0)
     u_x = r_x - nx * (nx + 1) / 2.0
     mu_u = nx * ny / 2.0
-    var_u = (nx * ny / 12.0) * ((N + 1) - tie_sum / (N * (N - 1)))
+    var_u = (nx * ny / 12.0) * ((n_tot + 1) - tie_sum / (n_tot * (n_tot - 1)))
     if var_u <= 0:
         return u_x, 0.0, 1.0
     z = (u_x - mu_u) / math.sqrt(var_u)
     p_two = math.erfc(abs(z) / math.sqrt(2.0))
-    # Rank-biserial correlation effect size r_rb in [-1, +1] (positive => xs > ys)
     r_rb = 2.0 * (u_x / (nx * ny)) - 1.0
     return round(r_rb, 4), round(z, 4), p_two
 
@@ -76,62 +67,52 @@ def run_multimodal_enrichment(
 ):
     ext_dir = data_dir / "raw_snapshot" / "external"
     if not (ext_dir / "structural_3d_and_uniprot_15genes.json.gz").exists():
-        print("   [Note] External snapshots not present; skipping multimodal extensions.")
         return
 
-    print("\n4. Integrating 3D Cryo-EM/AFDB structures, AlphaMissense, TCGA miRNA-seq, CPTAC, & DepMap ...")
+    print("\n4. Integrating 3D structures, AlphaMissense, PLM/IF1, TCGA miRNA-seq, CPTAC, and DepMap...")
     struct_snap = load_gz_json(ext_dir / "structural_3d_and_uniprot_15genes.json.gz")
     am_snap = load_gz_json(ext_dir / "alphamissense_15genes_lookup.json.gz")
     mir_snap = load_gz_json(ext_dir / "tcga_pancan_mirnaseq_per_sample.json.gz")
     cptac_snap = load_gz_json(ext_dir / "cptac_pancan_15genes.json.gz")
     depmap_snap = load_gz_json(ext_dir / "depmap_crispr_and_ccle_15genes.json.gz")
 
-    # RTX A4000 GPU outputs (loaded from frozen external snapshot or live data/ CSVs)
-    gpu_var_map = {}
-    gpu_mir_map = {}
-    gpu_derep_map = {}
-    gpu_top_axes = []
-    gpu_snap_gz = ext_dir / "gpu_a4000_esm3b_esm1v_svd.json.gz"
-    if gpu_snap_gz.exists():
-        gsnap = load_gz_json(gpu_snap_gz)
-        for r in gsnap.get("variant_scores", []):
-            gpu_var_map[(r["geneSymbol"], r["proteinChange"])] = r
-        for r in gsnap.get("sample_mirna_svd", []):
-            gpu_mir_map[r["sampleId"]] = r
-        for r in gsnap.get("sample_risc_derepression", []):
-            gpu_derep_map[r["sampleId"]] = r
-        gpu_top_axes = gsnap.get("top250_repressive_axes", [])
+    plm_var_map = {}
+    mir_pca_map = {}
+    risc_derep_map = {}
+    top_axes = []
+    plm_snap_gz = ext_dir / "plm_if1_saturation_and_mirna_svd.json.gz"
+    if plm_snap_gz.exists():
+        psnap = load_gz_json(plm_snap_gz)
+        for r in psnap.get("variant_scores", []):
+            plm_var_map[(r["geneSymbol"], r["proteinChange"])] = r
+        for r in psnap.get("sample_mirna_svd", []):
+            mir_pca_map[r["sampleId"]] = r
+        for r in psnap.get("sample_risc_derepression", []):
+            risc_derep_map[r["sampleId"]] = r
+        top_axes = psnap.get("top250_repressive_axes", [])
 
-    gpu_var_csv = data_dir / "gpu_a4000_variant_esm3b_if1_scores.csv"
-    if gpu_var_csv.exists():
-        with open(gpu_var_csv, "r", encoding="utf-8") as f:
+    var_csv = data_dir / "tcga_somatic_variant_plm_if1_scores.csv"
+    if var_csv.exists():
+        with open(var_csv, "r", encoding="utf-8") as f:
             for r in csv.DictReader(f):
-                gpu_var_map[(r["geneSymbol"], r["proteinChange"])] = r
-    gpu_mir_csv = data_dir / "gpu_a4000_sample_mirna_coupling_scores.csv"
-    if gpu_mir_csv.exists():
-        with open(gpu_mir_csv, "r", encoding="utf-8") as f:
+                plm_var_map[(r["geneSymbol"], r["proteinChange"])] = r
+    mir_pca_csv = data_dir / "tcga_pancan_sample_mirna_pca_scores.csv"
+    if mir_pca_csv.exists():
+        with open(mir_pca_csv, "r", encoding="utf-8") as f:
             for r in csv.DictReader(f):
-                gpu_mir_map[r["sampleId"]] = r
-    gpu_derep_csv = data_dir / "gpu_a4000_sample_risc_target_derepression.csv"
-    if gpu_derep_csv.exists():
-        with open(gpu_derep_csv, "r", encoding="utf-8") as f:
+                mir_pca_map[r["sampleId"]] = r
+    derep_csv = data_dir / "tcga_pancan_sample_risc_target_derepression.csv"
+    if derep_csv.exists():
+        with open(derep_csv, "r", encoding="utf-8") as f:
             for r in csv.DictReader(f):
-                gpu_derep_map[r["sampleId"]] = r
-    if gpu_top_axes:
+                risc_derep_map[r["sampleId"]] = r
+    if top_axes:
         write_csv_fn(
             data_dir / "tcga_pancan_mirna_mrna_top250_repressive_axes.csv",
-            list(gpu_top_axes[0].keys()),
-            gpu_top_axes,
-        )
-    if gpu_var_map:
-        print(
-            f"   [GPU RTX A4000] Integrated {len(gpu_var_map)} ESM-2 3B + ESM-1v + ESM-IF1 3D variant scores & "
-            f"{len(gpu_derep_map)} 13.37M-pair CUDA RISC target de-repression sample scores!"
+            list(top_axes[0].keys()),
+            top_axes,
         )
 
-    # -------------------------------------------------------------------------
-    # A. Enrich Gene Panel Metadata (15 genes)
-    # -------------------------------------------------------------------------
     ess_flags = depmap_snap.get("gene_is_common_essential_opentargets", {})
     for row in panel_rows:
         sym = row["geneSymbol"]
@@ -150,13 +131,10 @@ def run_multimodal_enrichment(
         panel_rows,
     )
 
-    # -------------------------------------------------------------------------
-    # B. Enrich All 6,292 Somatic Mutations with 3D Atomic Distances + AlphaMissense
-    # -------------------------------------------------------------------------
-    AM_FULL = {"P": "likely_pathogenic", "A": "ambiguous", "B": "likely_benign"}
+    am_full = {"P": "likely_pathogenic", "A": "ambiguous", "B": "likely_benign"}
     v2_tier_counts = Counter()
-    sample_has_3d_driver = defaultdict(set)  # sampleId -> set(geneSymbol)
-    sample_dicer1_class = {}                 # sampleId -> class label for miRNA-seq benchmark
+    sample_has_3d_driver = defaultdict(set)
+    sample_dicer1_class = {}
 
     for mrow in annotated_mut_rows:
         sym = mrow["geneSymbol"]
@@ -182,14 +160,12 @@ def run_multimodal_enrichment(
         am_score = ""
         am_cls = "non_missense"
         if m_sub:
-            sub_key = m_sub.group(1)
-            hit = am_gene["subs"].get(sub_key)
+            hit = am_gene["subs"].get(m_sub.group(1))
             if hit:
                 am_score = hit[0]
-                am_cls = AM_FULL.get(hit[1], hit[1])
+                am_cls = am_full.get(hit[1], hit[1])
         am_res_mean = am_gene["res_mean"].get(pos_s, "")
 
-        # Synthesize functionalVariantTierV2 resolving VUS!
         base_tier = mrow["consequenceTier"]
         if base_tier == "Truncating_LoF":
             v2_tier = "Truncating_LoF"
@@ -208,7 +184,6 @@ def run_multimodal_enrichment(
         if v2_tier in ("Truncating_LoF", "3D_Catalytic_or_Substrate_Pocket_Driver", "Pathogenic_Fold_or_Interface_Missense"):
             sample_has_3d_driver[mrow["sampleId"]].add(sym)
 
-        # Track DICER1 somatic status per sample (RNase IIIb catalytic cleft 1690-1830 + abutting RNase IIIa hotspot S1344 at 3.02A to RNA)
         if sym == "DICER1":
             sid = mrow["sampleId"]
             pos_int = int(pos_s) if pos_s.isdigit() else 0
@@ -241,14 +216,14 @@ def run_multimodal_enrichment(
         mrow["alphamissenseResidueMean"] = am_res_mean
         mrow["functionalVariantTierV2"] = v2_tier
 
-        if gpu_var_map:
-            grec = gpu_var_map.get((sym, pch), {})
-            mrow["esm2_3b_llr"] = grec.get("esm2_3b_llr", "")
-            mrow["esm1v_650m_llr"] = grec.get("esm1v_650m_llr", "")
-            mrow["esm2_3b_effect_tier"] = grec.get("esm2_3b_effect_tier", "")
-            mrow["esm_if1_3d_dlogp"] = grec.get("esm_if1_3d_dlogp", "")
-            mrow["esm_if1_3d_marginal_llr"] = grec.get("esm_if1_3d_marginal_llr", "")
-            mrow["biophysicalMechanismClass"] = grec.get("biophysicalMechanismClass", "")
+        if plm_var_map:
+            prec = plm_var_map.get((sym, pch), {})
+            mrow["esm2_3b_llr"] = prec.get("esm2_3b_llr", "")
+            mrow["esm1v_650m_llr"] = prec.get("esm1v_650m_llr", "")
+            mrow["esm2_3b_effect_tier"] = prec.get("esm2_3b_effect_tier", "")
+            mrow["esm_if1_3d_dlogp"] = prec.get("esm_if1_3d_dlogp", "")
+            mrow["esm_if1_3d_marginal_llr"] = prec.get("esm_if1_3d_marginal_llr", "")
+            mrow["biophysicalMechanismClass"] = prec.get("biophysicalMechanismClass", "")
 
     write_csv_fn(
         data_dir / "tcga_pancan_miRNA_biogenesis_somatic_mutations_annotated.csv",
@@ -256,8 +231,7 @@ def run_multimodal_enrichment(
         annotated_mut_rows,
     )
 
-    # Export GPU PLM (ESM-2 3B + ESM-1v + ESM-IF1 3D) vs AlphaMissense & 3D Structural Concordance Audit Table
-    if gpu_var_map:
+    if plm_var_map:
         uniq_by_gene = defaultdict(dict)
         for m in annotated_mut_rows:
             if m["alphamissenseScore"] != "" and m.get("esm2_3b_llr", "") != "" and m.get("esm1v_650m_llr", "") != "":
@@ -293,24 +267,22 @@ def run_multimodal_enrichment(
                 "median_ESM_IF1_3D_dlogP_LikelyBenign": round(statistics.median(ben_if1), 4) if ben_if1 else "",
             })
         write_csv_fn(
-            data_dir / "validation_gpu_plm_alphamissense_concordance.csv",
+            data_dir / "validation_plm_alphamissense_concordance.csv",
             list(plm_audit_rows[0].keys()),
             plm_audit_rows,
         )
 
-    # -------------------------------------------------------------------------
-    # C. Enrich Patient-Level Burden & Export Matched Mature miRNA-seq Table
-    # -------------------------------------------------------------------------
     mir_by_sid = mir_snap["sample_readouts"]
     mirna_table_rows = []
     mir_matched_by_study = Counter()
+    core10_syms = ("DROSHA", "DGCR8", "XPO5", "DICER1", "TARBP2", "PRKRA", "AGO1", "AGO2", "AGO3", "AGO4")
 
     for pb in patient_burden_rows:
         sid = pb["sampleId"]
         acro = pb["tumour_acronym"]
         mrec = mir_by_sid.get(sid)
-        drec = gpu_derep_map.get(sid, {})
-        pb["core10_has_3d_or_am_pathogenic_mut"] = int(any(g in sample_has_3d_driver.get(sid, set()) for g in ("DROSHA", "DGCR8", "XPO5", "DICER1", "TARBP2", "PRKRA", "AGO1", "AGO2", "AGO3", "AGO4")))
+        drec = risc_derep_map.get(sid, {})
+        pb["core10_has_3d_or_am_pathogenic_mut"] = int(any(g in sample_has_3d_driver.get(sid, set()) for g in core10_syms))
         if mrec:
             mir_matched_by_study[acro] += 1
             pb["hasMatchedMirnaSeq"] = 1
@@ -341,10 +313,11 @@ def run_multimodal_enrichment(
                 "n_detected_mature_mirnas_rpm_ge1": mrec["n_detected_rpm_ge1"],
                 "mirnaome_shannon_entropy_bits": mrec["shannon_entropy_bits"],
             }
-            if gpu_mir_map:
-                row_out["gpu_mirnaome_pc1_score"] = gpu_mir_map.get(sid, {}).get("gpu_mirnaome_pc1_score", "")
-                pb["gpu_mirnaome_pc1_score"] = row_out["gpu_mirnaome_pc1_score"]
-            if gpu_derep_map:
+            if mir_pca_map:
+                pc1 = mir_pca_map.get(sid, {}).get("mirnaome_pc1_score", "")
+                row_out["mirnaome_pc1_score"] = pc1
+                pb["mirnaome_pc1_score"] = pc1
+            if risc_derep_map:
                 for dcol in ("let7_target_oncofetal_mrna_z", "mir200_target_emt_mrna_z", "empirical_5p_target_derepression_z", "global_risc_target_derepression_z"):
                     row_out[dcol] = drec.get(dcol, "")
                     pb[dcol] = drec.get(dcol, "")
@@ -359,9 +332,9 @@ def run_multimodal_enrichment(
             pb["mirna_mir451a_minus_144_5p_log2"] = ""
             pb["mirna_global_median_log2_rpm"] = ""
             pb["mirna_shannon_entropy_bits"] = ""
-            if gpu_mir_map:
-                pb["gpu_mirnaome_pc1_score"] = ""
-            if gpu_derep_map:
+            if mir_pca_map:
+                pb["mirnaome_pc1_score"] = ""
+            if risc_derep_map:
                 for dcol in ("let7_target_oncofetal_mrna_z", "mir200_target_emt_mrna_z", "empirical_5p_target_derepression_z", "global_risc_target_derepression_z"):
                     pb[dcol] = ""
 
@@ -384,13 +357,9 @@ def run_multimodal_enrichment(
         study_summary_rows,
     )
 
-    # -------------------------------------------------------------------------
-    # D. Quantitative Mature miRNA-seq Enzymatic Benchmarks (9,578 Tumours)
-    # -------------------------------------------------------------------------
-    # Build fast lookup from sample_level_rows: (sampleId, sym) -> row
     sl_lookup = {(r["sampleId"], r["geneSymbol"]): r for r in sample_level_rows}
-
     bench_rows = []
+
     def add_benchmark(test_id, group_a_label, group_b_label, metric_name, vals_a, vals_b):
         if len(vals_a) < 2 or len(vals_b) < 2:
             return
@@ -412,7 +381,6 @@ def run_multimodal_enrichment(
             "p_value_two_sided": f"{p_val:.3e}",
         })
 
-    # 1. DICER1 RNase IIIb 3D catalytic pocket (<8A Mg2+/RNA) vs Wild-Type AND vs Benign Passenger Missense VUS!
     wt_5p_frac, r3b_5p_frac, ben_5p_frac, trunc_5p_frac = [], [], [], []
     wt_dup, r3b_dup, ben_dup, trunc_dup = [], [], [], []
     wt_451_144, r3b_451_144 = [], []
@@ -446,7 +414,6 @@ def run_multimodal_enrichment(
     add_benchmark("B4_DICER1_RNaseIIIb_vs_WT_5pLinearFraction", "DICER1_RNaseIIIb_3D_Catalytic_Pocket", "DICER1_WildType", "mirna_5p_arm_fraction", r3b_5p_frac, wt_5p_frac)
     add_benchmark("B5_DICER1_RNaseIIIb_AGO2_Bypass_miR451a_vs_miR144", "DICER1_RNaseIIIb_3D_Catalytic_Pocket", "DICER1_WildType", "mir451a_minus_mir144_5p_log2", r3b_451_144, wt_451_144)
 
-    # 2. LIN28A / LIN28B Reactivation (mRNA Z >= 2.0) vs Unreactivated (Z < 0) on Mature let-7 Family
     lin28_hi_let7, lin28_lo_let7 = [], []
     for r in mirna_table_rows:
         sid = r["sampleId"]
@@ -465,7 +432,6 @@ def run_multimodal_enrichment(
             lin28_lo_let7.append(float(l7))
     add_benchmark("B6_LIN28AB_Reactivated_vs_Silent_Let7Family", "LIN28A_or_LIN28B_mRNA_Z_ge_2", "LIN28AB_Silent_Z_le_0", "let7_family_mean_log2_rpm", lin28_hi_let7, lin28_lo_let7)
 
-    # 3. TP53 Somatic Mutation / Deep Deletion vs TP53 Wild-Type on Mature miR-34a/b/c Family
     tp53_alt_m34, tp53_wt_m34 = [], []
     for r in mirna_table_rows:
         sid = r["sampleId"]
@@ -479,31 +445,28 @@ def run_multimodal_enrichment(
             tp53_wt_m34.append(float(m34))
     add_benchmark("B7_TP53_Inactivated_vs_WT_miR34Family", "TP53_Mutated_or_DeepDel", "TP53_WildType_Diploid", "mir34_family_mean_log2_rpm", tp53_alt_m34, tp53_wt_m34)
 
-    # 4. AGO2 High-Level Amplification (GISTIC2 = +2, e.g. 8q24.3) vs Deletion (-1/-2) on Global Mature miRNA Output
     ago2_amp_glob, ago2_del_glob = [], []
     for r in mirna_table_rows:
         sid = r["sampleId"]
         gmed = r["global_canonical_median_log2_rpm"]
-        a_rec = sl_lookup.get((sid, "AGO2"), {})
-        gcna = a_rec.get("gistic2DiscreteCNA", 0)
+        gcna = sl_lookup.get((sid, "AGO2"), {}).get("gistic2DiscreteCNA", 0)
         if gcna == 2:
             ago2_amp_glob.append(float(gmed))
         elif gcna in (-1, -2):
             ago2_del_glob.append(float(gmed))
     add_benchmark("B8_AGO2_HighAmp_p2_vs_Loss_GlobalMatureMiRNA", "AGO2_GISTIC_Amp_p2", "AGO2_GISTIC_Del_m1_m2", "global_canonical_median_log2_rpm", ago2_amp_glob, ago2_del_glob)
 
-    # 5. Downstream RISC Target mRNA De-Repression Benchmarks (N_dual = 9,353 dual-profiled TCGA tumours)
-    if gpu_derep_map:
-        r3b_l7t, wt_l7t, ben_l7t = [], [], []
+    if risc_derep_map:
+        r3b_l7t, wt_l7t = [], []
         r3b_m200t, wt_m200t = [], []
         lin28_hi_l7t, lin28_lo_l7t = [], []
         m200_q_pairs = []
         for r in mirna_table_rows:
             sid = r["sampleId"]
-            if sid not in gpu_derep_map:
+            if sid not in risc_derep_map:
                 continue
-            l7_tz = float(gpu_derep_map[sid]["let7_target_oncofetal_mrna_z"])
-            m200_tz = float(gpu_derep_map[sid]["mir200_target_emt_mrna_z"])
+            l7_tz = float(risc_derep_map[sid]["let7_target_oncofetal_mrna_z"])
+            m200_tz = float(risc_derep_map[sid]["mir200_target_emt_mrna_z"])
             cls = r["dicer1FunctionalClass"]
             if cls == "DICER1_RNaseIIIb_3D_Catalytic_Pocket":
                 r3b_l7t.append(l7_tz)
@@ -511,8 +474,6 @@ def run_multimodal_enrichment(
             elif cls == "DICER1_WildType":
                 wt_l7t.append(l7_tz)
                 wt_m200t.append(m200_tz)
-            elif cls == "DICER1_Likely_Benign_Passenger_VUS":
-                ben_l7t.append(l7_tz)
 
             za = sl_lookup.get((sid, "LIN28A"), {}).get("mrnaZscore", "")
             zb = sl_lookup.get((sid, "LIN28B"), {}).get("mrnaZscore", "")
@@ -541,11 +502,8 @@ def run_multimodal_enrichment(
         bench_rows,
     )
 
-    # -------------------------------------------------------------------------
-    # E. CPTAC Pan-Cancer Mass-Spectrometry Proteogenomics (8 Studies, N=1,002)
-    # -------------------------------------------------------------------------
     ent_to_sym = {g["entrezGeneId"]: g["geneSymbol"] for g in gene_panel}
-    cptac_prot_mrna_pairs = {g: ([], []) for g in gene_order}  # mrna_z_within_study, prot_z_within_study
+    cptac_prot_mrna_pairs = {g: ([], []) for g in gene_order}
     cptac_cna_mrna_pairs = {g: ([], []) for g in gene_order}
     cptac_cna_prot_pairs = {g: ([], []) for g in gene_order}
     cptac_complex_pairs = {
@@ -557,7 +515,6 @@ def run_multimodal_enrichment(
     cptac_cohort_rows = []
 
     def zscore_dict(val_map):
-        """Standardizes {sampleId: float} within each CPTAC study so multi-cohort pooling is batch-free."""
         if len(val_map) < 5:
             return {}
         vs = list(val_map.values())
@@ -610,20 +567,16 @@ def run_multimodal_enrichment(
         cna_z = {sym: zscore_dict(cna_raw[sym]) for sym in gene_order}
 
         for sym in gene_order:
-            common_pm = sorted(set(prot_z[sym].keys()) & set(mrna_z[sym].keys()))
-            for s in common_pm:
+            for s in sorted(set(prot_z[sym].keys()) & set(mrna_z[sym].keys())):
                 cptac_prot_mrna_pairs[sym][0].append(mrna_z[sym][s])
                 cptac_prot_mrna_pairs[sym][1].append(prot_z[sym][s])
-            common_cm = sorted(set(cna_z[sym].keys()) & set(mrna_z[sym].keys()))
-            for s in common_cm:
+            for s in sorted(set(cna_z[sym].keys()) & set(mrna_z[sym].keys())):
                 cptac_cna_mrna_pairs[sym][0].append(cna_z[sym][s])
                 cptac_cna_mrna_pairs[sym][1].append(mrna_z[sym][s])
-            common_cp = sorted(set(cna_z[sym].keys()) & set(prot_z[sym].keys()))
-            for s in common_cp:
+            for s in sorted(set(cna_z[sym].keys()) & set(prot_z[sym].keys())):
                 cptac_cna_prot_pairs[sym][0].append(cna_z[sym][s])
                 cptac_cna_prot_pairs[sym][1].append(prot_z[sym][s])
 
-        # Co-complex protein correlations within study & pooled
         study_drosha_dgcr8_s = sorted(set(prot_z["DROSHA"].keys()) & set(prot_z["DGCR8"].keys()))
         rho_mp = spearman_rho_fn(
             [prot_z["DROSHA"][s] for s in study_drosha_dgcr8_s],
@@ -642,8 +595,7 @@ def run_multimodal_enrichment(
             ("DICER1_vs_PRKRA", ("DICER1", "PRKRA")),
             ("SMAD2_vs_SMAD4", ("SMAD2", "SMAD4")),
         ]:
-            cs = sorted(set(prot_z[g1].keys()) & set(prot_z[g2].keys()))
-            for s in cs:
+            for s in sorted(set(prot_z[g1].keys()) & set(prot_z[g2].keys())):
                 cptac_complex_pairs[label][0].append(prot_z[g1][s])
                 cptac_complex_pairs[label][1].append(prot_z[g2][s])
 
@@ -689,16 +641,13 @@ def run_multimodal_enrichment(
         cptac_cohort_rows,
     )
 
-    # -------------------------------------------------------------------------
-    # F. Broad DepMap CRISPR-Cas9 Essentiality (1,208 Cell Lines) & Collateral Lethality
-    # -------------------------------------------------------------------------
     cl_map = depmap_snap["cell_lines"]
     depmap_gene_rows = []
     for g in gene_panel:
         sym = g["geneSymbol"]
         effs = []
         expr_pairs = ([], [])
-        for did, cl in cl_map.items():
+        for cl in cl_map.values():
             if sym in cl["geneEffect"]:
                 ev = cl["geneEffect"][sym]
                 effs.append(ev)
@@ -730,7 +679,6 @@ def run_multimodal_enrichment(
         depmap_gene_rows,
     )
 
-    # Collateral vulnerability tests across CN-matched CCLE/DepMap cell lines (N=667)
     collat_rows = []
     def add_collateral_test(tid, desc, target_gene, grp_del_label, grp_wt_label, del_vals, wt_vals):
         if len(del_vals) < 5 or len(wt_vals) < 5:
@@ -754,10 +702,8 @@ def run_multimodal_enrichment(
             "p_value_two_sided": f"{p_val:.3e}",
         })
 
-    # Test 1: 1p34.3 AGO1/AGO3/AGO4 loss (any GISTIC <= -1) -> AGO2 Chronos dependency!
     ago2_in_1p_del, ago2_in_1p_intact = [], []
-    # Test 2: Self copy-number loss buffering (CYCLOPS-like haploinsufficiency) for DROSHA, DGCR8, DICER1, XPO5, AGO2
-    for did, cl in cl_map.items():
+    for cl in cl_map.values():
         gmap = cl.get("gistic")
         if not gmap:
             continue
@@ -780,7 +726,7 @@ def run_multimodal_enrichment(
 
     for sym in ("DROSHA", "DGCR8", "XPO5", "DICER1", "AGO1", "AGO2"):
         loss_v, neut_v = [], []
-        for did, cl in cl_map.items():
+        for cl in cl_map.values():
             gmap = cl.get("gistic")
             if not gmap or sym not in cl["geneEffect"] or sym not in gmap:
                 continue
@@ -798,7 +744,6 @@ def run_multimodal_enrichment(
             neut_v,
         )
 
-    # Test 3: Combined 1p34.3 paralogue cluster (AGO1+AGO3+AGO4) low expression (Q1) -> heightened AGO2 CRISPR dependency!
     ago134_scored = []
     for cl in cl_map.values():
         ex = cl.get("expression", {})
@@ -818,7 +763,6 @@ def run_multimodal_enrichment(
             [x[1] for x in ago134_scored[-q:]],
         )
 
-    # Test 4: Selective oncogene dependency in LIN28B-reactivated cancer cell lines (log2(TPM+1) >= 2.0 vs < 0.2)
     l28b_on = [cl["geneEffect"]["LIN28B"] for cl in cl_map.values() if cl.get("expression", {}).get("LIN28B", -1) >= 2.0 and "LIN28B" in cl["geneEffect"]]
     l28b_off = [cl["geneEffect"]["LIN28B"] for cl in cl_map.values() if 0 <= cl.get("expression", {}).get("LIN28B", -1) < 0.2 and "LIN28B" in cl["geneEffect"]]
     add_collateral_test(
@@ -831,7 +775,6 @@ def run_multimodal_enrichment(
         l28b_off,
     )
 
-    # Test 5: Technical positive control — TP53 knockout proliferation release in TP53-WT vs TP53-Mutant cell lines
     tp53_wt = [cl["geneEffect"]["TP53"] for cl in cl_map.values() if not cl.get("mutation", {}).get("TP53") and "TP53" in cl["geneEffect"]]
     tp53_mut = [cl["geneEffect"]["TP53"] for cl in cl_map.values() if cl.get("mutation", {}).get("TP53") and "TP53" in cl["geneEffect"]]
     add_collateral_test(
@@ -850,34 +793,11 @@ def run_multimodal_enrichment(
         collat_rows,
     )
 
-    # Print rich summary of all new layers!
-    print("\n=== MULTIMODAL & MULTI-CONSORTIUM ENRICHMENT SUMMARY ===")
-    print(f"Variant V2 functional/3D/AlphaMissense breakdown (6,292 total calls): {dict(v2_tier_counts)}")
-    print(f"Matched TCGA mature miRNA-seq tumours: {len(mirna_table_rows)} / {len(patient_burden_rows)} ({len(mirna_table_rows)/len(patient_burden_rows)*100:.2f}%)")
-    print("\nMature miRNA-seq enzymatic validation benchmarks:")
-    for b in bench_rows:
-        print(
-            f"  {b['benchmark_id']:<50} | nA={b['n_group_A']:4d} medA={b['median_group_A']:+8.4f} vs "
-            f"nB={b['n_group_B']:4d} medB={b['median_group_B']:+8.4f} | shift={b['median_shift_A_minus_B']:+8.4f} | p={b['p_value_two_sided']}"
-        )
-    print("\nCPTAC Pan-Cancer heterodimeric protein co-abundance correlations (pooled Z across 8 cohorts):")
-    for k, (xs, ys) in cptac_complex_pairs.items():
-        print(f"  {k:<22}: n={len(xs):4d} paired tumours | Spearman rho = {spearman_rho_fn(xs, ys):+.4f}")
-    print("\nDepMap CRISPR Chronos essentiality highlights (N=1,208 cell lines):")
-    for r in depmap_gene_rows:
-        print(
-            f"  {r['geneSymbol']:<8}: med_Chronos={r['median_chronos_gene_effect']:+7.4f} | "
-            f"dep(<-0.5)={r['prop_dependent_le_m05']*100:5.1f}% | strong(<-1.0)={r['prop_strongly_essential_le_m10']*100:5.1f}%"
-        )
-    print("\nDepMap collateral & copy-loss vulnerability tests:")
-    for c in collat_rows:
-        print(
-            f"  {c['test_id']:<42} | nAlt={c['n_altered_lines']:3d} med={c['median_chronos_altered']:+7.4f} vs "
-            f"nCtrl={c['n_control_lines']:3d} med={c['median_chronos_control']:+7.4f} | shift={c['chronos_shift_altered_minus_control']:+7.4f} | p={c['p_value_two_sided']}"
-        )
+    print(f"   Matched TCGA mature miRNA-seq tumours: {len(mirna_table_rows)} / {len(patient_burden_rows)}")
+    print(f"   Enzymatic benchmarks: {len(bench_rows)}; CPTAC cohorts: {len(cptac_cohort_rows)}; DepMap tests: {len(collat_rows)}")
 
-    from clinical_and_external_v21 import run_v21_clinical_and_external_enrichment
-    run_v21_clinical_and_external_enrichment(
+    from clinical_and_external import integrate_clinical_and_external
+    integrate_clinical_and_external(
         repo_root=repo_root,
         data_dir=data_dir,
         gene_panel=gene_panel,

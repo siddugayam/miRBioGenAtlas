@@ -1,16 +1,5 @@
 #!/usr/bin/env python3
-"""
-miRBioGenAtlas v2.0 — NAR-Grade Self-Contained Interactive Web Explorer Builder
-===============================================================================
-Compiles built CSV/CSV.GZ datasets from `data/` into:
-  1. `docs/index.html`: Zero-backend interactive HTML5/SVG/JS explorer supporting
-     6 multi-consortium tabs, interactive SVG protein-domain/3D-pocket/ClinVar/TCGA
-     lollipop tracks across all 11,260 codons, and CSV slice export.
-  2. `docs/sat/<GENE>.js` (15 lazy-loaded scripts): Complete 213,940-variant
-     single-amino-acid saturation mutagenesis lookup (`AlphaMissense`, `ESM-2 3B`,
-     `ESM-1v`, `ESM-IF1 3D`, and 3D PDB distances) working seamlessly on both
-     GitHub Pages (`https://`) and offline local disk (`file://`) without CORS issues.
-"""
+"""Compile CSV/CSV.GZ tables into docs/index.html and docs/sat/<GENE>.js."""
 
 import csv
 import gzip
@@ -209,8 +198,8 @@ def build_web_explorer():
 
     bundle = {
         "meta": {
-            "version": "2.0.0",
-            "doi": "10.5281/zenodo.24337287",
+            "version": "2.0.1",
+            "doi": "10.5281/zenodo.24393421",
             "tcga_n": 10195,
             "msk_n": 10945,
             "combined_tumours_n": 21140,
@@ -397,7 +386,7 @@ def build_web_explorer():
     <h1>miRBioGenAtlas v2.0 — Multi-Consortium Pan-Cancer miRNA Biogenesis &amp; Saturation Atlas</h1>
     <p>Harmonised across 21,140 clinical &amp; primary human tumours (10,195 TCGA PanCanAtlas + 10,945 MSK-IMPACT), 9,578 mature miRNA-seq profiles, 13.37M miRNA&times;mRNA couplings (9,353 dual tumours), 213,940 saturation-mutagenesis substitutions (16 Cryo-EM/X-ray PDB complexes, AlphaFold v6, AlphaMissense, ESM-2 3B, ESM-1v, ESM-IF1 3D), 16,569 ClinVar clinical records, gnomAD v4 constraint, GTEx 54-tissue baselines, HPA subcellular localisation, CPTAC proteomes (N=1,002), DepMap CRISPR screens (N=1,208), TCGA-CDR survival, and Thorsson PanImmune profiles.</p>
     <div class="badges">
-      <a class="badge" href="https://doi.org/10.5281/zenodo.24337287" target="_blank" rel="noopener">Zenodo Dataset DOI: 10.5281/zenodo.24337287</a>
+      <a class="badge" href="https://doi.org/10.5281/zenodo.24393421" target="_blank" rel="noopener">Zenodo Dataset DOI: 10.5281/zenodo.24393421</a>
       <a class="badge" href="https://github.com/siddugayam/miRBioGenAtlas" target="_blank" rel="noopener">GitHub: siddugayam/miRBioGenAtlas</a>
       <span class="badge">Licence: CC BY 4.0 (Data) / MIT (Code)</span>
     </div>
@@ -1184,7 +1173,7 @@ window.addEventListener('DOMContentLoaded', () => {{
 """
     out_html = DOCS_DIR / "index.html"
     out_html.write_text(html, encoding="utf-8")
-    print(f"6. Built NAR-grade standalone interactive Web Explorer: {out_html.relative_to(REPO_ROOT)} ({out_html.stat().st_size / 1024:.1f} KB)")
+    print(f"6. Built standalone interactive web explorer: {out_html.relative_to(REPO_ROOT)} ({out_html.stat().st_size / 1024:.1f} KB)")
 
 
 if __name__ == "__main__":

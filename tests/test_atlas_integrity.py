@@ -1,17 +1,12 @@
 #!/usr/bin/env python3
-"""
-Automated Reproducibility, Schema, Portability & Mathematical Integrity Suite
-for miRBioGenAtlas v2.0.0 (runs with zero third-party dependencies via `unittest`).
-
-Usage:
-    python3 -m unittest discover -s tests -v
-"""
+"""Integrity, schema, and portability tests for miRBioGenAtlas."""
 
 import csv
 import gzip
 import hashlib
 import json
 import pathlib
+import re
 import subprocess
 import sys
 import unittest
@@ -23,12 +18,12 @@ DATA_DIR = REPO_ROOT / "data"
 class TestMiRBioGenAtlasIntegrity(unittest.TestCase):
     def test_01_snapshot_manifest_sha256_all_45_archives(self):
         manifest_path = DATA_DIR / "raw_snapshot" / "snapshot_manifest.json"
-        self.assertTrue(manifest_path.exists(), "Missing snapshot_manifest.json")
+        self.assertTrue(manifest_path.exists())
         manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
         self.assertEqual(len(manifest["files"]), 45)
         for item in manifest["files"]:
             fp = REPO_ROOT / item["path"]
-            self.assertTrue(fp.exists(), f"Missing frozen snapshot: {item['path']}")
+            self.assertTrue(fp.exists(), f"Missing snapshot: {item['path']}")
             digest = hashlib.sha256(fp.read_bytes()).hexdigest()
             self.assertEqual(digest, item["sha256"], f"SHA-256 mismatch for {item['path']}")
 
@@ -46,6 +41,7 @@ class TestMiRBioGenAtlasIntegrity(unittest.TestCase):
         self.assertEqual(len(pb_rows), 10195)
         self.assertIn("osMonths", pb_rows[0])
         self.assertIn("hrdScore", pb_rows[0])
+        self.assertIn("mirnaome_pc1_score", pb_rows[0])
 
         with open(DATA_DIR / "tcga_pancan_miRNA_biogenesis_alteration_freqs_long_FINAL.csv", "r", encoding="utf-8") as f:
             long_rows = list(csv.DictReader(f))
@@ -81,15 +77,37 @@ class TestMiRBioGenAtlasIntegrity(unittest.TestCase):
         lin28_row = [r for r in surv_rows if r["test_id"] == "S6_LIN28AB_Oncofetal_Reactivation_Stratified_OS"][0]
         self.assertGreater(float(lin28_row["multivar_cox_hr"]), 1.2)
 
-    def test_05_no_hardcoded_user_paths_in_portable_code(self):
-        check_files = list((REPO_ROOT / "scripts").glob("*.py")) + [
-            REPO_ROOT / "notebooks" / "notebook.ipynb",
-            REPO_ROOT / "miRBioGenAtlas_figures.R",
-        ]
+    def test_05_no_hardcoded_paths_or_workstation_identifiers(self):
+        hw_pat = re.compile(r"\b(a4000|rtx|beerus|nvidia|gpu_a4000|gpu_mirnaome|gpu_full662|v21)\b", re.I)
+        path_pat = re.compile(r"(?<![A-Za-z0-9_.])/(?:Users|home)/[A-Za-z0-9_.-]+")
+        for p in REPO_ROOT.rglob("*"):
+            if ".git" in p.parts or "__pycache__" in p.parts:
+                continue
+            self.assertIsNone(hw_pat.search(p.name), f"Hardware-specific filename: {p.name}")
+
+        for csv_path in DATA_DIR.glob("*.csv"):
+            with open(csv_path, "r", encoding="utf-8") as f:
+                header = f.readline()
+            self.assertIsNone(hw_pat.search(header), f"Hardware-specific column in {csv_path.name}")
+
+        check_files = (
+            list((REPO_ROOT / "scripts").glob("*.py"))
+            + [
+                REPO_ROOT / "notebooks" / "notebook.ipynb",
+                REPO_ROOT / "miRBioGenAtlas_figures.R",
+                REPO_ROOT / "README.md",
+                REPO_ROOT / "DATA_DICTIONARY.md",
+                REPO_ROOT / ".zenodo.json",
+                REPO_ROOT / "CITATION.cff",
+                REPO_ROOT / "requirements.txt",
+                DATA_DIR / "plm_inference_provenance.json",
+            ]
+        )
         for fp in check_files:
             txt = fp.read_text(encoding="utf-8")
-            self.assertNotIn("/Users/", txt, f"Hard-coded macOS path in {fp.name}")
-            self.assertNotIn("/home/", txt, f"Hard-coded Linux path in {fp.name}")
+            txt_no_urls = re.sub(r"https?://\S+", "", txt)
+            self.assertIsNone(path_pat.search(txt_no_urls), f"Hard-coded local path in {fp.name}")
+            self.assertIsNone(hw_pat.search(txt), f"Workstation-specific term in {fp.name}")
 
     def test_06_web_explorer_and_15_saturation_chunks_present(self):
         idx = REPO_ROOT / "docs" / "index.html"

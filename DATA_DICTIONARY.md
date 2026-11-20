@@ -1,7 +1,7 @@
-# Data Dictionary — miRBioGenAtlas (v2.0.0)
+# Data Dictionary — miRBioGenAtlas (v2.0.1)
 
 **Dataset:** Multi-consortium, structurally and functionally calibrated alteration landscape of the miRNA biogenesis machinery across 32 TCGA cancer studies (`N = 10,195` matched tumours; `152,925` sample × gene records; `9,578` matched mature `miRNA-seq` profiles; `9,353` dual-profiled `miRNA × mRNA` tumours across `13,369,752` pairs; `213,940` proteome-wide saturation mutagenesis substitutions across `11,260` codons; `6,292` 3D Cryo-EM/PLM/AlphaMissense/ClinVar-annotated TCGA somatic variants; `16,569` NCBI ClinVar clinical variant records; `10,945` MSK-IMPACT clinical sequencing tumours; `810` GTEx v10 54-tissue healthy adult baselines; `1,002` CPTAC mass-spectrometry proteomes; `1,208` Broad DepMap CRISPR-Cas9 cell lines; TCGA-CDR curated survival and Thorsson Pan-Cancer Immune/HRD profiles).  
-**Version:** `2.0.0` · **Zenodo Dataset DOI:** [`10.5281/zenodo.24337287`](https://doi.org/10.5281/zenodo.24337287) · **Interactive Explorer:** `docs/index.html` + `docs/sat/*.js` (`https://siddugayam.github.io/miRBioGenAtlas/`).
+**Version:** `2.0.1` · **Zenodo Dataset DOI:** [`10.5281/zenodo.24393421`](https://doi.org/10.5281/zenodo.24393421) · **Interactive Explorer:** `docs/index.html` + `docs/sat/*.js` (`https://siddugayam.github.io/miRBioGenAtlas/`).
 
 ## Global Conventions
 
@@ -71,19 +71,19 @@ Contains `GRCh37` genomic coordinates, `variantType`, `mutationType`, `proteinCh
 
 ### 1.3 `tcga_pancan_miRNA_biogenesis_mirnaseq_functional_readouts.csv`
 **9,578 rows (all `miRNA-seq`-matched tumours in the `10,195` cohort; `93.95%` overlap) × 21 columns.**  
-Derived from NCI GDC PanCanAtlas batch-corrected mature miRNA-seq (`pancanMiRs`, GDC UUID `1c6174d9-8ffb-466e-b5ee-07b204c15cf8`) and `EBPlusPlusAdjustPANCAN` 20,531-gene mRNA-seq (`N_dual = 9,353` dual-profiled tumours; `13,369,752` CUDA Tensor-Core `miRNA × mRNA` pairs):
+Derived from NCI GDC PanCanAtlas batch-corrected mature miRNA-seq (`pancanMiRs`, GDC UUID `1c6174d9-8ffb-466e-b5ee-07b204c15cf8`) and `EBPlusPlusAdjustPANCAN` 20,531-gene mRNA-seq (`N_dual = 9,353` dual-profiled tumours; `13,369,752` transcriptome-wide `miRNA × mRNA` pairs):
 - `dicer1FunctionalClass`: Sample *DICER1* somatic status (`DICER1_RNaseIIIb_3D_Catalytic_Pocket`, `DICER1_Truncating_LoF`, `DICER1_Other_Domain_Pathogenic_Missense`, `DICER1_Likely_Benign_Passenger_VUS`, `DICER1_Ambiguous_VUS`, `DICER1_WildType`).
 - `mirna_5p_arm_fraction`: Linear RPM ratio $\sum \text{RPM}_{5p} / \sum (\text{RPM}_{5p} + \text{RPM}_{3p})$ across 192 batch-corrected canonical `-5p`/`-3p` duplex pairs.
 - `mirna_duplex_5p_3p_log2_ratio`: Mean paired $\log_2((\text{RPM}_{5p}+1)/(\text{RPM}_{3p}+1))$ across expressed canonical duplex pairs ($\text{RPM}_{5p}+\text{RPM}_{3p} \ge 10$; `n_expressed_canonical_duplexes`).
 - `let7_family_mean_log2_rpm`, `mir200_family_mean_log2_rpm`, `mir34_family_mean_log2_rpm`: Mean $\log_2(\text{RPM}+1)$ across canonical `let-7` (8 members), `miR-200` (5 members), and `miR-34` (3 members) mature families.
 - `mir451a_log2_rpm` & `mir451a_minus_mir144_5p_log2`: Endogenous **DICER1-independent / AGO2-Slicer-dependent** bicistronic processing control (`hsa-miR-451a` vs `hsa-miR-144-5p`).
-- `global_canonical_median_log2_rpm`, `n_detected_mature_mirnas_rpm_ge1`, `mirnaome_shannon_entropy_bits`, `gpu_mirnaome_pc1_score`: Global mature miRNA output, Shannon diversity (`bits`), and CUDA SVD principal component 1.
+- `global_canonical_median_log2_rpm`, `n_detected_mature_mirnas_rpm_ge1`, `mirnaome_shannon_entropy_bits`, `mirnaome_pc1_score`: Global mature miRNA output, Shannon diversity (`bits`), and singular-value decomposition principal component 1.
 - `let7_target_oncofetal_mrna_z`, `mir200_target_emt_mrna_z`, `empirical_5p_target_derepression_z`, `global_risc_target_derepression_z`: Downstream RISC target mRNA expression Z-scores across `n = 9,353` dual-profiled tumours (`HMGA2, IGF2BP1–3, LIN28B, MYCN, NRAS, CCND2, CDC25A, CDK6` for `let-7`; `ZEB1, ZEB2, FN1, VIM, SNAI2, TWIST1` for `miR-200`).
 
 ### 1.4 `miRNA_biogenesis_saturation_mutagenesis_213940_atlas.csv.gz` & `miRNA_biogenesis_residue_biophysical_11260_profile.csv.gz`
-- **`miRNA_biogenesis_saturation_mutagenesis_213940_atlas.csv.gz` (213,940 rows × 17 columns; `4.41 MB`):** Complete proteome-scale single-amino-acid saturation mutagenesis lookup across all `11,260` codons × `19` substitutions of the 15 human miRNA biogenesis proteins, combining experimental 3D PDB distances (`distSubstrateA`, `distMetalA`, `distPartnerA`), AlphaFold v6 `afdbPlddt`, `alphamissenseScore`/`Class`, GPU `esm2_3b_llr`, `esm1v_650m_llr`, `esm_if1_3d_llr`, and `observedTcgaSomaticCount`.
+- **`miRNA_biogenesis_saturation_mutagenesis_213940_atlas.csv.gz` (213,940 rows × 17 columns; `4.31 MB`):** Complete proteome-scale single-amino-acid saturation mutagenesis lookup across all `11,260` codons × `19` substitutions of the 15 human miRNA biogenesis proteins, combining experimental 3D PDB distances (`distSubstrateA`, `distMetalA`, `distPartnerA`), AlphaFold v6 `afdbPlddt`, `alphamissenseScore`/`Class`, `esm2_3b_llr`, `esm1v_650m_llr`, `esm_if1_3d_llr`, and `observedTcgaSomaticCount`.
 - **`miRNA_biogenesis_residue_biophysical_11260_profile.csv.gz` (11,260 rows × 14 columns; `262.9 KB`):** Codon-level biophysical constraint profile (`mean_alphamissense`, `mean_esm2_3b_llr`, `mean_esm1v_650m_llr`, `mean_esm_if1_3d_llr`, 3D PDB distances, and `observedTcgaCodonMutCount`).
-- **`gpu_a4000_variant_esm3b_if1_scores.csv` (1,960 rows × 8 columns)**, **`gpu_a4000_sample_risc_target_derepression.csv` (9,353 rows × 6 columns)**, **`gpu_a4000_sample_mirna_coupling_scores.csv` (9,578 rows × 4 columns)**, and **`tcga_pancan_mirna_mrna_top250_repressive_axes.csv` (250 rows × 6 columns)**.
+- **`tcga_somatic_variant_plm_if1_scores.csv` (1,960 rows × 8 columns)**, **`tcga_pancan_sample_risc_target_derepression.csv` (9,353 rows × 6 columns)**, **`tcga_pancan_sample_mirna_pca_scores.csv` (9,578 rows × 4 columns)**, **`plm_inference_provenance.json`**, and **`tcga_pancan_mirna_mrna_top250_repressive_axes.csv` (250 rows × 6 columns)**.
 
 ### 1.5 `tcga_pancan_miRNA_biogenesis_structural_variants.csv`
 **72 rows × 14 columns.** Somatic structural variants / fusions involving the 15 panel genes across the 10,195 samples.
@@ -117,7 +117,7 @@ Integrates `cancerTypeDetailed` (resolving `COAD` vs `READ`), `molecularSubtype`
   4. `validation_arm_vs_focal_cna_decomposition.csv` (15 × 12)
   5. `validation_mirnaseq_enzymatic_benchmarks.csv` (12 × 14; `B1–B12` across `n = 9,578` miRNA-seq and `n = 9,353` dual `miRNA × mRNA` tumours)
   6. `validation_depmap_collateral_vulnerability.csv` (10 × 15; `n = 1,208` DepMap / `667` CCLE CN-matched cell lines)
-  7. `validation_gpu_plm_alphamissense_concordance.csv` (16 × 11; `ESM-2 3B`, `ESM-1v`, `ESM-IF1 3D` vs `AlphaMissense` & 3D PDB pocket calibration)
+  7. `validation_plm_alphamissense_concordance.csv` (16 × 11; `ESM-2 3B`, `ESM-1v`, `ESM-IF1 3D` vs `AlphaMissense` & 3D PDB pocket calibration)
   8. `validation_clinvar_roc_auc_benchmarks.csv` (20 × 10; non-circular human clinical `ClinVar` Pathogenic vs Benign missense ROC-AUC & PR-AUC across `n = 612` assertions; `AlphaMissense` ROC-AUC = `0.9784`)
   9. `validation_clinical_survival_benchmarks.csv` (12 × 23; cancer-type-stratified Mantel–Haenszel log-rank hazard ratios AND exact Breslow-tied multivariable Cox proportional hazards (`multivar_cox_hr`, `multivar_ci95_low`, `multivar_ci95_high`, `multivar_wald_z`, `multivar_p_value`, `multivar_covariates`) adjusting simultaneously for age at diagnosis, biological sex, AJCC pathologic stage, and hypermutator status across 32 TCGA-CDR studies and metastatic/TMB/panel covariates across 43 MSK-IMPACT cancer types)
   10. `validation_panimmune_and_hrd_benchmarks.csv` (8 × 12; `Thorsson` PanImmune `HRD`, `IFN-gamma`, `Leukocyte Fraction`, `TGF-beta`, and `Wound Healing` benchmarks)

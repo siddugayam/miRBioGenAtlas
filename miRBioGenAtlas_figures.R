@@ -1,17 +1,5 @@
-################################################################################
-##                                                                            ##
-##   miRBioGenAtlas v2.0 — Publication & Technical Validation Figures         ##
-##   Generates Vector PDF + 600-DPI LZW TIFF + 300-DPI PNG (for DOCX)         ##
-##                                                                            ##
-##   Figures:                                                                 ##
-##     Figure 1 (Methods)              : End-to-end multi-modal workflow      ##
-##     Figure 2 (Data Overview)        : [0,1] heatmap + side-by-side split   ##
-##     Figure 3 (Technical Validation) : Arm vs focal CNA, cis-mRNA dosage,   ##
-##                                       synteny & aneuploidy validation      ##
-##     Figure 4 (Technical Validation) : Hypermutator & CDS-length audit,     ##
-##                                       variant tiers & nested burden tiers  ##
-##                                                                            ##
-################################################################################
+# Publication and technical validation figure generator for miRBioGenAtlas.
+# Exports vector PDF, 450-DPI LZW TIFF, and 300-DPI PNG files into figures/.
 
 suppressPackageStartupMessages({
   library(tidyverse)
@@ -28,13 +16,11 @@ output_dir <- "figures"
 dir.create(output_dir, showWarnings = FALSE, recursive = TRUE)
 
 save_pub_figure <- function(plot_obj, stem, width_in, height_in) {
-  # 1. Vector PDF (infinitely sharp at any magnification)
   ggsave(
     filename = file.path(output_dir, paste0(stem, ".pdf")),
     plot = plot_obj, width = width_in, height = height_in,
     units = "in", device = pdf, useDingbats = FALSE
   )
-  # 2. High-res 450-DPI LZW-compressed TIFF via ragg (<4 MB per Scientific Data guideline)
   agg_tiff(
     filename = file.path(output_dir, paste0(stem, ".tiff")),
     width = width_in, height = height_in, units = "in",
@@ -42,7 +28,6 @@ save_pub_figure <- function(plot_obj, stem, width_in, height_in) {
   )
   print(plot_obj)
   invisible(dev.off())
-  # 3. Crisp 300-DPI PNG for Word (.docx) manuscript embedding
   agg_png(
     filename = file.path(output_dir, paste0(stem, ".png")),
     width = width_in, height = height_in, units = "in",
@@ -50,10 +35,9 @@ save_pub_figure <- function(plot_obj, stem, width_in, height_in) {
   )
   print(plot_obj)
   invisible(dev.off())
-  cat(sprintf("  Saved %s (.pdf, .tiff [600 DPI], .png [300 DPI])\n", stem))
+  cat(sprintf("  Saved %s (.pdf, .tiff [450 DPI], .png [300 DPI])\n", stem))
 }
 
-## ── Load v2.0 tables ──────────────────────────────────────────────────────────
 
 long_df      <- read_csv(file.path(data_dir, "tcga_pancan_miRNA_biogenesis_alteration_freqs_long_FINAL.csv"), show_col_types = FALSE)
 gene_meta    <- read_csv(file.path(data_dir, "miRNA_biogenesis_gene_panel_metadata.csv"), show_col_types = FALSE)
@@ -68,9 +52,6 @@ GENE_ORDER <- c("DROSHA", "DGCR8", "XPO5", "DICER1", "TARBP2", "PRKRA",
                 "AGO1", "AGO2", "AGO3", "AGO4",
                 "LIN28A", "LIN28B", "SMAD2", "SMAD4", "TP53")
 
-## ══════════════════════════════════════════════════════════════════════════════
-## FIGURE 1 — Methods: Multi-Modal Data Retrieval, Harmonisation & Validation
-## ══════════════════════════════════════════════════════════════════════════════
 
 cat("Generating Figure 1 (Methods workflow)...\n")
 
@@ -85,7 +66,7 @@ boxes <- tibble(
     "1. Panel & Cohort Scope",
     "2. Multi-Consortium Frozen Snapshot",
     "3. 3D, Functional & Sample Harmonisation",
-    "4. Deposited Data Records & Web Portal (v2.0.0)",
+    "4. Deposited Data Records & Web Portal (v2.0.1)",
     "5. Multi-Modal Technical Validation Suite"
   ),
   body = c(
@@ -150,20 +131,15 @@ arrows_df <- tibble(
 )
 
 fig1 <- ggplot() +
-  # Outer card background
   geom_rect(data = boxes, aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax, fill = box_fill),
             colour = "#B8C4D0", linewidth = 0.5) +
-  # Header band
   geom_rect(data = boxes, aes(xmin = xmin, xmax = xmax, ymin = ymax - 0.48, ymax = ymax, fill = hdr_fill),
             colour = NA) +
   scale_fill_identity() +
-  # Header text
   geom_text(data = boxes, aes(x = xmin + 0.14, y = ymax - 0.24, label = title),
             hjust = 0, vjust = 0.5, colour = "white", fontface = "bold", size = 3.7, family = "sans") +
-  # Body text
   geom_text(data = boxes, aes(x = xmin + 0.14, y = ymax - 0.62, label = body),
             hjust = 0, vjust = 1, colour = "#1A2430", size = 3.05, lineheight = 1.18, family = "sans") +
-  # Connecting arrows
   geom_segment(data = arrows_df, aes(x = x, xend = xend, y = y, yend = yend),
                arrow = arrow(length = unit(0.20, "cm"), type = "closed"),
                colour = "#334E68", linewidth = 0.7) +
@@ -174,14 +150,6 @@ fig1 <- ggplot() +
 save_pub_figure(fig1, "Figure_1", width_in = 11.5, height_in = 6.2)
 
 
-## ══════════════════════════════════════════════════════════════════════════════
-## FIGURE 2 — Data Overview: [0, 1] Pan-Cancer Heatmap + Side-by-Side Split
-##   Addresses:
-##   - Scientific Data Guidelines p. 7 (single Data Overview figure)
-##   - Reviewer 1 Comment 2 (colour scale 0.00 to 1.00 matching cell values)
-##   - Reviewer 1 Comment 3 (explicit '*' asterisk for N < 100 cohorts)
-##   - Reviewer 1 Comment 1 (side-by-side split: CNA panel vs zoomed mutation panel)
-## ══════════════════════════════════════════════════════════════════════════════
 
 cat("Generating Figure 2 (Data Overview)...\n")
 
@@ -268,7 +236,7 @@ p2a_heat <- ggplot(heat_df, aes(x = tumour_label, y = geneSymbol, fill = any_alt
 
 # Panel b & c: Side-by-side split for the 14 biogenesis/accessory genes (TP53 reported in text)
 # Left (b): Mean CNA frequency decomposed into Focal (+/-2) vs Broad low-level (+/-1) on [0.00, 0.50] scale
-# Right (c): Mean Somatic Mutation frequency decomposed into Truncating LoF, Hotspot, Other coding on [0.000, 0.028] zoomed scale!
+# Right (c): Mean Somatic Mutation frequency decomposed into Truncating LoF, Hotspot, Other coding on [0.000, 0.028] zoomed scale
 
 gene_order_14 <- gene_rank %>%
   filter(geneSymbol != "TP53") %>%
@@ -393,9 +361,6 @@ fig2 <- plot_grid(
 save_pub_figure(fig2, "Figure_2", width_in = 12.0, height_in = 9.8)
 
 
-## ══════════════════════════════════════════════════════════════════════════════
-## FIGURE 3 — Technical Validation I: CNA Focality, cis-mRNA Dosage & Aneuploidy
-## ══════════════════════════════════════════════════════════════════════════════
 
 cat("Generating Figure 3 (Technical Validation I: CNA & cis-mRNA dosage)...\n")
 
@@ -560,9 +525,6 @@ fig3 <- plot_grid(
 save_pub_figure(fig3, "Figure_3", width_in = 12.0, height_in = 9.5)
 
 
-## ══════════════════════════════════════════════════════════════════════════════
-## FIGURE 4 — Technical Validation II: Hypermutator / CDS-Length Audit & Tiers
-## ══════════════════════════════════════════════════════════════════════════════
 
 cat("Generating Figure 4 (Technical Validation II: Mutations & nested tiers)...\n")
 
@@ -723,10 +685,6 @@ fig4 <- plot_grid(
 save_pub_figure(fig4, "Figure_4", width_in = 12.6, height_in = 7.4)
 
 
-## ══════════════════════════════════════════════════════════════════════════════
-## FIGURE 5 — Technical Validation III: Multi-Consortium Functional, 3D Structural,
-##            CPTAC Proteomic & Broad DepMap CRISPR Benchmarks
-## ══════════════════════════════════════════════════════════════════════════════
 
 cat("Generating Figure 5 (Technical Validation III: miRNA-seq, 3D/AlphaMissense, CPTAC & DepMap)...\n")
 
@@ -753,7 +711,6 @@ mir_dicer <- mir_df %>%
     )
   )
 
-# Update exact group counts dynamically in labels
 cnt_tbl <- mir_dicer %>% count(dicer1FunctionalClass)
 n_r3b <- cnt_tbl$n[cnt_tbl$dicer1FunctionalClass == "DICER1_RNaseIIIb_3D_Catalytic_Pocket"]
 n_trc <- cnt_tbl$n[cnt_tbl$dicer1FunctionalClass == "DICER1_Truncating_LoF"]
@@ -1121,10 +1078,6 @@ fig5 <- plot_grid(
 save_pub_figure(fig5, "Figure_5", width_in = 13.2, height_in = 13.8)
 
 
-## ══════════════════════════════════════════════════════════════════════════════
-## FIGURE 6 — Clinical, Germline Constraint, ClinVar ROC-AUC, MSK-IMPACT (N=10,945),
-##            GTEx Healthy Specificity, Thorsson HRD/Immune & Stratified Survival
-## ══════════════════════════════════════════════════════════════════════════════
 
 cat("Generating Figure 6 (Clinical, Germline, MSK-IMPACT, GTEx, Immune & Survival)...\n")
 

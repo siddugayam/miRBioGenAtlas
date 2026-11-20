@@ -1,9 +1,9 @@
-# miRBioGenAtlas v2.0.0 — Python environment specification
+# miRBioGenAtlas v2.0.1 — Python environment specification
 # Target: Python >= 3.9 (verified on Python 3.9, 3.10, 3.11, and 3.12)
 #
 # Zero-dependency offline execution:
 # Core dataset builder (`scripts/build_mirbiogen_v2_dataset.py`,
-# `scripts/multimodal_extensions.py`, `scripts/clinical_and_external_v21.py`),
+# `scripts/multimodal_extensions.py`, `scripts/clinical_and_external.py`),
 # live snapshot fetcher (`scripts/fetch_cbioportal_snapshot.py`), static web
 # explorer generator (`scripts/build_web_explorer.py`), CLI variant triage
 # (`scripts/query_variant.py`), unit test suite (`tests/test_atlas_integrity.py`),

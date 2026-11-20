@@ -1,6 +1,6 @@
 {
   "dataset": "miRBioGenAtlas",
-  "snapshot_version": "2.0.0",
+  "snapshot_version": "2.0.1",
   "retrieved_utc": "2026-11-18T04:52:53Z",
   "cbioportal_portal_version": "v7.2.3",
   "cbioportal_db_version": "3.1.0",
@@ -198,9 +198,9 @@
       "size_bytes": 1614665
     },
     {
-      "path": "data/raw_snapshot/external/gpu_a4000_esm3b_esm1v_svd.json.gz",
-      "sha256": "dcd347adba102e7f400b8ec032d2632885a1010d7b76c752fd6b21e26359d4ee",
-      "size_bytes": 510719
+      "path": "data/raw_snapshot/external/plm_if1_saturation_and_mirna_svd.json.gz",
+      "sha256": "7838257ec25994fd0556e7ba3ba5b581787b8aa47b9145b3ecfd2380ca7c465f",
+      "size_bytes": 507326
     },
     {
       "path": "data/miRNA_biogenesis_saturation_mutagenesis_213940_atlas.csv.gz",
@@ -233,5 +233,5 @@
       "sha256": "143619a17cbfd8879d8d99a6dde1f2d773ed04d9cf5fe9e534c101f2353f4683"
     }
   ],
-  "external_layers_version": "2.0.0-multimodal-gpu-deep-atlas"
+  "external_layers_version": "2.0.1"
 }

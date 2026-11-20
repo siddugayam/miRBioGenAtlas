@@ -1,0 +1,16 @@
+geneSymbol,panelRole,n_cptac_mrna_protein_paired,n_cptac_cna_protein_paired,spearman_CNA_to_mRNA,spearman_CNA_to_Protein,spearman_mRNA_to_Protein,post_transcriptional_CNA_attenuation
+DROSHA,Core_Enzyme,598,416,0.3489,0.1318,0.3258,0.217
+DGCR8,Core_Cofactor,664,424,0.2918,0.1861,0.3681,0.1057
+XPO5,Core_Transporter,958,709,0.3892,0.2871,0.7627,0.1021
+DICER1,Core_Enzyme,762,512,0.4574,0.2466,0.3591,0.2109
+TARBP2,Core_Cofactor,642,424,0.2855,0.1585,0.3277,0.127
+PRKRA,Core_Cofactor,958,709,0.2674,0.2066,0.4912,0.0609
+AGO1,Core_Effector,958,709,0.3292,0.1819,0.2611,0.1474
+AGO2,Core_Effector,958,709,0.4499,0.3408,0.4034,0.1091
+AGO3,Core_Effector,949,700,0.3093,0.1457,0.2973,0.1637
+AGO4,Core_Effector,535,388,0.2655,0.1526,0.3042,0.1128
+LIN28A,Direct_Biogenesis_Regulator,29,11,0.0253,0.4518,0.0335,-0.4266
+LIN28B,Direct_Biogenesis_Regulator,16,16,0.0633,0.028,0.7785,0.0353
+SMAD2,Pleiotropic_Accessory,947,698,0.4324,0.3807,0.4632,0.0517
+SMAD4,Pleiotropic_Accessory,958,709,0.4591,0.4444,0.6048,0.0147
+TP53,Upstream_Pleiotropic_Regulator,603,411,0.1686,-0.1064,0.3954,0.275

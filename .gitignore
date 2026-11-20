@@ -1,5 +1,11 @@
 .DS_Store
+**/.DS_Store
 __pycache__/
+**/__pycache__/
 *.pyc
+*.pyo
 .ipynb_checkpoints/
+**/.ipynb_checkpoints/
 .Rhistory
+.RData
+.pytest_cache/

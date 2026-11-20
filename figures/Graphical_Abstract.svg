@@ -1,0 +1,220 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 730" width="1440" height="730">
+<defs>
+  <filter id="cardShadow" x="-8%" y="-8%" width="116%" height="120%">
+    <feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="#0F172A" flood-opacity="0.08"/>
+  </filter>
+  <marker id="arrow-slate" viewBox="0 0 12 12" refX="10" refY="6" markerWidth="7.5" markerHeight="7.5" orient="auto-start-reverse">
+    <path d="M 1 1.5 L 10.5 6 L 1 10.5 z" fill="#495057"/>
+  </marker>
+  <marker id="inhibit-slate" viewBox="0 0 12 14" refX="7" refY="7" markerWidth="7" markerHeight="8" orient="auto">
+    <line x1="7" y1="1" x2="7" y2="13" stroke="#495057" stroke-width="3" stroke-linecap="round"/>
+  </marker>
+  <marker id="arrow-teal" viewBox="0 0 12 12" refX="10" refY="6" markerWidth="7.5" markerHeight="7.5" orient="auto-start-reverse">
+    <path d="M 1 1.5 L 10.5 6 L 1 10.5 z" fill="#0CA678"/>
+  </marker>
+  <marker id="inhibit-teal" viewBox="0 0 12 14" refX="7" refY="7" markerWidth="7" markerHeight="8" orient="auto">
+    <line x1="7" y1="1" x2="7" y2="13" stroke="#0CA678" stroke-width="3" stroke-linecap="round"/>
+  </marker>
+  <marker id="arrow-blue" viewBox="0 0 12 12" refX="10" refY="6" markerWidth="7.5" markerHeight="7.5" orient="auto-start-reverse">
+    <path d="M 1 1.5 L 10.5 6 L 1 10.5 z" fill="#1C7ED6"/>
+  </marker>
+  <marker id="inhibit-blue" viewBox="0 0 12 14" refX="7" refY="7" markerWidth="7" markerHeight="8" orient="auto">
+    <line x1="7" y1="1" x2="7" y2="13" stroke="#1C7ED6" stroke-width="3" stroke-linecap="round"/>
+  </marker>
+  <marker id="arrow-coral" viewBox="0 0 12 12" refX="10" refY="6" markerWidth="7.5" markerHeight="7.5" orient="auto-start-reverse">
+    <path d="M 1 1.5 L 10.5 6 L 1 10.5 z" fill="#E03131"/>
+  </marker>
+  <marker id="inhibit-coral" viewBox="0 0 12 14" refX="7" refY="7" markerWidth="7" markerHeight="8" orient="auto">
+    <line x1="7" y1="1" x2="7" y2="13" stroke="#E03131" stroke-width="3" stroke-linecap="round"/>
+  </marker>
+  <marker id="arrow-amber" viewBox="0 0 12 12" refX="10" refY="6" markerWidth="7.5" markerHeight="7.5" orient="auto-start-reverse">
+    <path d="M 1 1.5 L 10.5 6 L 1 10.5 z" fill="#E67700"/>
+  </marker>
+  <marker id="inhibit-amber" viewBox="0 0 12 14" refX="7" refY="7" markerWidth="7" markerHeight="8" orient="auto">
+    <line x1="7" y1="1" x2="7" y2="13" stroke="#E67700" stroke-width="3" stroke-linecap="round"/>
+  </marker>
+  <marker id="arrow-violet" viewBox="0 0 12 12" refX="10" refY="6" markerWidth="7.5" markerHeight="7.5" orient="auto-start-reverse">
+    <path d="M 1 1.5 L 10.5 6 L 1 10.5 z" fill="#7048E8"/>
+  </marker>
+  <marker id="inhibit-violet" viewBox="0 0 12 14" refX="7" refY="7" markerWidth="7" markerHeight="8" orient="auto">
+    <line x1="7" y1="1" x2="7" y2="13" stroke="#7048E8" stroke-width="3" stroke-linecap="round"/>
+  </marker>
+  <marker id="arrow-emerald" viewBox="0 0 12 12" refX="10" refY="6" markerWidth="7.5" markerHeight="7.5" orient="auto-start-reverse">
+    <path d="M 1 1.5 L 10.5 6 L 1 10.5 z" fill="#2F9E44"/>
+  </marker>
+  <marker id="inhibit-emerald" viewBox="0 0 12 14" refX="7" refY="7" markerWidth="7" markerHeight="8" orient="auto">
+    <line x1="7" y1="1" x2="7" y2="13" stroke="#2F9E44" stroke-width="3" stroke-linecap="round"/>
+  </marker>
+</defs>
+<rect x="0" y="0" width="1440" height="730" fill="#FFFFFF"/>
+<text x="44" y="40" font-family="Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="23" font-weight="700" fill="#0F172A">miRBioGenAtlas v2.0: Structural, Functional &amp; Clinical Architecture Across 21,140 Tumours</text>
+<text x="44" y="64" font-family="Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13.5" font-weight="400" fill="#475569">Multi-consortium atlas integrating 213,940 saturation variants, mature miRNA-seq, CPTAC proteomics, DepMap CRISPR &amp; survival</text>
+<rect x="36.0" y="96.0" width="410.0" height="584.0" rx="16" fill="#F3F0FF" fill-opacity="0.55" stroke="#7950F2" stroke-opacity="0.35" stroke-width="1.6"/>
+<rect x="50.0" y="108.0" width="26" height="24" rx="7" fill="#5F3DC4"/>
+<text x="63.0" y="125.0" text-anchor="middle" font-family="Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13.5" font-weight="700" fill="#FFFFFF">A</text>
+<text x="84.0" y="125.0" font-family="Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13.5" font-weight="700" letter-spacing="0.02em" fill="#2B195A">Canonical Biogenesis Cascade</text>
+<rect x="486.0" y="96.0" width="450.0" height="584.0" rx="16" fill="#FFF5F5" fill-opacity="0.55" stroke="#FA5252" stroke-opacity="0.35" stroke-width="1.6"/>
+<rect x="500.0" y="108.0" width="26" height="24" rx="7" fill="#C92A2A"/>
+<text x="513.0" y="125.0" text-anchor="middle" font-family="Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13.5" font-weight="700" fill="#FFFFFF">B</text>
+<text x="534.0" y="125.0" font-family="Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13.5" font-weight="700" letter-spacing="0.02em" fill="#4A151B">Somatic &amp; 3D Pocket Perturbations</text>
+<rect x="976.0" y="96.0" width="428.0" height="584.0" rx="16" fill="#E6FCF5" fill-opacity="0.55" stroke="#0CA678" stroke-opacity="0.35" stroke-width="1.6"/>
+<rect x="990.0" y="108.0" width="26" height="24" rx="7" fill="#087F5B"/>
+<text x="1003.0" y="125.0" text-anchor="middle" font-family="Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13.5" font-weight="700" fill="#FFFFFF">C</text>
+<text x="1024.0" y="125.0" font-family="Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13.5" font-weight="700" letter-spacing="0.02em" fill="#0B3B2E">Clinical &amp; Therapeutic Readouts</text>
+<path d="M 241.0,292.0 C 241.0,315.0 241.0,315.0 241.0,338.0" fill="none" stroke="#7048E8" stroke-width="2.6" stroke-linecap="round" marker-end="url(#arrow-violet)"/>
+<rect x="201.4" y="304.0" width="79.2" height="22" rx="11" fill="#FFFFFF" stroke="#7048E8" stroke-width="1.3"/>
+<text x="241.0" y="319.0" text-anchor="middle" font-family="Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" font-weight="600" fill="#7048E8">pre-miRNA</text>
+<path d="M 241.0,467.0 C 241.0,490.0 241.0,490.0 241.0,513.0" fill="none" stroke="#1C7ED6" stroke-width="2.6" stroke-linecap="round" marker-end="url(#arrow-blue)"/>
+<rect x="191.2" y="479.0" width="99.6" height="22" rx="11" fill="#FFFFFF" stroke="#1C7ED6" stroke-width="1.3"/>
+<text x="241.0" y="494.0" text-anchor="middle" font-family="Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" font-weight="600" fill="#1C7ED6">5p/3p duplex</text>
+<path d="M 578.5,230.0 C 475.4,230.0 475.4,401.8 372.3,401.8" fill="none" stroke="#E67700" stroke-width="2.6" stroke-linecap="round" marker-end="url(#inhibit-amber)"/>
+<rect x="412.0" y="304.9" width="126.8" height="22" rx="11" fill="#FFFFFF" stroke="#E67700" stroke-width="1.3"/>
+<text x="475.4" y="319.9" text-anchor="middle" font-family="Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" font-weight="600" fill="#E67700">Blocks pre-let-7</text>
+<path d="M 578.5,405.0 C 476.0,405.0 476.0,405.0 373.5,405.0" fill="none" stroke="#E03131" stroke-width="2.6" stroke-linecap="round" marker-end="url(#inhibit-coral)"/>
+<rect x="419.4" y="394.0" width="113.2" height="22" rx="11" fill="#FFFFFF" stroke="#E03131" stroke-width="1.3"/>
+<text x="476.0" y="409.0" text-anchor="middle" font-family="Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" font-weight="600" fill="#E03131">5p strand loss</text>
+<path d="M 578.5,580.0 C 476.0,580.0 476.0,580.0 373.5,580.0" fill="none" stroke="#495057" stroke-width="2.6" stroke-linecap="round" stroke-dasharray="7 5" marker-end="url(#arrow-slate)"/>
+<rect x="433.0" y="569.0" width="86.0" height="22" rx="11" fill="#FFFFFF" stroke="#495057" stroke-width="1.3"/>
+<text x="476.0" y="584.0" text-anchor="middle" font-family="Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" font-weight="600" fill="#495057">Δρ = +0.21</text>
+<path d="M 843.5,230.0 C 945.3,230.0 945.3,234.9 1047.0,234.9" fill="none" stroke="#E67700" stroke-width="2.6" stroke-linecap="round" marker-end="url(#arrow-amber)"/>
+<rect x="898.9" y="221.4" width="92.8" height="22" rx="11" fill="#FFFFFF" stroke="#E67700" stroke-width="1.3"/>
+<text x="945.3" y="236.4" text-anchor="middle" font-family="Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" font-weight="600" fill="#E67700">Multivar OS</text>
+<path d="M 843.5,405.0 C 945.2,405.0 945.2,405.0 1047.0,405.0" fill="none" stroke="#E03131" stroke-width="2.6" stroke-linecap="round" marker-end="url(#arrow-coral)"/>
+<rect x="888.6" y="394.0" width="113.2" height="22" rx="11" fill="#FFFFFF" stroke="#E03131" stroke-width="1.3"/>
+<text x="945.2" y="409.0" text-anchor="middle" font-family="Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" font-weight="600" fill="#E03131">Oncofetal mRNA</text>
+<path d="M 843.5,580.0 C 945.3,580.0 945.3,578.0 1047.0,578.0" fill="none" stroke="#0CA678" stroke-width="2.6" stroke-linecap="round" marker-end="url(#arrow-teal)"/>
+<rect x="888.7" y="568.0" width="113.2" height="22" rx="11" fill="#FFFFFF" stroke="#0CA678" stroke-width="1.3"/>
+<text x="945.3" y="583.0" text-anchor="middle" font-family="Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" font-weight="600" fill="#0CA678">CRISPR Chronos</text>
+<g filter="url(#cardShadow)">
+<rect x="113.5" y="168.0" width="255.0" height="124.0" rx="14" fill="#FFFFFF" stroke="#7950F2" stroke-width="2"/>
+<path d="M 127.5,169.0 L 354.5,169.0" stroke="#7950F2" stroke-width="5" stroke-linecap="round"/>
+</g>
+<circle cx="131.5" cy="188.0" r="11" fill="#5F3DC4"/>
+<text x="131.5" y="192.0" text-anchor="middle" font-family="Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="700" fill="#FFFFFF">1</text>
+<g transform="translate(241.0,204.0) scale(0.880)">
+<path d="M-12,-22 C12,-11 -12,11 12,22" stroke="#7950F2" stroke-width="3" fill="none" stroke-linecap="round"/>
+<path d="M12,-22 C-12,-11 12,11 -12,22" stroke="#5F3DC4" stroke-width="3" fill="none" stroke-linecap="round"/>
+<line x1="-6" y1="-14" x2="6" y2="-14" stroke="#7950F2" stroke-width="1.8" opacity="0.7"/>
+<line x1="-6" y1="-5" x2="6" y2="-5" stroke="#7950F2" stroke-width="1.8" opacity="0.7"/>
+<line x1="-6" y1="5" x2="6" y2="5" stroke="#7950F2" stroke-width="1.8" opacity="0.7"/>
+<line x1="-6" y1="14" x2="6" y2="14" stroke="#7950F2" stroke-width="1.8" opacity="0.7"/>
+</g>
+<text x="241.0" y="242.0" text-anchor="middle" font-family="Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" font-weight="700" fill="#2B195A">DROSHA–DGCR8 Complex</text>
+<text x="241.0" y="260.0" text-anchor="middle" font-family="Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" font-weight="400" fill="#475569">Nuclear pri-miRNA cropping + XPO5 export</text>
+<g filter="url(#cardShadow)">
+<rect x="113.5" y="343.0" width="255.0" height="124.0" rx="14" fill="#FFFFFF" stroke="#1C7ED6" stroke-width="2"/>
+<path d="M 127.5,344.0 L 354.5,344.0" stroke="#1C7ED6" stroke-width="5" stroke-linecap="round"/>
+</g>
+<circle cx="131.5" cy="363.0" r="11" fill="#1864AB"/>
+<text x="131.5" y="367.0" text-anchor="middle" font-family="Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="700" fill="#FFFFFF">2</text>
+<g transform="translate(241.0,379.0) scale(0.880)">
+<circle cx="0" cy="0" r="24" fill="#D0EBFF" stroke="#1C7ED6" stroke-width="2.5"/>
+<circle cx="-3" cy="2" r="10" fill="#1864AB" opacity="0.85"/>
+<circle cx="-6" cy="-1" r="3.2" fill="#FFFFFF" opacity="0.85"/>
+</g>
+<text x="241.0" y="417.0" text-anchor="middle" font-family="Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" font-weight="700" fill="#102A43">DICER1–TARBP2 Dicing</text>
+<text x="241.0" y="435.0" text-anchor="middle" font-family="Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" font-weight="400" fill="#475569">RNase IIIa (3p) &amp; IIIb (5p) cleavage</text>
+<g filter="url(#cardShadow)">
+<rect x="113.5" y="518.0" width="255.0" height="124.0" rx="14" fill="#FFFFFF" stroke="#37B24D" stroke-width="2"/>
+<path d="M 127.5,519.0 L 354.5,519.0" stroke="#37B24D" stroke-width="5" stroke-linecap="round"/>
+</g>
+<circle cx="131.5" cy="538.0" r="11" fill="#2B8A3E"/>
+<text x="131.5" y="542.0" text-anchor="middle" font-family="Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="700" fill="#FFFFFF">3</text>
+<g transform="translate(241.0,554.0) scale(0.880)">
+<rect x="-7" y="-2" width="5" height="24" rx="2.5" fill="#37B24D"/>
+<rect x="2" y="-2" width="5" height="24" rx="2.5" fill="#37B24D"/>
+<path d="M-14,-18 C-14,-6 -4,-4 -4,-2 M14,-18 C14,-6 4,-4 4,-2" stroke="#2B8A3E" stroke-width="3.2" stroke-linecap="round" fill="none"/>
+<circle cx="0" cy="-16" r="4.5" fill="#2B8A3E"/>
+</g>
+<text x="241.0" y="592.0" text-anchor="middle" font-family="Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" font-weight="700" fill="#133A1B">AGO1–4 RISC Silencing</text>
+<text x="241.0" y="610.0" text-anchor="middle" font-family="Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" font-weight="400" fill="#475569">CPTAC stoichiometrically buffered</text>
+<g filter="url(#cardShadow)">
+<rect x="578.5" y="168.0" width="265.0" height="124.0" rx="14" fill="#FFFFFF" stroke="#F59F00" stroke-width="2"/>
+<path d="M 592.5,169.0 L 829.5,169.0" stroke="#F59F00" stroke-width="5" stroke-linecap="round"/>
+</g>
+<circle cx="596.5" cy="188.0" r="11" fill="#E67700"/>
+<text x="596.5" y="192.0" text-anchor="middle" font-family="Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="700" fill="#FFFFFF">4</text>
+<g transform="translate(711.0,204.0) scale(0.880)">
+<path d="M-22,-8 C-26,-20 -10,-27 2,-23 C14,-28 27,-17 23,-4 C29,8 20,24 6,23 C-6,28 -24,22 -24,8 Z" fill="#FFEC99" stroke="#F59F00" stroke-width="2.5"/>
+<ellipse cx="2" cy="1" rx="11" ry="8.5" transform="rotate(-18)" fill="#E67700" opacity="0.88"/>
+</g>
+<text x="711.0" y="242.0" text-anchor="middle" font-family="Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" font-weight="700" fill="#493000">LIN28A/B Reactivation</text>
+<text x="711.0" y="260.0" text-anchor="middle" font-family="Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" font-weight="400" fill="#475569">GTEx testis-restricted (τ = 0.997)</text>
+<g filter="url(#cardShadow)">
+<rect x="578.5" y="343.0" width="265.0" height="124.0" rx="14" fill="#FFFFFF" stroke="#FA5252" stroke-width="2"/>
+<path d="M 592.5,344.0 L 829.5,344.0" stroke="#FA5252" stroke-width="5" stroke-linecap="round"/>
+</g>
+<circle cx="596.5" cy="363.0" r="11" fill="#C92A2A"/>
+<text x="596.5" y="367.0" text-anchor="middle" font-family="Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="700" fill="#FFFFFF">5</text>
+<g transform="translate(711.0,379.0) scale(0.880)">
+<path d="M0,-22 L23,18 L-23,18 Z" fill="#FFE3E3" stroke="#FA5252" stroke-width="2.6" stroke-linejoin="round"/>
+<line x1="0" y1="-8" x2="0" y2="5" stroke="#C92A2A" stroke-width="3.2" stroke-linecap="round"/>
+<circle cx="0" cy="12" r="2.2" fill="#C92A2A"/>
+</g>
+<text x="711.0" y="417.0" text-anchor="middle" font-family="Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" font-weight="700" fill="#4A151B">3D Active-Site Hotspots</text>
+<text x="711.0" y="435.0" text-anchor="middle" font-family="Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" font-weight="400" fill="#475569">Fold-preserving (ClinVar AUC = 0.978)</text>
+<g filter="url(#cardShadow)">
+<rect x="578.5" y="518.0" width="265.0" height="124.0" rx="14" fill="#FFFFFF" stroke="#FA5252" stroke-width="2"/>
+<path d="M 592.5,519.0 L 829.5,519.0" stroke="#FA5252" stroke-width="5" stroke-linecap="round"/>
+</g>
+<circle cx="596.5" cy="538.0" r="11" fill="#C92A2A"/>
+<text x="596.5" y="542.0" text-anchor="middle" font-family="Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="700" fill="#FFFFFF">6</text>
+<g transform="translate(711.0,554.0) scale(0.880)">
+<rect x="-16" y="-20" width="32" height="40" rx="4" fill="#FFE3E3" stroke="#FA5252" stroke-width="2.4"/>
+<rect x="-8" y="-24" width="16" height="7" rx="2.5" fill="#C92A2A"/>
+<line x1="-9" y1="-6" x2="9" y2="-6" stroke="#C92A2A" stroke-width="2.2" stroke-linecap="round"/>
+<line x1="-9" y1="2" x2="9" y2="2" stroke="#C92A2A" stroke-width="2.2" stroke-linecap="round"/>
+<line x1="-9" y1="10" x2="9" y2="10" stroke="#C92A2A" stroke-width="2.2" stroke-linecap="round"/>
+</g>
+<text x="711.0" y="592.0" text-anchor="middle" font-family="Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" font-weight="700" fill="#4A151B">8q24.3 Amp &amp; 1p34.3 Loss</text>
+<text x="711.0" y="610.0" text-anchor="middle" font-family="Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" font-weight="400" fill="#475569">AGO2 +2 amp vs AGO1/3/4 co-deletion</text>
+<g filter="url(#cardShadow)">
+<rect x="1052.0" y="172.0" width="276.0" height="126.0" rx="14" fill="#FFFFFF" stroke="#F59F00" stroke-width="2"/>
+<path d="M 1066.0,173.0 L 1314.0,173.0" stroke="#F59F00" stroke-width="5" stroke-linecap="round"/>
+</g>
+<circle cx="1070.0" cy="192.0" r="11" fill="#E67700"/>
+<text x="1070.0" y="196.0" text-anchor="middle" font-family="Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="700" fill="#FFFFFF">7</text>
+<g transform="translate(1190.0,208.0) scale(0.880)">
+<g transform="translate(-12,2)" opacity="0.65">
+<circle cx="0" cy="-11" r="6.5" fill="#E67700"/>
+<path d="M-11,14 C-11,3 -6,-2 0,-2 C6,-2 11,3 11,14 Z" fill="#F59F00"/>
+</g>
+<g transform="translate(12,2)" opacity="0.65">
+<circle cx="0" cy="-11" r="6.5" fill="#E67700"/>
+<path d="M-11,14 C-11,3 -6,-2 0,-2 C6,-2 11,3 11,14 Z" fill="#F59F00"/>
+</g>
+<g transform="translate(0,0)" opacity="1.0">
+<circle cx="0" cy="-11" r="6.5" fill="#E67700"/>
+<path d="M-11,14 C-11,3 -6,-2 0,-2 C6,-2 11,3 11,14 Z" fill="#F59F00"/>
+</g>
+</g>
+<text x="1190.0" y="246.0" text-anchor="middle" font-family="Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" font-weight="700" fill="#493000">Independent Survival Risk</text>
+<text x="1190.0" y="264.0" text-anchor="middle" font-family="Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" font-weight="400" fill="#475569">LIN28 HR=1.36; AGO2 +2 HR=1.23, 4.7x HRD</text>
+<g filter="url(#cardShadow)">
+<rect x="1052.0" y="342.0" width="276.0" height="126.0" rx="14" fill="#FFFFFF" stroke="#FA5252" stroke-width="2"/>
+<path d="M 1066.0,343.0 L 1314.0,343.0" stroke="#FA5252" stroke-width="5" stroke-linecap="round"/>
+</g>
+<circle cx="1070.0" cy="362.0" r="11" fill="#C92A2A"/>
+<text x="1070.0" y="366.0" text-anchor="middle" font-family="Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="700" fill="#FFFFFF">8</text>
+<g transform="translate(1190.0,378.0) scale(0.880)">
+<path d="M-6,-20 L6,-20 M-4,-20 L-4,-8 L-18,16 A4,4 0 0 0 -14,22 L14,22 A4,4 0 0 0 18,16 L4,-8 L4,-20" fill="#FFE3E3" stroke="#FA5252" stroke-width="2.4" stroke-linejoin="round"/>
+<path d="M-11,8 L11,8 L16,17 A2,2 0 0 1 14,20 L-14,20 A2,2 0 0 1 -16,17 Z" fill="#C92A2A" opacity="0.55"/>
+</g>
+<text x="1190.0" y="416.0" text-anchor="middle" font-family="Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" font-weight="700" fill="#4A151B">5p let-7 De-repression</text>
+<text x="1190.0" y="434.0" text-anchor="middle" font-family="Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" font-weight="400" fill="#475569">5p collapse (p=1.5e-15); 3p spared</text>
+<g filter="url(#cardShadow)">
+<rect x="1052.0" y="515.0" width="276.0" height="126.0" rx="14" fill="#FFFFFF" stroke="#0CA678" stroke-width="2"/>
+<path d="M 1066.0,516.0 L 1314.0,516.0" stroke="#0CA678" stroke-width="5" stroke-linecap="round"/>
+</g>
+<circle cx="1070.0" cy="535.0" r="11" fill="#087F5B"/>
+<text x="1070.0" y="539.0" text-anchor="middle" font-family="Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="700" fill="#FFFFFF">9</text>
+<g transform="translate(1190.0,551.0) scale(0.880)">
+<g transform="rotate(-32)">
+<rect x="-20" y="-9" width="40" height="18" rx="9" fill="#FFFFFF" stroke="#0CA678" stroke-width="2.4"/>
+<path d="M0,-9 L11,-9 A9,9 0 0 1 11,9 L0,9 Z" fill="#087F5B"/>
+</g>
+</g>
+<text x="1190.0" y="589.0" text-anchor="middle" font-family="Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" font-weight="700" fill="#0B3B2E">AGO2 Synthetic Lethality</text>
+<text x="1190.0" y="607.0" text-anchor="middle" font-family="Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" font-weight="400" fill="#475569">1p34.3 loss exposes AGO2 hit (p=5.4e-4)</text>
+<text x="44" y="712" font-family="Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" fill="#64748B">Arrow semantics:  → Canonical biogenesis / oncogenic progression   ⊣ Enzymatic blockade   ⇢ Post-transcriptional complex buffering</text>
+</svg>

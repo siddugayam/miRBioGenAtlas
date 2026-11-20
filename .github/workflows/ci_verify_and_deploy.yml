@@ -1,0 +1,36 @@
+name: Verify miRBioGenAtlas Reproducibility & Integrity
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify-reproducibility:
+    name: Clean-Room SHA-256, Pipeline & CLI Verification (Python ${{ matrix.python-version }})
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.10", "3.12"]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }} (zero third-party packages)
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Rebuild entire multi-consortium dataset offline from 45 SHA-256 snapshots
+        run: python3 scripts/build_mirbiogen_v2_dataset.py
+
+      - name: Rebuild static web explorer & 15 saturation chunks
+        run: python3 scripts/build_web_explorer.py
+
+      - name: Run automated schema, checksum, union-identity & CLI unit tests
+        run: python3 -m unittest discover -s tests -v

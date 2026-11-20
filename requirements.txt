@@ -1,14 +1,26 @@
 # miRBioGenAtlas v2.0.0 — Python environment specification
-# Target: Python >= 3.9 (tested on Python 3.9, 3.10, 3.11, and 3.12)
+# Target: Python >= 3.9 (verified on Python 3.9, 3.10, 3.11, and 3.12)
 #
-# Core pipeline scripts (`scripts/fetch_cbioportal_snapshot.py` and
-# `scripts/build_mirbiogen_v2_dataset.py`) and `notebooks/notebook.ipynb`
-# use ONLY the Python standard library (`csv`, `gzip`, `hashlib`, `json`,
-# `math`, `pathlib`, `statistics`, `urllib.request`) so they run out-of-the-box
-# in any clean Python >= 3.9 environment with zero third-party binary issues.
+# Zero-dependency offline execution:
+# Core dataset builder (`scripts/build_mirbiogen_v2_dataset.py`,
+# `scripts/multimodal_extensions.py`, `scripts/clinical_and_external_v21.py`),
+# live snapshot fetcher (`scripts/fetch_cbioportal_snapshot.py`), static web
+# explorer generator (`scripts/build_web_explorer.py`), CLI variant triage
+# (`scripts/query_variant.py`), unit test suite (`tests/test_atlas_integrity.py`),
+# and `notebooks/notebook.ipynb` use ONLY the Python >= 3.9 standard library
+# (`argparse`, `csv`, `gzip`, `hashlib`, `json`, `math`, `pathlib`, `re`,
+# `statistics`, `unittest`, `urllib.request`) and run out-of-the-box with zero
+# third-party packages.
 #
-# Optional interactive/notebook analysis packages:
+# Optional interactive / downstream data-science packages:
 jupyterlab>=4.0.0
 pandas>=2.0.0
 numpy>=1.24.0
 requests>=2.31.0
+
+# Optional GPU inference packages (only needed to re-compute raw PLM / 3D
+# inverse-folding scores from scratch rather than reading the frozen snapshot):
+# torch>=2.1.0
+# fair-esm>=2.0.0
+# biotite>=0.39.0,<1.0.0
+# scipy>=1.11.0

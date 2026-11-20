@@ -1,0 +1,41 @@
+msk_cancer_type,N_samples,dicer1_mut_n,dicer1_mut_freq,dicer1_rnase3b_hotspot_n,dicer1_rnase3b_hotspot_freq,dicer1_truncating_n,dicer1_truncating_freq
+Melanoma,365,24,0.0658,5,0.0137,3,0.0082
+Non-Small Cell Lung Cancer,1668,39,0.0234,4,0.0024,8,0.0048
+Endometrial Cancer,218,13,0.0596,4,0.0183,3,0.0138
+Colorectal Cancer,1007,32,0.0318,3,0.003,4,0.004
+Thyroid Cancer,231,6,0.026,3,0.013,2,0.0087
+"Skin Cancer, Non-Melanoma",148,11,0.0743,1,0.0068,1,0.0068
+Soft Tissue Sarcoma,443,3,0.0068,1,0.0023,0,0.0
+Hepatobiliary Cancer,355,2,0.0056,1,0.0028,0,0.0
+Sex Cord Stromal Tumor,19,1,0.0526,1,0.0526,0,0.0
+Breast Cancer,1337,14,0.0105,0,0.0,1,0.0007
+Bladder Cancer,423,13,0.0307,0,0.0,1,0.0024
+Glioma,553,9,0.0163,0,0.0,3,0.0054
+Esophagogastric Cancer,341,7,0.0205,0,0.0,3,0.0088
+Prostate Cancer,717,6,0.0084,0,0.0,2,0.0028
+Cancer of Unknown Primary,186,6,0.0323,0,0.0,0,0.0
+Head and Neck Cancer,186,4,0.0215,0,0.0,1,0.0054
+Renal Cell Carcinoma,361,3,0.0083,0,0.0,0,0.0
+Ovarian Cancer,224,3,0.0134,0,0.0,1,0.0045
+Germ Cell Tumor,288,2,0.0069,0,0.0,0,0.0
+Pancreatic Cancer,502,1,0.002,0,0.0,0,0.0
+Gastrointestinal Stromal Tumor,137,1,0.0073,0,0.0,0,0.0
+Bone Cancer,134,1,0.0075,0,0.0,0,0.0
+Mesothelioma,107,1,0.0093,0,0.0,1,0.0093
+Small Cell Lung Cancer,82,1,0.0122,0,0.0,0,0.0
+Appendiceal Cancer,79,1,0.0127,0,0.0,0,0.0
+Cervical Cancer,50,1,0.02,0,0.0,0,0.0
+CNS Cancer,48,1,0.0208,0,0.0,0,0.0
+Anal Cancer,32,1,0.0312,0,0.0,1,0.0312
+Mature B-Cell Neoplasms,134,0,0.0,0,0.0,0,0.0
+Salivary Gland Cancer,114,0,0.0,0,0.0,0,0.0
+Uterine Sarcoma,93,0,0.0,0,0.0,0,0.0
+Peripheral Nervous System,80,0,0.0,0,0.0,0,0.0
+Gastrointestinal Neuroendocrine Tumor,46,0,0.0,0,0.0,0,0.0
+Small Bowel Cancer,35,0,0.0,0,0.0,0,0.0
+Mature T and NK Neoplasms,29,0,0.0,0,0.0,0,0.0
+Adrenocortical Carcinoma,25,0,0.0,0,0.0,0,0.0
+Histiocytosis,22,0,0.0,0,0.0,0,0.0
+Thymic Tumor,18,0,0.0,0,0.0,0,0.0
+Nerve Sheath Tumor,16,0,0.0,0,0.0,0,0.0
+Ampullary Cancer,16,0,0.0,0,0.0,0,0.0

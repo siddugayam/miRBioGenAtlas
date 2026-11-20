@@ -1,0 +1,9 @@
+benchmark_id,immune_or_instability_metric,group_A,n_group_A,median_group_A,group_B,n_group_B,median_group_B,median_shift_A_minus_B,rank_biserial_r,mann_whitney_z,p_value_two_sided
+I1_AGO2_FocalAmp_p2_vs_Diploid_HRDScore,hrdScore,AGO2_GISTIC2_HighAmp_p2,601,33.0,AGO2_Diploid_0,4884,7.0,26.0,0.7181,28.8938,1.428e-183
+I2_AGO2_FocalAmp_p2_vs_Diploid_IFNgResponse,ifngResponseScore,AGO2_GISTIC2_HighAmp_p2,515,0.3393,AGO2_Diploid_0,4254,-0.1939,0.5332,0.2858,10.6099,2.680e-26
+I3_Core10_StrictAlter_vs_WT_HRDScore,hrdScore,Core10_Strict_Altered,2126,24.0,Core10_Unaltered,7773,12.0,12.0,0.329,23.3069,3.769e-120
+I4_Core10_3DorAM_DriverMut_vs_WT_IFNgResponse,ifngResponseScore,Core10_3D_or_Pathogenic_Mut,526,0.0537,Core10_No_Pathogenic_Mut,8110,-0.0426,0.0963,0.0451,1.7357,8.262e-02
+I5_Core10_3DorAM_DriverMut_vs_WT_LeukocyteFraction,leukocyteFraction,Core10_3D_or_Pathogenic_Mut,641,0.2103,Core10_No_Pathogenic_Mut,9092,0.1685,0.0418,0.1342,5.6858,1.302e-08
+I6_TARBP2_or_XPO5_Truncating_vs_WT_IFNgResponse,ifngResponseScore,TARBP2_or_XPO5_Truncating_LoF,29,-0.2283,TARBP2_and_XPO5_WT,8474,-0.0347,-0.1936,-0.029,-0.27,7.871e-01
+I7_SMAD4_Inactivated_vs_WT_TGFbResponse,tgfbResponseScore,SMAD4_Mut_or_DeepDel,404,0.2248,SMAD4_WildType_Diploid,4850,-0.064,0.2888,0.3411,11.4095,3.748e-30
+I8_LIN28AB_Reactivated_vs_Silent_WoundHealingProliferation,woundHealingScore,LIN28AB_mRNA_Z_ge_2,255,0.125,LIN28AB_Silent_Z_le_0,6056,-0.029,0.154,0.2856,7.7365,1.022e-14

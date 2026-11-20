@@ -1,0 +1,13 @@
+benchmark_id,metric,group_A,n_group_A,median_group_A,mean_group_A,group_B,n_group_B,median_group_B,mean_group_B,median_shift_A_minus_B,rank_biserial_r,mann_whitney_z,p_value_two_sided
+B1_DICER1_RNaseIIIb_vs_WT_DuplexLog2,mirna_duplex_5p_3p_log2_ratio,DICER1_RNaseIIIb_3D_Catalytic_Pocket,30,-0.1116,-0.39906,DICER1_WildType,9332,0.47534,0.45585,-0.58694,-0.8426,-7.9799,1.464e-15
+B2_DICER1_RNaseIIIb_vs_BenignVUS_DuplexLog2,mirna_duplex_5p_3p_log2_ratio,DICER1_RNaseIIIb_3D_Catalytic_Pocket,30,-0.1116,-0.39906,DICER1_Likely_Benign_Passenger_VUS,59,0.44987,0.44573,-0.56147,-0.8689,-6.6744,2.483e-11
+B3_DICER1_BenignVUS_vs_WT_NegativeControl,mirna_duplex_5p_3p_log2_ratio,DICER1_Likely_Benign_Passenger_VUS,59,0.44987,0.44573,DICER1_WildType,9332,0.47534,0.45585,-0.02547,-0.0707,-0.9375,3.485e-01
+B4_DICER1_RNaseIIIb_vs_WT_5pLinearFraction,mirna_5p_arm_fraction,DICER1_RNaseIIIb_3D_Catalytic_Pocket,30,0.58063,0.56972,DICER1_WildType,9332,0.64804,0.63536,-0.06741,-0.2928,-2.7728,5.557e-03
+B5_DICER1_RNaseIIIb_AGO2_Bypass_miR451a_vs_miR144,mir451a_minus_mir144_5p_log2,DICER1_RNaseIIIb_3D_Catalytic_Pocket,30,2.0463,2.19241,DICER1_WildType,9332,2.11975,2.22161,-0.07345,0.0044,0.0416,9.668e-01
+B6_LIN28AB_Reactivated_vs_Silent_Let7Family,let7_family_mean_log2_rpm,LIN28A_or_LIN28B_mRNA_Z_ge_2,286,10.6618,10.61917,LIN28AB_Silent_Z_le_0,6550,10.98385,11.06048,-0.32205,-0.3318,-9.5122,1.867e-21
+B7_TP53_Inactivated_vs_WT_miR34Family,mir34_family_mean_log2_rpm,TP53_Mutated_or_DeepDel,3588,3.3142,3.516,TP53_WildType_Diploid,3968,3.46265,3.69761,-0.14845,-0.0957,-7.1941,6.290e-13
+B8_AGO2_HighAmp_p2_vs_Loss_GlobalMatureMiRNA,global_canonical_median_log2_rpm,AGO2_GISTIC_Amp_p2,580,2.3442,2.35429,AGO2_GISTIC_Del_m1_m2,545,2.308,2.31743,0.0362,0.042,1.2178,2.233e-01
+B9_DICER1_RNaseIIIb_vs_WT_Let7_5pTargetMRNA_DeRepression,let7_target_oncofetal_mrna_z,DICER1_RNaseIIIb_3D_Catalytic_Pocket,30,0.3134,0.41082,DICER1_WildType,9109,-0.04628,-0.00531,0.35968,0.4216,3.9929,6.527e-05
+B10_DICER1_RNaseIIIb_vs_WT_miR200_3pTargetMRNA_SparedControl,mir200_target_emt_mrna_z,DICER1_RNaseIIIb_3D_Catalytic_Pocket,30,-0.17547,-0.08329,DICER1_WildType,9109,0.01053,-0.00084,-0.186,-0.0998,-0.9449,3.447e-01
+B11_LIN28AB_Reactivated_vs_Silent_Let7TargetMRNA_DeRepression,let7_target_oncofetal_mrna_z,LIN28A_or_LIN28B_mRNA_Z_ge_2,286,0.34569,0.37122,LIN28AB_Silent_Z_le_0,6550,-0.14893,-0.1319,0.49462,0.4072,11.6732,1.748e-31
+B12_miR200_LowQ1_vs_HighQ4_EMTTargetMRNA_DeRepression,mir200_target_emt_mrna_z,miR200_BottomQuartile_Q1,2338,0.24544,0.24161,miR200_TopQuartile_Q4,2338,-0.3285,-0.33689,0.57395,0.4784,28.3268,1.618e-176

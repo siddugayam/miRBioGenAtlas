@@ -1,0 +1,5 @@
+geneSymbol,msk_N_profiled,msk_mut_calls_n,msk_mut_samples_n,msk_mut_freq,tcga_mut_freq_N10195,msk_nonhypermut_mut_freq,msk_truncating_n,msk_truncating_freq,tcga_truncating_freq,msk_3dpocket_or_hotspot_n,msk_3dpocket_or_hotspot_freq,tcga_3dpocket_or_hotspot_freq,msk_amp_p2_n,msk_deep_del_m2_n,msk_high_conf_alter_freq,tcga_high_conf_alter_freq,msk_primary_mut_freq,msk_metastasis_mut_freq
+DICER1,10945,246,207,0.01891,0.0254,0.00827,35,0.0032,0.0051,37,0.00338,0.00549,6,12,0.02056,0.03286,0.01706,0.02134
+SMAD2,10945,133,127,0.0116,0.01118,0.00639,43,0.00393,0.00402,40,0.00365,0.00412,6,33,0.01517,0.02079,0.01159,0.01162
+SMAD4,10945,491,466,0.04258,0.02629,0.03843,181,0.01654,0.00804,205,0.01873,0.01246,4,92,0.05089,0.04237,0.03911,0.04713
+TP53,10945,4954,4538,0.41462,0.36969,0.38802,1638,0.14966,0.12702,1528,0.13961,0.12702,5,96,0.4222,0.37803,0.39031,0.44653

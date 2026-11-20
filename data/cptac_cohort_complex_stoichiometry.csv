@@ -1,0 +1,9 @@
+cptacStudyId,studyName,n_total_samples,n_drosha_dgcr8_protein_paired,spearman_drosha_vs_dgcr8_protein,n_dicer1_tarbp2_protein_paired,spearman_dicer1_vs_tarbp2_protein
+brain_cptac_2020,"Pediatric Brain Cancer (CPTAC/CHOP, Cell 2020)",218,0,,0,
+brca_cptac_2020,"Proteogenomic landscape of breast cancer (CPTAC, Cell 2020)",122,114,0.3416,122,0.4989
+coad_cptac_2019,"Colon Cancer (CPTAC-2 Prospective, Cell 2019)",110,0,,0,
+gbm_cptac_2021,"Glioblastoma (CPTAC, Cell 2021)",99,99,0.3278,99,0.5782
+luad_cptac_2020,"Lung Adenocarcinoma (CPTAC, Cell 2020)",110,110,0.1996,110,0.4926
+lusc_cptac_2021,"Lung Squamous Cell Carcinoma (CPTAC, Cell 2021)",108,108,0.5341,108,0.5208
+paad_cptac_2021,"Pancreatic Ductal Adenocarcinoma (CPTAC, Cell 2021)",140,72,0.3516,121,0.231
+ucec_cptac_2020,"Endometrial Carcinoma (CPTAC, Cell 2020)",95,95,0.3878,95,0.4984

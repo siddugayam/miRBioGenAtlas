@@ -5,7 +5,7 @@
   "language": "eng",
   "access_right": "open",
   "license": "cc-by-4.0",
-  "description": "Versioned, SHA-256-verified sample-level and aggregated genomic/transcriptomic resource covering 15 canonical microRNA biogenesis and regulatory genes across 32 TCGA PanCancer Atlas (2018) studies (33 cancer types; N = 10,195 tumours; 152,925 sample x gene records). Includes a frozen cBioPortal v7.2.3 (DB v3.1.0) input snapshot, sample-level discrete GISTIC2 (-2 to +2), continuous log2 copy-number ratios, matched chromosome-arm CNA status, 6,292 functionally annotated somatic variants (truncating LoF, curated catalytic/domain hotspots, in-frame indels, VUS missense), 72 structural variants, sample-level TMB/MSI/POLE hypermutator flags, matched mRNA expression (n = 9,620), synteny-aware patient-level burden across nested Core-10/Extended-12/Panel-14 gene-set tiers, aggregated frequency matrices, technical validation audit tables, and portable Python/R pipelines. Data CC BY 4.0; code MIT.",
+  "description": "Versioned, SHA-256-verified sample-level, variant-level, saturation-mutagenesis, mature miRNA-seq, proteogenomic, CRISPR-dependency, germline-constraint, and clinical-replication resource covering 15 canonical microRNA biogenesis and regulatory genes across 32 TCGA PanCancer Atlas (2018) studies (33 cancer types; N = 10,195 primary tumours; 152,925 sample x gene records) plus an independent MSK-IMPACT clinical cohort (N = 10,945; 21,140 tumours combined). Includes 45 SHA-256-verified frozen input snapshots (cBioPortal v7.2.3 / DB v3.1.0, GDC mature miRNA-seq, RCSB PDB / AlphaFold v6 structures, ESM-2 3B / ESM-1v / ESM-IF1 3D / AlphaMissense saturation scores across all 213,940 single-amino-acid variants, CPTAC MS proteomics across 1,039 tumours, Broad DepMap 24Q4 CRISPRChronos across 1,150 cell lines, gnomAD v4 constraint, GTEx v10 54 healthy tissues, Human Protein Atlas, Open Targets, NCBI ClinVar [16,569 records; missense ROC-AUC = 0.9784], TCGA-CDR survival, and Thorsson PanImmune/HRD profiles), 26 derived tables, 10 technical validation audit tables, zero-dependency Python/CLI/unittest pipelines, R figure scripts, and an interactive static web explorer. Data CC BY 4.0; code MIT.",
   "creators": [
     {
       "name": "Gayam, Prasanna Kumar Reddy",
@@ -32,12 +32,18 @@
     "microRNA biogenesis",
     "copy number alteration",
     "somatic mutation",
+    "saturation mutagenesis",
+    "AlphaMissense",
+    "ESM-IF1",
+    "ClinVar",
     "TCGA PanCancer Atlas",
-    "cBioPortal",
-    "pan-cancer multi-omics",
+    "MSK-IMPACT",
+    "CPTAC proteogenomics",
+    "DepMap CRISPR",
     "DICER1",
     "DROSHA",
-    "AGO2"
+    "AGO2",
+    "LIN28B"
   ],
   "related_identifiers": [
     {
@@ -46,10 +52,15 @@
       "scheme": "url"
     },
     {
+      "identifier": "https://siddugayam.github.io/miRBioGenAtlas/",
+      "relation": "isCompiledBy",
+      "scheme": "url"
+    },
+    {
       "identifier": "10.5281/zenodo.20068007",
       "relation": "continues",
       "scheme": "doi"
     }
   ],
-  "notes": "Version 2.0.0 adds frozen SHA-256-verified cBioPortal v7.2.3 input snapshots, sample-level multi-modal tables (152,925 rows), variant-level functional annotations (6,292 variants), structural variants (72 calls), synteny-aware patient-level burden (10,195 tumours), and 4 technical validation audit tables."
+  "notes": "Version 2.0.0 provides 45 SHA-256-verified frozen snapshots, 152,925 sample-level multi-modal rows, 6,292 functionally/structurally/ClinVar-annotated TCGA somatic mutations, 213,940-variant 3D + PLM saturation mutagenesis atlas, mature miRNA 5p:3p arm-usage profiles (n = 9,409), CPTAC proteomics (n = 1,039), DepMap CRISPR synthetic-lethality profiles (n = 1,150), GTEx v10 54-tissue baselines, MSK-IMPACT replication (N = 10,945), multivariable Cox survival benchmarks, zero-dependency CLI variant triage (scripts/query_variant.py), automated unit tests, and an interactive web explorer (docs/index.html)."
 }

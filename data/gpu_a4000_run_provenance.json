@@ -1,0 +1,57 @@
+{
+  "completed_utc": "2026-11-19T10:35:22Z",
+  "gpu_device_name": "NVIDIA RTX A4000",
+  "gpu_total_vram_gb": 15.73,
+  "gpu_peak_allocated_vram_mb": 11226.7,
+  "pytorch_version": "2.5.1+cu121",
+  "cuda_version": "12.1",
+  "platform": "Linux-6.8.0-111-generic-x86_64-with-glibc2.35",
+  "cpu_cores": 16,
+  "wall_clock_seconds": 3233.72,
+  "module1_esm_if1_3d": {
+    "model": "esm_if1_gvp4_t16_142M_UR50",
+    "saturation_variants_scored": 213940,
+    "tcga_full_autoregressive_variants_scored": 1960
+  },
+  "module2_saturation_mutagenesis": {
+    "models": [
+      "esm2_t36_3B_UR50D",
+      "esm1v_t33_650M_UR90S_1"
+    ],
+    "total_codons_scored": 11260,
+    "total_single_aa_variants_scored": 213940
+  },
+  "module3_cuda_mirna_mrna_coupling": {
+    "n_dual_profiled_tcga_tumours": 9353,
+    "n_mature_mirnas": 662,
+    "n_expressed_mrnas": 20196,
+    "total_mirna_mrna_pairs_evaluated": 13369752,
+    "let7_targets_used": [
+      "HMGA2",
+      "IGF2BP1",
+      "IGF2BP2",
+      "IGF2BP3",
+      "LIN28B",
+      "MYCN",
+      "NRAS",
+      "CCND2",
+      "CDC25A",
+      "CDK6"
+    ],
+    "mir200_targets_used": [
+      "ZEB1",
+      "ZEB2",
+      "FN1",
+      "VIM",
+      "SNAI2",
+      "TWIST1"
+    ]
+  },
+  "outputs": {
+    "gpu_a4000_variant_esm3b_if1_scores.csv": "d44fae25f8b563f311abd22e61d3fc2ea9645e2266979608be15ef1c3bc3404f",
+    "miRNA_biogenesis_saturation_mutagenesis_213940_atlas.csv.gz": "4f99b150f29829300d3d916ddae11510e57a7f2f43e8f0472de5351d78bb9c91",
+    "miRNA_biogenesis_residue_biophysical_11260_profile.csv.gz": "3634c935fe0967c03d7adce3fd8dbcbb0a8951bdcd0a72e18b2d2d621944e902",
+    "gpu_a4000_sample_risc_target_derepression.csv": "afcf1aadb752eb22d1717bd6ec982818c74108637e0539f4e46dee023cb2e4af",
+    "tcga_pancan_mirna_mrna_top250_repressive_axes.csv": "33651b39b232b5cfe6c25015794b3821bc074bf98a0ed8944774ecd79c654251"
+  }
+}

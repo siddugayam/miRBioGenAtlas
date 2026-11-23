@@ -331,407 +331,805 @@ def build_web_explorer():
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>miRBioGenAtlas v2.0.2 — Multi-Consortium Pan-Cancer miRNA Biogenesis &amp; 3D Structure Explorer</title>
+<title>miRBioGenAtlas — Human MicroRNA Biogenesis Somatic &amp; Structural Reference</title>
 <script src="vendor/3Dmol-min.js"></script>
 <style>
   :root {{
-    --bg: #f8fafc;
-    --card: #ffffff;
-    --ink: #0f172a;
-    --muted: #475569;
-    --border: #e2e8f0;
-    --brand: #0f5499;
-    --brand-light: #e0f2fe;
-    --accent: #dc2626;
-    --teal: #0d9488;
+    --canvas: #f5f5f7;
+    --surface: #ffffff;
+    --surface-subtle: #fafafa;
+    --ink: #1d1d1f;
+    --ink-secondary: #515154;
+    --ink-tertiary: #6e6e73;
+    --line: #d2d2d7;
+    --line-light: #e8e8ed;
+    --embl-petrol: #00709b;
+    --embl-petrol-dark: #004f6e;
+    --embl-teal: #007c82;
+    --crimson: #b91c1c;
+    --amber: #b45309;
+    --emerald: #047857;
+    --mono: "SF Mono", "JetBrains Mono", ui-monospace, Menlo, Consolas, monospace;
+    --sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "IBM Plex Sans", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   }}
   * {{ box-sizing: border-box; }}
+  html {{ -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }}
   body {{
     margin: 0;
-    font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, sans-serif;
-    background: var(--bg);
+    font-family: var(--sans);
+    background: var(--canvas);
     color: var(--ink);
-    line-height: 1.5;
+    font-size: 14px;
+    line-height: 1.47;
   }}
-  header {{
-    background: linear-gradient(135deg, #0b2545 0%, #0f5499 65%, #136f63 100%);
-    color: #fff;
-    padding: 26px 24px 20px;
-    border-bottom: 1px solid #0b2545;
+  .container {{ max-width: 1440px; margin: 0 auto; padding: 0 24px; }}
+
+  /* EMBL-EBI style top institutional utility bar */
+  .global-bar {{
+    background: #1d1d1f;
+    color: #d2d2d7;
+    font-size: 12px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid #2c2c2e;
   }}
-  .container {{ max-width: 1420px; margin: 0 auto; padding: 0 18px; }}
-  header h1 {{ margin: 0 0 6px; font-size: 1.6rem; letter-spacing: -0.02em; }}
-  header p {{ margin: 0; opacity: 0.93; font-size: 0.92rem; max-width: 1150px; }}
-  .badges {{ display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }}
-  .badge {{
-    background: rgba(255,255,255,0.14);
-    border: 1px solid rgba(255,255,255,0.25);
-    color: #fff;
-    padding: 4px 10px;
-    border-radius: 999px;
-    font-size: 0.77rem;
-    font-weight: 600;
-    text-decoration: none;
+  .global-bar .container {{
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
   }}
-  .kpi-row {{
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(175px, 1fr));
+  .global-brand {{
+    display: flex;
+    align-items: center;
     gap: 10px;
-    margin: 16px 0;
+    color: #f5f5f7;
+    font-weight: 500;
+    letter-spacing: -0.01em;
   }}
-  .kpi {{
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 12px 14px;
-    box-shadow: 0 1px 2px rgba(15,23,42,0.04);
+  .embl-mark {{
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #009f4d;
+    box-shadow: 12px 0 0 #00709b;
+    margin-right: 12px;
+    display: inline-block;
   }}
-  .kpi .num {{ font-size: 1.38rem; font-weight: 800; color: var(--brand); }}
-  .kpi .lbl {{ font-size: 0.75rem; color: var(--muted); margin-top: 2px; }}
+  .global-links {{
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    font-family: var(--mono);
+    font-size: 11.5px;
+  }}
+  .global-links a {{
+    color: #d2d2d7;
+    text-decoration: none;
+    transition: color 0.15s ease;
+  }}
+  .global-links a:hover {{ color: #ffffff; }}
+
+  /* Architectural masthead */
+  .masthead {{
+    background: var(--surface);
+    border-bottom: 1px solid var(--line-light);
+    padding: 22px 0 0;
+  }}
+  .masthead-top {{
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    gap: 20px;
+    padding-bottom: 18px;
+  }}
+  .title-block h1 {{
+    margin: 0;
+    font-size: 26px;
+    font-weight: 650;
+    letter-spacing: -0.028em;
+    color: var(--ink);
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+  }}
+  .version-tag {{
+    font-family: var(--mono);
+    font-size: 11.5px;
+    font-weight: 500;
+    color: var(--embl-petrol);
+    border: 1px solid rgba(0, 112, 155, 0.3);
+    padding: 1px 7px;
+    border-radius: 4px;
+    letter-spacing: 0;
+  }}
+  .title-block p {{
+    margin: 4px 0 0;
+    color: var(--ink-secondary);
+    font-size: 13.5px;
+    max-width: 780px;
+  }}
+  .omni-search {{
+    position: relative;
+    width: 350px;
+    max-width: 100%;
+  }}
+  .omni-search input {{
+    width: 100%;
+    height: 36px;
+    padding: 0 34px 0 12px;
+    background: var(--canvas);
+    border: 1px solid var(--line);
+    border-radius: 7px;
+    font-size: 13px;
+    color: var(--ink);
+    font-family: var(--sans);
+    transition: border-color 0.15s ease, background 0.15s ease;
+  }}
+  .omni-search input:focus {{
+    outline: none;
+    background: var(--surface);
+    border-color: var(--embl-petrol);
+    box-shadow: 0 0 0 3px rgba(0, 112, 155, 0.12);
+  }}
+  .omni-kbd {{
+    position: absolute;
+    right: 9px;
+    top: 8px;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--ink-tertiary);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 0 5px;
+    background: var(--surface);
+    pointer-events: none;
+  }}
+
+  /* Restrained specification bar (replaces KPI cards) */
+  .spec-strip {{
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    border-top: 1px solid var(--line-light);
+    padding: 12px 0;
+    gap: 16px;
+  }}
+  @media (max-width: 1024px) {{
+    .spec-strip {{ grid-template-columns: repeat(3, 1fr); }}
+  }}
+  @media (max-width: 640px) {{
+    .spec-strip {{ grid-template-columns: repeat(2, 1fr); }}
+  }}
+  .spec-item {{
+    border-left: 1px solid var(--line-light);
+    padding-left: 14px;
+  }}
+  .spec-item:first-child {{ border-left: none; padding-left: 0; }}
+  .spec-val {{
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+    font-variant-numeric: tabular-nums;
+  }}
+  .spec-lbl {{
+    font-size: 11.5px;
+    color: var(--ink-tertiary);
+    margin-top: 1px;
+  }}
+
+  /* Sticky frosted sub-navigation */
+  .subnav-wrap {{
+    position: sticky;
+    top: 0;
+    z-index: 30;
+    background: rgba(255, 255, 255, 0.88);
+    backdrop-filter: saturate(180%) blur(18px);
+    -webkit-backdrop-filter: saturate(180%) blur(18px);
+    border-bottom: 1px solid var(--line);
+  }}
   .tabs {{
     display: flex;
-    flex-wrap: wrap;
-    gap: 4px;
-    border-bottom: 2px solid var(--border);
-    margin-bottom: 16px;
+    gap: 24px;
+    overflow-x: auto;
+    scrollbar-width: none;
   }}
+  .tabs::-webkit-scrollbar {{ display: none; }}
   .tab-btn {{
     border: none;
     background: transparent;
-    padding: 9px 13px;
-    font-size: 0.85rem;
-    font-weight: 600;
-    color: var(--muted);
+    padding: 12px 2px 11px;
+    font-family: var(--sans);
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--ink-secondary);
     cursor: pointer;
-    border-bottom: 3px solid transparent;
-    margin-bottom: -2px;
+    border-bottom: 2px solid transparent;
+    white-space: nowrap;
+    transition: color 0.15s ease, border-color 0.15s ease;
   }}
+  .tab-btn:hover {{ color: var(--ink); }}
   .tab-btn.active {{
-    color: var(--brand);
-    border-bottom-color: var(--brand);
-    background: #fff;
-    border-radius: 8px 8px 0 0;
+    color: var(--embl-petrol);
+    font-weight: 600;
+    border-bottom-color: var(--embl-petrol);
   }}
+
+  /* Content layout & surfaces */
+  main.workspace {{ padding-top: 22px; padding-bottom: 36px; }}
   .panel {{ display: none; }}
   .panel.active {{ display: block; }}
-  .card {{
-    background: var(--card);
-    border: 1px solid var(--border);
+  .surface {{
+    background: var(--surface);
+    border: 1px solid var(--line-light);
     border-radius: 10px;
-    padding: 16px 18px;
-    margin-bottom: 16px;
-    box-shadow: 0 1px 3px rgba(15,23,42,0.04);
+    padding: 20px 22px;
+    margin-bottom: 18px;
   }}
-  .controls {{
+  .section-head {{
     display: flex;
+    justify-content: space-between;
+    align-items: baseline;
     flex-wrap: wrap;
     gap: 10px;
+    margin-bottom: 14px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--line-light);
+  }}
+  .section-head h2 {{
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: -0.018em;
+    color: var(--ink);
+  }}
+  .section-meta {{
+    font-size: 12px;
+    color: var(--ink-tertiary);
+    font-variant-numeric: tabular-nums;
+  }}
+
+  /* Clean form controls & segmented groups */
+  .toolbar {{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
     align-items: center;
+    margin-bottom: 14px;
+  }}
+  .field-group {{
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 12.5px;
+    color: var(--ink-secondary);
+  }}
+  .field-label {{
+    font-weight: 500;
+    color: var(--ink-tertiary);
+    text-transform: uppercase;
+    font-size: 11px;
+    letter-spacing: 0.04em;
+  }}
+  select, input[type="text"] {{
+    height: 32px;
+    padding: 0 10px;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    font-size: 12.5px;
+    font-family: var(--sans);
+    color: var(--ink);
+    background: var(--surface);
+  }}
+  select:focus, input[type="text"]:focus {{
+    outline: none;
+    border-color: var(--embl-petrol);
+  }}
+  .btn-primary {{
+    height: 32px;
+    background: var(--embl-petrol);
+    color: #ffffff;
+    border: none;
+    padding: 0 13px;
+    border-radius: 6px;
+    font-size: 12.5px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.15s ease;
+  }}
+  .btn-primary:hover {{ background: var(--embl-petrol-dark); }}
+  .btn-quiet {{
+    height: 28px;
+    background: var(--surface);
+    color: var(--ink);
+    border: 1px solid var(--line);
+    padding: 0 10px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.12s ease;
+  }}
+  .btn-quiet:hover {{ background: var(--canvas); }}
+
+  /* Reference loci inline strip */
+  .ref-strip {{
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: var(--ink-tertiary);
     margin-bottom: 12px;
   }}
-  select, input[type="text"], input[type="number"] {{
-    padding: 6px 10px;
-    border: 1px solid #cbd5e1;
-    border-radius: 6px;
-    font-size: 0.84rem;
-    background: #fff;
-  }}
-  button.action-btn {{
-    background: var(--brand);
-    color: #fff;
-    border: none;
-    padding: 7px 13px;
-    border-radius: 6px;
-    font-size: 0.82rem;
-    font-weight: 600;
+  .ref-link {{
+    background: transparent;
+    border: 1px solid var(--line-light);
+    color: var(--ink-secondary);
+    font-family: var(--mono);
+    font-size: 11.5px;
+    padding: 2px 8px;
+    border-radius: 5px;
     cursor: pointer;
+    transition: all 0.12s ease;
   }}
-  button.action-btn:hover {{ opacity: 0.92; }}
-  button.ghost-btn {{
-    background: #f1f5f9;
-    color: #0f172a;
-    border: 1px solid #cbd5e1;
-    padding: 5px 10px;
-    border-radius: 6px;
-    font-size: 0.78rem;
-    font-weight: 600;
-    cursor: pointer;
+  .ref-link:hover {{
+    border-color: var(--embl-petrol);
+    color: var(--embl-petrol);
+    background: rgba(0, 112, 155, 0.04);
   }}
-  button.ghost-btn:hover {{ background: #e2e8f0; }}
-  .preset-chip {{
-    background: #eff6ff;
-    color: #1e3a8a;
-    border: 1px solid #bfdbfe;
-    padding: 4px 10px;
-    border-radius: 999px;
-    font-size: 0.76rem;
-    font-weight: 600;
-    cursor: pointer;
+
+  /* Linear sequence & pocket SVG track */
+  .svg-box {{
+    width: 100%;
+    overflow-x: auto;
+    border: 1px solid var(--line-light);
+    border-radius: 8px;
+    background: var(--surface-subtle);
+    padding: 8px 10px 4px;
   }}
-  .preset-chip:hover {{ background: #dbeafe; }}
-  .aa-btn {{
-    border: 1px solid #cbd5e1;
-    border-radius: 6px;
-    padding: 3px 7px;
-    font-size: 0.76rem;
-    font-weight: 700;
-    cursor: pointer;
-    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-  }}
-  .aa-btn.active {{
-    outline: 2px solid #0f172a;
-    transform: translateY(-1px);
-  }}
-  .struct-grid {{
+
+  /* 3D Structure & Residue Specification Workbench */
+  .workbench {{
     display: grid;
-    grid-template-columns: 1.15fr 1fr;
-    gap: 16px;
-    margin-top: 14px;
+    grid-template-columns: 1.18fr 1fr;
+    gap: 18px;
+    margin-top: 16px;
   }}
-  @media (max-width: 1024px) {{
-    .struct-grid {{ grid-template-columns: 1fr; }}
+  @media (max-width: 1060px) {{
+    .workbench {{ grid-template-columns: 1fr; }}
   }}
+  .viewport-shell {{
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    overflow: hidden;
+    background: #111315;
+    display: flex;
+    flex-direction: column;
+  }}
+  .viewport-bar {{
+    background: #1c1e21;
+    border-bottom: 1px solid #2d3035;
+    padding: 8px 10px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    align-items: center;
+    justify-content: space-between;
+  }}
+  .viewport-bar select {{
+    height: 27px;
+    background: #282b30;
+    color: #f5f5f7;
+    border: 1px solid #3c4047;
+    font-size: 11.5px;
+    border-radius: 5px;
+    padding: 0 8px;
+  }}
+  .vp-btn {{
+    height: 27px;
+    background: #282b30;
+    color: #e5e5ea;
+    border: 1px solid #3c4047;
+    border-radius: 5px;
+    padding: 0 9px;
+    font-size: 11.5px;
+    cursor: pointer;
+  }}
+  .vp-btn:hover {{ background: #34383e; color: #ffffff; }}
   .mol3d-stage {{
     position: relative;
     width: 100%;
-    height: 495px;
-    background: #0b1120;
-    border-radius: 10px;
-    border: 1px solid #1e293b;
-    overflow: hidden;
+    height: 470px;
+    background: #111315;
+  }}
+  .mol3d-hud {{
+    position: absolute;
+    top: 10px;
+    left: 12px;
+    color: rgba(245, 245, 247, 0.85);
+    font-family: var(--mono);
+    font-size: 11px;
+    background: rgba(28, 30, 33, 0.78);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 4px 9px;
+    border-radius: 5px;
+    pointer-events: none;
+    z-index: 5;
   }}
   .mol3d-legend {{
     position: absolute;
     bottom: 10px;
-    left: 10px;
-    right: 10px;
-    background: rgba(15, 23, 42, 0.84);
-    color: #e2e8f0;
-    padding: 7px 11px;
-    border-radius: 7px;
-    font-size: 0.74rem;
+    left: 12px;
+    right: 12px;
+    background: rgba(22, 24, 27, 0.84);
+    border: 1px solid rgba(255, 255, 255, 0.09);
+    color: #d2d2d7;
+    padding: 6px 10px;
+    border-radius: 5px;
+    font-size: 11px;
     display: flex;
     flex-wrap: wrap;
-    gap: 12px;
+    gap: 14px;
     pointer-events: none;
     z-index: 5;
   }}
-  .mol3d-dot {{
+  .mol3d-swatch {{
     display: inline-block;
-    width: 9px;
-    height: 9px;
+    width: 8px;
+    height: 8px;
     border-radius: 50%;
-    margin-right: 4px;
+    margin-right: 5px;
     vertical-align: middle;
   }}
-  .prop-box {{
-    background: #f8fafc;
-    border: 1px solid #cbd5e1;
-    border-radius: 10px;
-    padding: 13px 15px;
+  .vp-footnote {{
+    margin: 7px 0 0;
+    font-size: 11.5px;
+    color: var(--ink-tertiary);
   }}
-  .mech-note {{
-    background: #eff6ff;
-    border-left: 4px solid #0f5499;
-    padding: 9px 12px;
-    border-radius: 0 6px 6px 0;
-    font-size: 0.8rem;
-    color: #1e293b;
-    margin-top: 10px;
+
+  /* Residue specification sheet (Right column) */
+  .spec-sheet {{
+    border: 1px solid var(--line-light);
+    border-radius: 8px;
+    padding: 16px 18px;
+    background: var(--surface);
   }}
-  .table-wrap {{ overflow-x: auto; max-height: 500px; overflow-y: auto; border: 1px solid var(--border); border-radius: 8px; }}
-  table {{ width: 100%; border-collapse: collapse; font-size: 0.81rem; }}
-  th, td {{ padding: 7px 9px; border-bottom: 1px solid var(--border); text-align: left; white-space: nowrap; }}
-  th {{ background: #f1f5f9; position: sticky; top: 0; z-index: 2; font-weight: 700; color: #1e293b; }}
-  tr:hover td {{ background: #f8fafc; }}
-  .pill {{
+  .aa-strip {{
+    display: grid;
+    grid-template-columns: repeat(19, minmax(24px, 1fr));
+    gap: 3px;
+    margin: 8px 0 14px;
+  }}
+  .aa-cell {{
+    background: var(--surface-subtle);
+    border: 1px solid var(--line);
+    border-top-width: 2.5px;
+    border-radius: 4px;
+    height: 28px;
+    font-family: var(--mono);
+    font-size: 11.5px;
+    font-weight: 600;
+    color: var(--ink);
+    cursor: pointer;
+    padding: 0;
+    transition: all 0.1s ease;
+  }}
+  .aa-cell:hover {{ background: #ededf2; }}
+  .aa-cell.active {{
+    background: var(--ink);
+    color: #ffffff;
+    border-color: var(--ink);
+  }}
+  .interp-box {{
+    margin-top: 12px;
+    padding: 10px 12px;
+    background: var(--surface-subtle);
+    border: 1px solid var(--line-light);
+    border-radius: 6px;
+    font-size: 12.5px;
+    color: var(--ink-secondary);
+    line-height: 1.5;
+  }}
+
+  /* Clean institutional data tables & subtle status dots */
+  .table-wrap {{
+    overflow-x: auto;
+    max-height: 500px;
+    overflow-y: auto;
+    border: 1px solid var(--line-light);
+    border-radius: 8px;
+  }}
+  table {{
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12.5px;
+    font-variant-numeric: tabular-nums;
+  }}
+  th, td {{
+    padding: 8px 11px;
+    border-bottom: 1px solid var(--line-light);
+    text-align: left;
+    white-space: nowrap;
+  }}
+  th {{
+    background: var(--surface-subtle);
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.035em;
+    color: var(--ink-tertiary);
+    border-bottom: 1px solid var(--line);
+  }}
+  tbody tr:hover td {{ background: #f8f9fb; }}
+  code {{
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--ink);
+  }}
+
+  /* Restrained EMBL-style status tags (replaces loud pastel pills) */
+  .tag {{
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 11.5px;
+    font-weight: 500;
+    color: var(--ink);
+    padding: 1px 7px;
+    border-radius: 4px;
+    border: 1px solid var(--line-light);
+    background: var(--surface-subtle);
+  }}
+  .dot {{
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
     display: inline-block;
-    padding: 2px 8px;
-    border-radius: 999px;
-    font-size: 0.72rem;
-    font-weight: 700;
+    flex-shrink: 0;
   }}
-  .pill-red {{ background: #fee2e2; color: #991b1b; }}
-  .pill-orange {{ background: #ffedd5; color: #9a3412; }}
-  .pill-dark {{ background: #e2e8f0; color: #0f172a; }}
-  .pill-blue {{ background: #dbeafe; color: #1e40af; }}
-  .pill-amber {{ background: #fef3c7; color: #92400e; }}
-  .pill-green {{ background: #dcfce7; color: #166534; }}
-  .heatmap-grid {{ overflow-x: auto; }}
-  .hm-cell {{ text-align: center; font-size: 0.72rem; font-variant-numeric: tabular-nums; padding: 5px 4px; cursor: default; }}
-  .svg-box {{ width: 100%; overflow-x: auto; border: 1px solid var(--border); border-radius: 8px; background: #fcfdff; padding: 8px; }}
-  footer {{
+  .dot-crimson {{ background: var(--crimson); }}
+  .dot-amber {{ background: var(--amber); }}
+  .dot-petrol {{ background: var(--embl-petrol); }}
+  .dot-emerald {{ background: var(--emerald); }}
+  .dot-slate {{ background: #6e6e73; }}
+
+  .heatmap-grid {{ overflow-x: auto; border: 1px solid var(--line-light); border-radius: 8px; }}
+  .hm-cell {{
     text-align: center;
-    padding: 22px 16px 34px;
-    color: var(--muted);
-    font-size: 0.81rem;
+    font-family: var(--mono);
+    font-size: 11px;
+    font-variant-numeric: tabular-nums;
+    padding: 6px 4px;
+    cursor: default;
   }}
+
+  footer {{
+    border-top: 1px solid var(--line-light);
+    background: var(--surface);
+    padding: 24px 0 32px;
+    color: var(--ink-tertiary);
+    font-size: 12px;
+  }}
+  .footer-inner {{
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+  }}
+  .footer-inner a {{ color: var(--embl-petrol); text-decoration: none; }}
+  .footer-inner a:hover {{ text-decoration: underline; }}
 </style>
 </head>
 <body>
-<header>
+
+<div class="global-bar">
   <div class="container">
-    <h1>miRBioGenAtlas v2.0.2 — Multi-Consortium Pan-Cancer miRNA Biogenesis &amp; 3D Saturation Atlas</h1>
-    <p>Harmonised across 21,140 clinical &amp; primary human tumours (10,195 TCGA PanCanAtlas + 10,945 MSK-IMPACT), 9,578 mature miRNA-seq profiles, 13.37M miRNA&times;mRNA couplings (9,353 dual tumours), 213,940 saturation-mutagenesis substitutions with interactive 3D wild-type vs mutated side-chain &amp; physicochemical delta modelling (16 Cryo-EM/X-ray PDB complexes, AlphaFold v6, AlphaMissense, ESM-2 3B, ESM-1v, ESM-IF1 3D), 16,569 ClinVar clinical records, gnomAD v4 constraint, GTEx 54-tissue baselines, CPTAC proteomes (N=1,002), and DepMap CRISPR screens (N=1,208).</p>
-    <div class="badges">
-      <a class="badge" href="https://doi.org/10.5281/zenodo.24455067" target="_blank" rel="noopener">Zenodo Dataset DOI: 10.5281/zenodo.24455067</a>
-      <a class="badge" href="https://doi.org/10.5281/zenodo.24337286" target="_blank" rel="noopener">Concept DOI: 10.5281/zenodo.24337286</a>
-      <a class="badge" href="https://github.com/siddugayam/miRBioGenAtlas" target="_blank" rel="noopener">GitHub: siddugayam/miRBioGenAtlas</a>
-      <span class="badge">Licence: CC BY 4.0 (Data) / MIT (Code)</span>
+    <div class="global-brand">
+      <span class="embl-mark"></span>
+      <span>miRBioGenAtlas &middot; Multi-Consortium Cancer Genomics &amp; Structural Reference</span>
+    </div>
+    <div class="global-links">
+      <a href="https://doi.org/10.5281/zenodo.24455067" target="_blank" rel="noopener">DOI:10.5281/zenodo.24455067</a>
+      <a href="https://github.com/siddugayam/miRBioGenAtlas" target="_blank" rel="noopener">GitHub</a>
+      <span>CC BY 4.0 / MIT</span>
+    </div>
+  </div>
+</div>
+
+<header class="masthead">
+  <div class="container">
+    <div class="masthead-top">
+      <div class="title-block">
+        <h1>miRBioGenAtlas <span class="version-tag">v2.0.2</span></h1>
+        <p>Sample-, variant-, and atomic-level reference of the human microRNA biogenesis machinery across TCGA, MSK-IMPACT, GDC, PDB, AlphaFold, ClinVar, gnomAD, GTEx, CPTAC, and DepMap.</p>
+      </div>
+      <div class="omni-search">
+        <input type="text" id="global-search" placeholder="Jump to gene, mutation, or study (e.g. DICER1 E1705K, TP53 R175H)..." onkeydown="if(event.key==='Enter') runGlobalSearch(this.value)">
+        <span class="omni-kbd">/</span>
+      </div>
+    </div>
+
+    <div class="spec-strip">
+      <div class="spec-item">
+        <div class="spec-val">21,140</div>
+        <div class="spec-lbl">Sequenced Tumours (TCGA &amp; MSK)</div>
+      </div>
+      <div class="spec-item">
+        <div class="spec-val">15 Proteins</div>
+        <div class="spec-lbl">11,260 Codons &middot; 89,132 Heavy Atoms</div>
+      </div>
+      <div class="spec-item">
+        <div class="spec-val">213,940</div>
+        <div class="spec-lbl">Missense Substitutions &amp; 3D Rotamers</div>
+      </div>
+      <div class="spec-item">
+        <div class="spec-val">16 Complexes</div>
+        <div class="spec-lbl">Experimental Cryo-EM &amp; X-ray PDBs</div>
+      </div>
+      <div class="spec-item">
+        <div class="spec-val">9,578</div>
+        <div class="spec-lbl">Mature miRNA-seq &amp; 13.37M Pairs</div>
+      </div>
+      <div class="spec-item">
+        <div class="spec-val">0.978 AUC</div>
+        <div class="spec-lbl">ClinVar Benchmark (16,569 Records)</div>
+      </div>
     </div>
   </div>
 </header>
 
-<main class="container">
-  <div class="kpi-row">
-    <div class="kpi"><div class="num">21,140</div><div class="lbl">Human Tumours (10,195 TCGA + 10,945 MSK-IMPACT)</div></div>
-    <div class="kpi"><div class="num">213,940</div><div class="lbl">3D Mutated Side-Chain &amp; Saturation Variants</div></div>
-    <div class="kpi"><div class="num">16,569</div><div class="lbl">ClinVar Records (Missense ROC-AUC = 0.978)</div></div>
-    <div class="kpi"><div class="num">9,578</div><div class="lbl">Mature miRNA-seq &amp; 13.37M miRNA&times;mRNA Pairs</div></div>
-    <div class="kpi"><div class="num">54 Tissues</div><div class="lbl">GTEx v10 Normal Adult TPM + HPA Subcellular</div></div>
-    <div class="kpi"><div class="num">2,210</div><div class="lbl">Orthogonal Validation (1,002 CPTAC + 1,208 DepMap)</div></div>
-  </div>
-
-  <div class="tabs">
-    <button class="tab-btn active" id="btn-tab-heatmap" onclick="switchTab('tab-heatmap', this)">1. Pan-Cancer Heatmap (15&times;32)</button>
-    <button class="tab-btn" id="btn-tab-variants" onclick="switchTab('tab-variants', this)">2. 3D Mutated Structure, Lollipop &amp; 213,940 Saturation</button>
-    <button class="tab-btn" id="btn-tab-mirna" onclick="switchTab('tab-mirna', this)">3. miRNA-seq &amp; 13.37M Target Couplings</button>
-    <button class="tab-btn" id="btn-tab-clinvar" onclick="switchTab('tab-clinvar', this)">4. ClinVar ROC-AUC, gnomAD &amp; MSK-IMPACT</button>
-    <button class="tab-btn" id="btn-tab-gtex" onclick="switchTab('tab-gtex', this)">5. GTEx 54-Tissue, HPA &amp; Tractability</button>
-    <button class="tab-btn" id="btn-tab-consortia" onclick="switchTab('tab-consortia', this)">6. CPTAC, DepMap, Survival &amp; PanImmune</button>
-  </div>
-
-  <!-- TAB 1: HEATMAP -->
-  <section id="tab-heatmap" class="panel active">
-    <div class="card">
-      <div class="controls">
-        <label><strong>Alteration Metric:</strong>
-          <select id="hm-metric" onchange="renderHeatmap()">
-            <option value="hc">Strict High-Confidence (Mutation or GISTIC2 &plusmn;2)</option>
-            <option value="fcna">High-Level Focal CNA (&plusmn;2 only)</option>
-            <option value="mut">Somatic Nonsynonymous Mutation (All)</option>
-            <option value="nhm">Somatic Mutation (Non-Hypermutated Only)</option>
-            <option value="any">Broad Any Alteration (Mutation or GISTIC2 &ne;0)</option>
-          </select>
-        </label>
-        <button class="action-btn" onclick="exportLongCSV()">Download 480-Row Summary CSV</button>
-      </div>
-      <div id="hm-container" class="heatmap-grid"></div>
-      <p style="font-size:0.78rem;color:var(--muted);margin:10px 0 0;">Values represent exact cohort proportions in [0.00, 1.00]. Hover any cell for exact sample counts (N, mutated, high-level amplified +2, deep deleted -2). Asterisk (*) marks studies with N &lt; 100.</p>
+<nav class="subnav-wrap" aria-label="Primary sections">
+  <div class="container">
+    <div class="tabs">
+      <button class="tab-btn active" id="btn-tab-variants" onclick="switchTab('tab-variants', this)">Structure &amp; Saturation</button>
+      <button class="tab-btn" id="btn-tab-heatmap" onclick="switchTab('tab-heatmap', this)">Pan-Cancer Matrix</button>
+      <button class="tab-btn" id="btn-tab-mirna" onclick="switchTab('tab-mirna', this)">Small-RNA &amp; Targets</button>
+      <button class="tab-btn" id="btn-tab-clinvar" onclick="switchTab('tab-clinvar', this)">Clinical &amp; Germline</button>
+      <button class="tab-btn" id="btn-tab-gtex" onclick="switchTab('tab-gtex', this)">Tissue &amp; Tractability</button>
+      <button class="tab-btn" id="btn-tab-consortia" onclick="switchTab('tab-consortia', this)">Proteomics, CRISPR &amp; Survival</button>
     </div>
-  </section>
+  </div>
+</nav>
 
-  <!-- TAB 2: INTERACTIVE 3D MUTATED STRUCTURE, SVG LOLLIPOP & 213,940 SATURATION CALCULATOR -->
-  <section id="tab-variants" class="panel">
-    <div class="card" id="struct3d-card">
-      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:8px;">
-        <h3 style="margin:0;">Interactive 3D Mutated Structure, Side-Chain Rotamer &amp; Physicochemical Delta Inspector</h3>
-        <span id="sat-status" style="font-size:0.8rem;color:var(--muted);"></span>
+<main class="container workspace">
+
+  <!-- SECTION 1: STRUCTURE, LOLLIPOP & 213,940 SATURATION WORKBENCH -->
+  <section id="tab-variants" class="panel active">
+    <div class="surface" id="struct3d-card">
+      <div class="section-head">
+        <h2>3D Structural, Side-Chain Rotamer &amp; Saturation Mutagenesis Workbench</h2>
+        <span class="section-meta" id="sat-status">Initialising structural coordinates...</span>
       </div>
-      <div class="controls" style="margin-bottom:8px;">
-        <label><strong>Protein:</strong>
+
+      <div class="toolbar">
+        <div class="field-group">
+          <span class="field-label">Protein</span>
           <select id="lol-gene" onchange="renderLollipopAndLoadSat()"></select>
-        </label>
-        <label><strong>Codon or Mutation:</strong>
-          <input type="text" id="sat-query" placeholder="e.g. E1705K, D1810Y, 1705..." oninput="inspectSaturationCodon()" style="width:165px;font-weight:600;">
-        </label>
-        <span style="font-size:0.78rem;color:var(--muted);font-weight:600;">Presets:</span>
-        <button class="preset-chip" onclick="loadPresetMutation('DICER1','E1705K')">DICER1 E1705K (RNase IIIb Mg&sup2;&plus;)</button>
-        <button class="preset-chip" onclick="loadPresetMutation('DICER1','D1810Y')">DICER1 D1810Y</button>
-        <button class="preset-chip" onclick="loadPresetMutation('DROSHA','E1147K')">DROSHA E1147K</button>
-        <button class="preset-chip" onclick="loadPresetMutation('TP53','R175H')">TP53 R175H (Core Fold)</button>
-        <button class="preset-chip" onclick="loadPresetMutation('TP53','R248Q')">TP53 R248Q (DNA Contact)</button>
-        <button class="preset-chip" onclick="loadPresetMutation('SMAD4','R361H')">SMAD4 R361H (Interface)</button>
-        <button class="preset-chip" onclick="loadPresetMutation('AGO2','M364T')">AGO2 M364T (PAZ)</button>
-        <button class="preset-chip" onclick="loadPresetMutation('DICER1','R944Q')">DICER1 R944Q (Benign Control)</button>
+        </div>
+        <div class="field-group">
+          <span class="field-label">Residue / Variant</span>
+          <input type="text" id="sat-query" placeholder="e.g. E1705K, 1705" oninput="inspectSaturationCodon()" style="width:148px;font-family:var(--mono);font-weight:500;">
+        </div>
+      </div>
+
+      <div class="ref-strip">
+        <span>Reference loci:</span>
+        <button class="ref-link" onclick="loadPresetMutation('DICER1','E1705K')">DICER1 E1705K</button>
+        <button class="ref-link" onclick="loadPresetMutation('DICER1','D1810Y')">DICER1 D1810Y</button>
+        <button class="ref-link" onclick="loadPresetMutation('DROSHA','E1147K')">DROSHA E1147K</button>
+        <button class="ref-link" onclick="loadPresetMutation('TP53','R175H')">TP53 R175H</button>
+        <button class="ref-link" onclick="loadPresetMutation('TP53','R248Q')">TP53 R248Q</button>
+        <button class="ref-link" onclick="loadPresetMutation('SMAD4','R361H')">SMAD4 R361H</button>
+        <button class="ref-link" onclick="loadPresetMutation('AGO2','M364T')">AGO2 M364T</button>
+        <button class="ref-link" onclick="loadPresetMutation('DICER1','R944Q')">DICER1 R944Q (neutral)</button>
       </div>
 
       <div id="lollipop-svg-wrap" class="svg-box"></div>
 
-      <div class="struct-grid">
+      <div class="workbench">
         <div>
-          <div class="controls" style="margin-bottom:8px;gap:6px;">
-            <select id="mol3d-mode" onchange="refresh3DScene()" title="3D Display Mode">
-              <option value="overlay">Superimposed: WT (Cyan) + Mutated Side-Chain (Crimson)</option>
-              <option value="mutant">Mutated 3D Structure Only (In-Situ Side-Chain)</option>
-              <option value="wt">Wild-Type 3D Structure Only</option>
-              <option value="rcsb">Experimental RCSB Cryo-EM/X-ray Complex (RNA/DNA + Metal)</option>
-            </select>
-            <select id="mol3d-color" onchange="refresh3DScene()" title="Backbone Coloring">
-              <option value="plddt">Ribbon: AlphaFold v6 pLDDT</option>
-              <option value="am">Ribbon: Codon AlphaMissense</option>
-              <option value="pocket">Ribbon: 3D Active Pocket (&le;6&Aring;)</option>
-            </select>
-            <button class="ghost-btn" onclick="zoomToMutatedResidue()">Zoom 8&Aring; Pocket</button>
-            <button class="ghost-btn" onclick="resetFullProtein3D()">Full Protein</button>
-            <button class="ghost-btn" id="btn-nbrs" onclick="toggleNeighbors3D()">8&Aring; Sidechains: ON</button>
-            <button class="ghost-btn" id="btn-spin" onclick="toggleSpin3D()">Spin</button>
-            <button class="ghost-btn" onclick="downloadMutatedPDB()">Export PDB</button>
-          </div>
-          <div class="mol3d-stage">
-            <div id="mol3d-canvas" style="width:100%;height:100%;position:relative;"></div>
-            <div class="mol3d-legend" id="mol3d-caption">
-              <span><i class="mol3d-dot" style="background:#06b6d4;"></i>Wild-Type Side-Chain</span>
-              <span><i class="mol3d-dot" style="background:#ef4444;"></i>Mutated 3D Rotamer</span>
-              <span><i class="mol3d-dot" style="background:#94a3b8;"></i>8&Aring; Pocket Neighbors</span>
-              <span><i class="mol3d-dot" style="background:#f59e0b;"></i>Polar/Pocket Contact (&le;3.8&Aring;)</span>
-              <span><i class="mol3d-dot" style="background:#ff2e4c;"></i>Steric Clash (&lt;2.4&Aring;)</span>
+          <div class="viewport-shell">
+            <div class="viewport-bar">
+              <div style="display:flex;flex-wrap:wrap;gap:6px;">
+                <select id="mol3d-mode" onchange="refresh3DScene()" aria-label="Structure comparison mode">
+                  <option value="overlay">Overlay: Wild-Type + Mutant</option>
+                  <option value="mutant">Mutant Side-Chain Only</option>
+                  <option value="wt">Wild-Type Only</option>
+                  <option value="rcsb">Experimental PDB Complex</option>
+                </select>
+                <select id="mol3d-color" onchange="refresh3DScene()" aria-label="Backbone coloring">
+                  <option value="plddt">Color: AlphaFold pLDDT</option>
+                  <option value="am">Color: AlphaMissense</option>
+                  <option value="pocket">Color: 3D Active Pocket</option>
+                </select>
+              </div>
+              <div style="display:flex;flex-wrap:wrap;gap:5px;">
+                <button class="vp-btn" onclick="zoomToMutatedResidue()">Focus 8&Aring;</button>
+                <button class="vp-btn" onclick="resetFullProtein3D()">Full Chain</button>
+                <button class="vp-btn" id="btn-nbrs" onclick="toggleNeighbors3D()">Shell: On</button>
+                <button class="vp-btn" id="btn-spin" onclick="toggleSpin3D()">Spin</button>
+                <button class="vp-btn" onclick="downloadMutatedPDB()">PDB</button>
+              </div>
+            </div>
+            <div class="mol3d-stage">
+              <div class="mol3d-hud" id="mol3d-hud">DICER1 &middot; Q9UPY3</div>
+              <div id="mol3d-canvas" style="width:100%;height:100%;position:relative;"></div>
+              <div class="mol3d-legend">
+                <span><i class="mol3d-swatch" style="background:#0095c8;"></i>Wild-type side chain</span>
+                <span><i class="mol3d-swatch" style="background:#e11d48;"></i>Mutant 3D rotamer</span>
+                <span><i class="mol3d-swatch" style="background:#94a3b8;"></i>8&Aring; shell</span>
+                <span><i class="mol3d-swatch" style="background:#f59e0b;"></i>Contact (&le;3.8&Aring;)</span>
+                <span><i class="mol3d-swatch" style="background:#ff3b30;"></i>Steric clash (&lt;2.4&Aring;)</span>
+              </div>
             </div>
           </div>
-          <p style="font-size:0.74rem;color:var(--muted);margin:6px 0 0;">Click any residue on the SVG track, 3D ribbon, or tables below to inspect it in 3D. Wild-type coordinates: AlphaFold v6 monomeric heavy-atom models (or live experimental RCSB PDB complexes); mutant side chains: clash-minimised AMBER-relaxed rotamer placed onto the local N&ndash;C&alpha;&ndash;C backbone frame.</p>
+          <p class="vp-footnote">Coordinates: AlphaFold DB v6 canonical heavy-atom models and experimental RCSB PDB macromolecular complexes. Mutant side chains represent the lowest-clash AMBER-relaxed rotamer projected onto the local N&ndash;C&alpha;&ndash;C frame.</p>
         </div>
 
-        <div class="prop-box" id="prop-delta-panel">
-          <div style="color:var(--muted);font-size:0.84rem;">Loading 3D structural &amp; physicochemical delta profile...</div>
+        <div class="spec-sheet" id="prop-delta-panel">
+          <div style="color:var(--ink-tertiary);font-size:13px;">Loading residue specification...</div>
         </div>
       </div>
 
-      <div id="sat-codon-detail" style="margin-top:14px;"></div>
+      <div id="sat-codon-detail" style="margin-top:18px;"></div>
     </div>
 
-    <div class="card">
-      <h3 style="margin:0 0 10px;">Observed TCGA PanCanAtlas Somatic Coding Variants (6,292 Calls Across 10,195 Tumours)</h3>
-      <div class="controls">
-        <label><strong>Gene:</strong>
+    <div class="surface">
+      <div class="section-head">
+        <h2>Observed TCGA PanCanAtlas Somatic Coding Variants</h2>
+        <span class="section-meta" id="var-count">6,292 coding calls across 10,195 tumours</span>
+      </div>
+      <div class="toolbar">
+        <div class="field-group">
+          <span class="field-label">Gene</span>
           <select id="var-gene" onchange="renderVariants()">
-            <option value="ALL">All 15 Genes</option>
+            <option value="ALL">All 15 genes</option>
           </select>
-        </label>
-        <label><strong>V2 Functional / 3D Tier:</strong>
+        </div>
+        <div class="field-group">
+          <span class="field-label">Tier</span>
           <select id="var-tier" onchange="renderVariants()">
-            <option value="ALL">All Tiers</option>
-            <option value="3D_Catalytic_or_Substrate_Pocket_Driver">3D Pocket &le;6 &Aring; to RNA/Metal/Partner</option>
-            <option value="Pathogenic_Fold_or_Interface_Missense">Pathogenic Fold / Interface (AlphaMissense)</option>
+            <option value="ALL">All functional tiers</option>
+            <option value="3D_Catalytic_or_Substrate_Pocket_Driver">3D pocket (&le;6 &Aring;)</option>
+            <option value="Pathogenic_Fold_or_Interface_Missense">Pathogenic fold / interface</option>
             <option value="Truncating_LoF">Truncating LoF</option>
             <option value="Ambiguous_Missense_VUS">Ambiguous VUS</option>
-            <option value="Likely_Benign_Passenger_Missense">Likely Benign Passenger VUS</option>
+            <option value="Likely_Benign_Passenger_Missense">Likely benign VUS</option>
           </select>
-        </label>
-        <label><strong>ESM-IF1 3D Mechanism:</strong>
+        </div>
+        <div class="field-group">
+          <span class="field-label">Mechanism</span>
           <select id="var-mech" onchange="renderVariants()">
-            <option value="ALL">All Mechanisms</option>
-            <option value="Fold_Preserving_Catalytic_or_Interface">Fold-Preserving Active / Interface</option>
-            <option value="Thermodynamic_Fold_Destabilizing">Predicted Fold-Destabilising</option>
-            <option value="Tolerated_Neutral">Tolerated Neutral</option>
+            <option value="ALL">All mechanisms</option>
+            <option value="Fold_Preserving_Catalytic_or_Interface">Fold-preserving active / interface</option>
+            <option value="Thermodynamic_Fold_Destabilizing">Fold-destabilising</option>
+            <option value="Tolerated_Neutral">Tolerated neutral</option>
           </select>
-        </label>
-        <label><strong>Filter:</strong>
-          <input type="text" id="var-q" placeholder="e.g. E1705K, R248Q, Pathogenic..." oninput="renderVariants()">
-        </label>
-        <button class="action-btn" onclick="exportFilteredVariantsCSV()">Export Filtered Variants CSV</button>
+        </div>
+        <div class="field-group">
+          <span class="field-label">Filter</span>
+          <input type="text" id="var-q" placeholder="HGVS, study, ClinVar..." oninput="renderVariants()">
+        </div>
+        <button class="btn-primary" onclick="exportFilteredVariantsCSV()">Export CSV</button>
       </div>
-      <div id="var-count" style="font-size:0.83rem;color:var(--muted);margin-bottom:8px;"></div>
       <div class="table-wrap">
         <table id="var-table">
           <thead>
             <tr>
               <th>3D</th>
               <th>Gene</th>
-              <th>Change</th>
-              <th>TCGA Calls</th>
-              <th>ClinVar Clinical</th>
-              <th>V2 Functional / 3D Tier</th>
-              <th>Biophysical Mechanism</th>
+              <th>Variant</th>
+              <th>TCGA</th>
+              <th>ClinVar</th>
+              <th>Structural Tier</th>
+              <th>3D Mechanism</th>
               <th>PDB</th>
               <th>RNA/DNA (&Aring;)</th>
               <th>Metal (&Aring;)</th>
@@ -739,7 +1137,7 @@ def build_web_explorer():
               <th>ESM-2 3B</th>
               <th>ESM-1v</th>
               <th>ESM-IF1 &Delta;logP</th>
-              <th>Top TCGA Studies</th>
+              <th>Studies</th>
             </tr>
           </thead>
           <tbody></tbody>
@@ -748,11 +1146,38 @@ def build_web_explorer():
     </div>
   </section>
 
-  <!-- TAB 3: MIRNA-SEQ & TARGET COUPLINGS -->
+  <!-- SECTION 2: PAN-CANCER MATRIX -->
+  <section id="tab-heatmap" class="panel">
+    <div class="surface">
+      <div class="section-head">
+        <h2>Pan-Cancer Alteration Frequency Matrix (15 Genes &times; 32 TCGA Studies)</h2>
+        <span class="section-meta">Matched sequencing &amp; GISTIC2 cohort (N = 10,195)</span>
+      </div>
+      <div class="toolbar">
+        <div class="field-group">
+          <span class="field-label">Metric</span>
+          <select id="hm-metric" onchange="renderHeatmap()">
+            <option value="hc">High-confidence alteration (nonsynonymous mutation or GISTIC2 &plusmn;2)</option>
+            <option value="fcna">Focal high-level CNA only (GISTIC2 &plusmn;2)</option>
+            <option value="mut">Somatic nonsynonymous mutation (all samples)</option>
+            <option value="nhm">Somatic nonsynonymous mutation (non-hypermutated, n = 9,360)</option>
+            <option value="any">Broad alteration (mutation or any GISTIC2 &ne; 0)</option>
+          </select>
+        </div>
+        <button class="btn-primary" onclick="exportLongCSV()">Download 480-Row CSV</button>
+      </div>
+      <div id="hm-container" class="heatmap-grid"></div>
+      <p class="vp-footnote">Cells report exact study proportions in [0.00, 1.00]. Hover any cell for denominator N, somatic mutation count, +2 amplification count, and &minus;2 deep-deletion count. Studies marked with * have N &lt; 100.</p>
+    </div>
+  </section>
+
+  <!-- SECTION 3: MIRNA-SEQ & TARGET COUPLINGS -->
   <section id="tab-mirna" class="panel">
-    <div class="card">
-      <h3 style="margin-top:0;">Mature miRNA-seq Enzymatic &amp; Downstream Target mRNA Benchmarks (B1&ndash;B12)</h3>
-      <p style="font-size:0.85rem;color:var(--muted);">Evaluated across 9,578 matched mature miRNA-seq profiles (192 canonical <code>-5p / -3p</code> duplexes) and 9,353 dual-profiled TCGA tumours (13,369,752 mature miRNA &times; mRNA pairs).</p>
+    <div class="surface">
+      <div class="section-head">
+        <h2>Mature miRNA-seq Enzymatic &amp; Target mRNA Benchmarks</h2>
+        <span class="section-meta">9,578 miRNA-seq tumours &middot; 192 canonical 5p/3p duplexes &middot; 9,353 dual-profiled tumours</span>
+      </div>
       <div class="table-wrap">
         <table id="mir-bench-table">
           <thead>
@@ -763,7 +1188,7 @@ def build_web_explorer():
               <th>Median A</th>
               <th>Group B (n)</th>
               <th>Median B</th>
-              <th>Shift</th>
+              <th>Median Shift</th>
               <th>Two-Sided p</th>
             </tr>
           </thead>
@@ -771,36 +1196,39 @@ def build_web_explorer():
         </table>
       </div>
     </div>
-    <div class="card">
-      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:10px;">
-        <h3 style="margin:0;">Individual DICER1-Altered TCGA Tumours: 5p:3p Strand Balance &amp; 5p let-7 Target mRNA Z-Score</h3>
-        <button class="action-btn" onclick="exportDicerMirnaCSV()">Download DICER1 miRNA-seq CSV</button>
+    <div class="surface">
+      <div class="section-head">
+        <h2>DICER1-Altered TCGA Tumours: 5p:3p Strand Balance &amp; let-7 Target Derepression</h2>
+        <button class="btn-primary" onclick="exportDicerMirnaCSV()">Export CSV</button>
       </div>
-      <div class="table-wrap" style="max-height:320px;">
+      <div class="table-wrap" style="max-height:340px;">
         <table id="dicer-mir-table">
           <thead>
             <tr>
               <th>Sample ID</th>
               <th>Study</th>
-              <th>DICER1 3D / AlphaMissense Class</th>
+              <th>DICER1 Class</th>
               <th>Paired Duplex log2((5p+1)/(3p+1))</th>
               <th>Linear 5p Fraction</th>
-              <th>let-7 (5p) Target mRNA Z</th>
+              <th>let-7 Target mRNA Z</th>
             </tr>
           </thead>
           <tbody></tbody>
         </table>
       </div>
     </div>
-    <div class="card">
-      <h3 style="margin-top:0;">Top Pan-Cancer Anti-Correlated miRNA &times; mRNA Axes (13,369,752 Pairs, N = 9,353 Tumours)</h3>
-      <div class="table-wrap" style="max-height:300px;">
+    <div class="surface">
+      <div class="section-head">
+        <h2>Top Pan-Cancer Repressive miRNA &times; mRNA Couplings</h2>
+        <span class="section-meta">13,369,752 transcriptome-wide pairs evaluated across N = 9,353 dual-profiled tumours</span>
+      </div>
+      <div class="table-wrap" style="max-height:320px;">
         <table id="top-axes-table">
           <thead>
             <tr>
               <th>Rank</th>
               <th>Mature miRNA</th>
-              <th>Target mRNA Gene</th>
+              <th>Target mRNA</th>
               <th>Dual Tumours (n)</th>
               <th>Pearson r (log2)</th>
               <th>t-Statistic</th>
@@ -812,21 +1240,23 @@ def build_web_explorer():
     </div>
   </section>
 
-  <!-- TAB 4: CLINVAR ROC-AUC, GNOMAD & MSK-IMPACT -->
+  <!-- SECTION 4: CLINVAR, GNOMAD & MSK-IMPACT -->
   <section id="tab-clinvar" class="panel">
-    <div class="card">
-      <h3 style="margin-top:0;">Non-Circular Human Clinical Benchmark: NCBI ClinVar Pathogenic vs Benign Missense ROC-AUC &amp; PR-AUC</h3>
-      <p style="font-size:0.85rem;color:var(--muted);">Evaluated across unambiguous ClinVar coding missense assertions joined against the 213,940-variant saturation atlas.</p>
+    <div class="surface">
+      <div class="section-head">
+        <h2>NCBI ClinVar Pathogenic vs Benign Missense Discrimination</h2>
+        <span class="section-meta">Non-circular human clinical assertions joined to the 213,940-variant saturation atlas</span>
+      </div>
       <div class="table-wrap">
         <table id="clinvar-roc-table">
           <thead>
             <tr>
-              <th>ClinVar Benchmark Subset</th>
+              <th>Benchmark Subset</th>
               <th>Predictor</th>
               <th>Pathogenic (n)</th>
               <th>Benign (n)</th>
               <th>ROC-AUC (95% CI)</th>
-              <th>PR-AUC (vs Baseline)</th>
+              <th>PR-AUC (Baseline)</th>
               <th>Mann&ndash;Whitney p</th>
             </tr>
           </thead>
@@ -834,8 +1264,11 @@ def build_web_explorer():
         </table>
       </div>
     </div>
-    <div class="card">
-      <h3 style="margin-top:0;">Independent Clinical Sequencing Replication: MSK-IMPACT Cohort (N = 10,945 Patients) vs TCGA (N = 10,195)</h3>
+    <div class="surface">
+      <div class="section-head">
+        <h2>Prospective Clinical Sequencing Replication: MSK-IMPACT (N = 10,945) vs TCGA (N = 10,195)</h2>
+        <span class="section-meta">21,140 combined tumours</span>
+      </div>
       <div class="table-wrap">
         <table id="msk-rep-table">
           <thead>
@@ -847,15 +1280,18 @@ def build_web_explorer():
               <th>MSK Non-Hypermut %</th>
               <th>MSK Truncating % (n)</th>
               <th>MSK 3D Pocket / Hotspot % (n)</th>
-              <th>MSK Primary vs Metastasis Mut %</th>
+              <th>Primary vs Metastasis %</th>
             </tr>
           </thead>
           <tbody></tbody>
         </table>
       </div>
     </div>
-    <div class="card">
-      <h3 style="margin-top:0;">MSK-IMPACT Clinical Cancer-Type Spectrum of Somatic DICER1 Mutations &amp; RNase IIIb Hotspots</h3>
+    <div class="surface">
+      <div class="section-head">
+        <h2>MSK-IMPACT Cancer-Type Distribution of Somatic DICER1 Variants</h2>
+        <span class="section-meta">RNase IIIb catalytic hotspots vs truncating variants</span>
+      </div>
       <div class="table-wrap" style="max-height:300px;">
         <table id="msk-dicer-table">
           <thead>
@@ -863,7 +1299,7 @@ def build_web_explorer():
               <th>Clinical Cancer Type</th>
               <th>Samples (N)</th>
               <th>DICER1 Mutated (n, %)</th>
-              <th>RNase IIIb 3D Hotspot (n, %)</th>
+              <th>RNase IIIb Hotspot (n, %)</th>
               <th>Truncating LoF (n, %)</th>
             </tr>
           </thead>
@@ -873,10 +1309,13 @@ def build_web_explorer():
     </div>
   </section>
 
-  <!-- TAB 5: GTEX 54-TISSUE, HPA & TRACTABILITY -->
+  <!-- SECTION 5: GTEX, HPA & TRACTABILITY -->
   <section id="tab-gtex" class="panel">
-    <div class="card">
-      <h3 style="margin-top:0;">Germline Constraint (gnomAD v4), Subcellular Localisation (HPA), GTEx Tissue Specificity &amp; Open Targets Tractability</h3>
+    <div class="surface">
+      <div class="section-head">
+        <h2>Germline Constraint (gnomAD v4), Subcellular Localisation (HPA) &amp; Tractability (Open Targets)</h2>
+        <span class="section-meta">15-gene reference summary</span>
+      </div>
       <div class="table-wrap">
         <table id="gene-ref-table">
           <thead>
@@ -889,7 +1328,7 @@ def build_web_explorer():
               <th>GTEx Pan-54 Median TPM</th>
               <th>GTEx Peak Tissue (TPM)</th>
               <th>Specificity (&tau;)</th>
-              <th>Small-Mol / PROTAC Tractable</th>
+              <th>Tractability</th>
               <th>ClinVar Pathogenic / Total</th>
             </tr>
           </thead>
@@ -897,19 +1336,25 @@ def build_web_explorer():
         </table>
       </div>
     </div>
-    <div class="card">
-      <div class="controls">
-        <h3 style="margin:0;">GTEx v10 Healthy Human Baseline Expression Across All 54 Adult Tissues:</h3>
-        <select id="gtex-gene" onchange="renderGtexBars()"></select>
+    <div class="surface">
+      <div class="section-head">
+        <h2>GTEx v10 Healthy Adult Expression Baseline Across 54 Tissues</h2>
+        <div class="field-group">
+          <span class="field-label">Gene</span>
+          <select id="gtex-gene" onchange="renderGtexBars()"></select>
+        </div>
       </div>
-      <div id="gtex-bars" class="table-wrap" style="max-height:420px;padding:10px;"></div>
+      <div id="gtex-bars" class="table-wrap" style="max-height:420px;"></div>
     </div>
   </section>
 
-  <!-- TAB 6: CPTAC, DEPMAP, SURVIVAL & PANIMMUNE -->
+  <!-- SECTION 6: CPTAC, DEPMAP, SURVIVAL & PANIMMUNE -->
   <section id="tab-consortia" class="panel">
-    <div class="card">
-      <h3 style="margin-top:0;">CPTAC Mass-Spectrometry Proteogenomics (N = 1,002) &amp; Broad DepMap CRISPR-Cas9 Essentiality (N = 1,208)</h3>
+    <div class="surface">
+      <div class="section-head">
+        <h2>CPTAC Mass-Spectrometry Proteogenomics (N = 1,002) &amp; Broad DepMap CRISPR Essentiality (N = 1,208)</h2>
+        <span class="section-meta">8 CPTAC cohorts &middot; 29 DepMap lineages</span>
+      </div>
       <div class="table-wrap">
         <table id="consortia-table">
           <thead>
@@ -922,16 +1367,18 @@ def build_web_explorer():
               <th>Attenuation (&Delta;&rho;)</th>
               <th>DepMap Median Chronos</th>
               <th>% Dependent (&le;&minus;0.5)</th>
-              <th>Essentiality Class</th>
+              <th>Dependency Class</th>
             </tr>
           </thead>
           <tbody></tbody>
         </table>
       </div>
     </div>
-    <div class="card">
-      <h3 style="margin-top:0;">Cancer-Type-Stratified Log-Rank &amp; Multivariable Breslow Cox Survival Benchmarks (TCGA-CDR &amp; MSK-IMPACT)</h3>
-      <p style="font-size:0.84rem;color:var(--muted);">Multivariable TCGA Cox models adjust simultaneously for age at diagnosis, biological sex, AJCC pathologic stage (III/IV vs I/II), hypermutator status, and cancer-type baseline hazard strata; MSK-IMPACT models adjust for metastatic specimen status, TMB hypermutator status, panel version, and cancer-type strata.</p>
+    <div class="surface">
+      <div class="section-head">
+        <h2>Cancer-Type-Stratified Log-Rank &amp; Multivariable Breslow Cox Survival Benchmarks</h2>
+        <span class="section-meta">Adjusted for age, sex, AJCC stage, hypermutator status, and tumour strata</span>
+      </div>
       <div class="table-wrap">
         <table id="surv-table">
           <thead>
@@ -939,9 +1386,9 @@ def build_web_explorer():
               <th>Benchmark ID</th>
               <th>Cohort</th>
               <th>Endpoint</th>
-              <th>Altered Group (Events / n)</th>
-              <th>Control Group (Events / n)</th>
-              <th>Stratified Log-Rank HR (95% CI)</th>
+              <th>Altered (Events / n)</th>
+              <th>Control (Events / n)</th>
+              <th>Stratified HR (95% CI)</th>
               <th>Log-Rank p</th>
               <th>Multivariable Cox HR (95% CI)</th>
               <th>Multivariable p</th>
@@ -951,8 +1398,11 @@ def build_web_explorer():
         </table>
       </div>
     </div>
-    <div class="card">
-      <h3 style="margin-top:0;">Thorsson Pan-Cancer Immune Landscape &amp; Homologous Recombination Deficiency (HRD) Benchmarks</h3>
+    <div class="surface">
+      <div class="section-head">
+        <h2>Thorsson Pan-Cancer Immune &amp; Homologous Recombination Deficiency (HRD) Benchmarks</h2>
+        <span class="section-meta">N = 9,899 immune-profiled TCGA tumours</span>
+      </div>
       <div class="table-wrap">
         <table id="imm-table">
           <thead>
@@ -975,7 +1425,13 @@ def build_web_explorer():
 </main>
 
 <footer>
-  miRBioGenAtlas v2.0.2 &bull; Manipal Academy of Higher Education (MAHE) &bull; Data: CC BY 4.0 &bull; Code: MIT &bull; Deterministically compiled from 46 SHA-256-verified snapshots.
+  <div class="container footer-inner">
+    <div>miRBioGenAtlas v2.0.2 &middot; Manipal Academy of Higher Education (MAHE) &middot; Built deterministically from 46 SHA-256-verified multi-consortium archives.</div>
+    <div>
+      <a href="https://doi.org/10.5281/zenodo.24455067" target="_blank" rel="noopener">Zenodo Deposit (CC BY 4.0)</a> &middot;
+      <a href="https://github.com/siddugayam/miRBioGenAtlas" target="_blank" rel="noopener">Source &amp; Documentation (MIT)</a>
+    </div>
+  </div>
 </footer>
 
 <script>
@@ -984,31 +1440,31 @@ window.STRUCT3D_CACHE = window.STRUCT3D_CACHE || {{}};
 window.RCSB_CACHE = window.RCSB_CACHE || {{}};
 const ATLAS = {data_json};
 const LOW_N = new Set(["ACC","CHOL","DLBC","KICH","MESO","UCS","UVM"]);
+const GENE_SET = new Set(ATLAS.panel.map(p => p.geneSymbol));
 
 const AA_PROPS = {{
-  A: {{three:'ALA', name:'Alanine', cls:'Aliphatic Nonpolar', q:0.0, vol:88.6, mw:89.09, kd:1.8, hd:0, ha:0, arom:0, metal:0}},
-  R: {{three:'ARG', name:'Arginine', cls:'Basic Guanidinium (+)', q:1.0, vol:173.4, mw:174.20, kd:-4.5, hd:5, ha:0, arom:0, metal:0}},
-  N: {{three:'ASN', name:'Asparagine', cls:'Polar Carboxamide', q:0.0, vol:114.1, mw:132.12, kd:-3.5, hd:2, ha:1, arom:0, metal:1}},
-  D: {{three:'ASP', name:'Aspartate', cls:'Acidic Carboxylate (-)', q:-1.0, vol:111.1, mw:133.10, kd:-3.5, hd:0, ha:2, arom:0, metal:1}},
-  C: {{three:'CYS', name:'Cysteine', cls:'Thiol / Redox Sulfhydryl', q:0.0, vol:108.5, mw:121.16, kd:2.5, hd:1, ha:1, arom:0, metal:1}},
-  Q: {{three:'GLN', name:'Glutamine', cls:'Polar Carboxamide', q:0.0, vol:143.8, mw:146.15, kd:-3.5, hd:2, ha:1, arom:0, metal:1}},
-  E: {{three:'GLU', name:'Glutamate', cls:'Acidic Carboxylate (-)', q:-1.0, vol:138.4, mw:147.13, kd:-3.5, hd:0, ha:2, arom:0, metal:1}},
-  G: {{three:'GLY', name:'Glycine', cls:'Achiral Flexible H-only', q:0.0, vol:60.1, mw:75.07, kd:-0.4, hd:0, ha:0, arom:0, metal:0}},
-  H: {{three:'HIS', name:'Histidine', cls:'Basic Imidazole / Zn-Ligand', q:0.1, vol:153.2, mw:155.16, kd:-3.2, hd:1, ha:1, arom:1, metal:1}},
-  I: {{three:'ILE', name:'Isoleucine', cls:'Branched Hydrophobic', q:0.0, vol:166.7, mw:131.17, kd:4.5, hd:0, ha:0, arom:0, metal:0}},
-  L: {{three:'LEU', name:'Leucine', cls:'Branched Hydrophobic', q:0.0, vol:166.7, mw:131.17, kd:3.8, hd:0, ha:0, arom:0, metal:0}},
-  K: {{three:'LYS', name:'Lysine', cls:'Basic Primary Amine (+)', q:1.0, vol:168.6, mw:146.19, kd:-3.9, hd:3, ha:0, arom:0, metal:0}},
-  M: {{three:'MET', name:'Methionine', cls:'Thioether Nonpolar', q:0.0, vol:162.9, mw:149.21, kd:1.9, hd:0, ha:1, arom:0, metal:0}},
-  F: {{three:'PHE', name:'Phenylalanine', cls:'Bulky Aromatic Nonpolar', q:0.0, vol:189.9, mw:165.19, kd:2.8, hd:0, ha:0, arom:1, metal:0}},
-  P: {{three:'PRO', name:'Proline', cls:'Cyclic Imino Helix-Breaker', q:0.0, vol:112.7, mw:115.13, kd:-1.6, hd:0, ha:0, arom:0, metal:0}},
-  S: {{three:'SER', name:'Serine', cls:'Small Polar Hydroxyl', q:0.0, vol:89.0, mw:105.09, kd:-0.8, hd:1, ha:1, arom:0, metal:0}},
-  T: {{three:'THR', name:'Threonine', cls:'Beta-Branched Polar Hydroxyl', q:0.0, vol:116.1, mw:119.12, kd:-0.7, hd:1, ha:1, arom:0, metal:0}},
-  W: {{three:'TRP', name:'Tryptophan', cls:'Bulky Indole Aromatic', q:0.0, vol:227.8, mw:204.23, kd:-0.9, hd:1, ha:0, arom:1, metal:0}},
-  Y: {{three:'TYR', name:'Tyrosine', cls:'Phenolic Polar Aromatic', q:0.0, vol:193.6, mw:181.19, kd:-1.3, hd:1, ha:1, arom:1, metal:0}},
-  V: {{three:'VAL', name:'Valine', cls:'Beta-Branched Hydrophobic', q:0.0, vol:140.0, mw:117.15, kd:4.2, hd:0, ha:0, arom:0, metal:0}}
+  A: {{three:'ALA', name:'Alanine', cls:'Aliphatic nonpolar', q:0.0, vol:88.6, mw:89.09, kd:1.8, hd:0, ha:0, arom:0, metal:0}},
+  R: {{three:'ARG', name:'Arginine', cls:'Basic guanidinium (+)', q:1.0, vol:173.4, mw:174.20, kd:-4.5, hd:5, ha:0, arom:0, metal:0}},
+  N: {{three:'ASN', name:'Asparagine', cls:'Polar carboxamide', q:0.0, vol:114.1, mw:132.12, kd:-3.5, hd:2, ha:1, arom:0, metal:1}},
+  D: {{three:'ASP', name:'Aspartate', cls:'Acidic carboxylate (-)', q:-1.0, vol:111.1, mw:133.10, kd:-3.5, hd:0, ha:2, arom:0, metal:1}},
+  C: {{three:'CYS', name:'Cysteine', cls:'Thiol / sulfhydryl', q:0.0, vol:108.5, mw:121.16, kd:2.5, hd:1, ha:1, arom:0, metal:1}},
+  Q: {{three:'GLN', name:'Glutamine', cls:'Polar carboxamide', q:0.0, vol:143.8, mw:146.15, kd:-3.5, hd:2, ha:1, arom:0, metal:1}},
+  E: {{three:'GLU', name:'Glutamate', cls:'Acidic carboxylate (-)', q:-1.0, vol:138.4, mw:147.13, kd:-3.5, hd:0, ha:2, arom:0, metal:1}},
+  G: {{three:'GLY', name:'Glycine', cls:'Achiral H-only', q:0.0, vol:60.1, mw:75.07, kd:-0.4, hd:0, ha:0, arom:0, metal:0}},
+  H: {{three:'HIS', name:'Histidine', cls:'Imidazole / Zn-ligand', q:0.1, vol:153.2, mw:155.16, kd:-3.2, hd:1, ha:1, arom:1, metal:1}},
+  I: {{three:'ILE', name:'Isoleucine', cls:'Branched hydrophobic', q:0.0, vol:166.7, mw:131.17, kd:4.5, hd:0, ha:0, arom:0, metal:0}},
+  L: {{three:'LEU', name:'Leucine', cls:'Branched hydrophobic', q:0.0, vol:166.7, mw:131.17, kd:3.8, hd:0, ha:0, arom:0, metal:0}},
+  K: {{three:'LYS', name:'Lysine', cls:'Basic primary amine (+)', q:1.0, vol:168.6, mw:146.19, kd:-3.9, hd:3, ha:0, arom:0, metal:0}},
+  M: {{three:'MET', name:'Methionine', cls:'Thioether nonpolar', q:0.0, vol:162.9, mw:149.21, kd:1.9, hd:0, ha:1, arom:0, metal:0}},
+  F: {{three:'PHE', name:'Phenylalanine', cls:'Aromatic nonpolar', q:0.0, vol:189.9, mw:165.19, kd:2.8, hd:0, ha:0, arom:1, metal:0}},
+  P: {{three:'PRO', name:'Proline', cls:'Cyclic imino (rigid)', q:0.0, vol:112.7, mw:115.13, kd:-1.6, hd:0, ha:0, arom:0, metal:0}},
+  S: {{three:'SER', name:'Serine', cls:'Polar hydroxyl', q:0.0, vol:89.0, mw:105.09, kd:-0.8, hd:1, ha:1, arom:0, metal:0}},
+  T: {{three:'THR', name:'Threonine', cls:'Beta-branched hydroxyl', q:0.0, vol:116.1, mw:119.12, kd:-0.7, hd:1, ha:1, arom:0, metal:0}},
+  W: {{three:'TRP', name:'Tryptophan', cls:'Indole aromatic', q:0.0, vol:227.8, mw:204.23, kd:-0.9, hd:1, ha:0, arom:1, metal:0}},
+  Y: {{three:'TYR', name:'Tyrosine', cls:'Phenolic aromatic', q:0.0, vol:193.6, mw:181.19, kd:-1.3, hd:1, ha:1, arom:1, metal:0}},
+  V: {{three:'VAL', name:'Valine', cls:'Beta-branched hydrophobic', q:0.0, vol:140.0, mw:117.15, kd:4.2, hd:0, ha:0, arom:0, metal:0}}
 }};
 
-// Grantham (1974) Science 185:862 composition-polarity-volume parameters (c, p, v)
 const GRANTHAM_CPV = {{
   S:[1.42,9.2,32], R:[0.65,10.5,124], L:[0.00,4.9,111], P:[0.39,8.0,32.5], T:[0.71,8.6,61],
   A:[0.00,8.1,31], V:[0.00,5.9,84], G:[0.74,9.0,3], I:[0.00,5.2,111], F:[0.00,5.2,132],
@@ -1019,6 +1475,10 @@ function granthamDist(a, b) {{
   if (a === b || !GRANTHAM_CPV[a] || !GRANTHAM_CPV[b]) return 0;
   const [ca, pa, va] = GRANTHAM_CPV[a], [cb, pb, vb] = GRANTHAM_CPV[b];
   return Math.round(50.723 * Math.sqrt(1.833*(ca-cb)*(ca-cb) + 0.1018*(pa-pb)*(pa-pb) + 0.000399*(va-vb)*(va-vb)));
+}}
+
+function tagDot(cls, label) {{
+  return `<span class="tag"><i class="dot ${{cls}}"></i>${{label}}</span>`;
 }}
 
 let viewer3d = null;
@@ -1034,14 +1494,47 @@ function switchTab(id, btn) {{
   if (id === 'tab-variants') {{
     setTimeout(() => {{
       if (viewer3d) viewer3d.resize();
-      refresh3DScene();
+      refresh3DScene(true);
     }}, 40);
   }}
 }}
 
+function runGlobalSearch(raw) {{
+  const q = (raw || '').trim().toUpperCase().replace(/^P\\./, '');
+  if (!q) return;
+  const parts = q.split(/[\\s:]+/);
+  if (parts.length >= 2 && GENE_SET.has(parts[0])) {{
+    loadPresetMutation(parts[0], parts[1]);
+    return;
+  }}
+  if (GENE_SET.has(q)) {{
+    document.getElementById('lol-gene').value = q;
+    document.getElementById('sat-query').value = '';
+    switchTab('tab-variants', document.getElementById('btn-tab-variants'));
+    renderLollipopAndLoadSat();
+    return;
+  }}
+  if (/^[A-Z]?\\d+[A-Z]?$/.test(q)) {{
+    document.getElementById('sat-query').value = q;
+    switchTab('tab-variants', document.getElementById('btn-tab-variants'));
+    inspectSaturationCodon();
+    return;
+  }}
+  document.getElementById('var-q').value = raw.trim();
+  switchTab('tab-variants', document.getElementById('btn-tab-variants'));
+  renderVariants();
+  document.getElementById('var-table').scrollIntoView({{behavior:'smooth'}});
+}}
+
+document.addEventListener('keydown', e => {{
+  if (e.key === '/' && document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'SELECT') {{
+    e.preventDefault();
+    document.getElementById('global-search').focus();
+  }}
+}});
+
 function loadPresetMutation(gene, mutStr) {{
-  const selLol = document.getElementById('lol-gene');
-  selLol.value = gene;
+  document.getElementById('lol-gene').value = gene;
   document.getElementById('sat-query').value = mutStr;
   if (!document.getElementById('tab-variants').classList.contains('active')) {{
     switchTab('tab-variants', document.getElementById('btn-tab-variants'));
@@ -1054,12 +1547,13 @@ function openVariantIn3D(gene, mutStr) {{
   document.getElementById('struct3d-card').scrollIntoView({{behavior: 'smooth', block: 'start'}});
 }}
 
+// EMBL-petrol monochrome ramp
 function heatColor(val, maxScale) {{
   const t = Math.min(1, Math.max(0, val / maxScale));
-  const r = Math.round(255 - t * (255 - 15));
-  const g = Math.round(255 - t * (255 - 84));
-  const b = Math.round(255 - t * (255 - 153));
-  const txt = t > 0.55 ? '#ffffff' : '#0f172a';
+  const r = Math.round(255 - t * (255 - 0));
+  const g = Math.round(255 - t * (255 - 88));
+  const b = Math.round(255 - t * (255 - 124));
+  const txt = t > 0.52 ? '#ffffff' : '#1d1d1f';
   return `background:rgb(${{r}},${{g}},${{b}});color:${{txt}};`;
 }}
 
@@ -1079,7 +1573,7 @@ function renderHeatmap() {{
     studies.forEach(s => {{
       const r = map[g + '|' + s];
       const v = r ? r[metric] : 0;
-      const tip = r ? `${{g}} in ${{s}} (N=${{r.N}}): value=${{v.toFixed(3)}} | mut_n=${{r.mut_n}}, amp_n=${{r.amp_n}}, deep_del_n=${{r.dd_n}}` : '';
+      const tip = r ? `${{g}} in ${{s}} (N=${{r.N}}): ${{v.toFixed(3)}} | mut=${{r.mut_n}}, amp(+2)=${{r.amp_n}}, deep_del(-2)=${{r.dd_n}}` : '';
       html += `<td class="hm-cell" style="${{heatColor(v, maxScale)}}" title="${{tip}}">${{v.toFixed(2)}}</td>`;
     }});
     html += '</tr>';
@@ -1091,20 +1585,20 @@ function renderHeatmap() {{
 function ensureSatLoaded(gene, cb) {{
   if (window.SAT_CACHE && window.SAT_CACHE[gene]) {{
     const nCod = Object.keys(window.SAT_CACHE[gene]).length;
-    document.getElementById('sat-status').textContent = `Loaded ${{(nCod * 19).toLocaleString()}} substitutions (${{nCod}} codons) + 3D heavy-atom model for ${{gene}}.`;
+    document.getElementById('sat-status').textContent = `${{gene}} · ${{nCod.toLocaleString()}} codons · ${{(nCod * 19).toLocaleString()}} missense substitutions`;
     if (cb) cb();
     return;
   }}
-  document.getElementById('sat-status').textContent = `Loading 19x saturation matrix & 3D structure for ${{gene}}...`;
+  document.getElementById('sat-status').textContent = `Loading ${{gene}} saturation & structural profile...`;
   const sc = document.createElement('script');
   sc.src = `sat/${{gene}}.js`;
   sc.onload = () => {{
     const nCod = window.SAT_CACHE[gene] ? Object.keys(window.SAT_CACHE[gene]).length : 0;
-    document.getElementById('sat-status').textContent = `Loaded ${{(nCod * 19).toLocaleString()}} substitutions (${{nCod}} codons) for ${{gene}}.`;
+    document.getElementById('sat-status').textContent = `${{gene}} · ${{nCod.toLocaleString()}} codons · ${{(nCod * 19).toLocaleString()}} missense substitutions`;
     if (cb) cb();
   }};
   sc.onerror = () => {{
-    document.getElementById('sat-status').textContent = `Codon track active for ${{gene}}.`;
+    document.getElementById('sat-status').textContent = `${{gene}} codon track`;
     if (cb) cb();
   }};
   document.head.appendChild(sc);
@@ -1123,9 +1617,7 @@ function ensureStruct3DLoaded(gene, cb) {{
     if (st && !st._indexed) indexStruct3D(st);
     if (cb) cb(st);
   }};
-  sc.onerror = () => {{
-    if (cb) cb(null);
-  }};
+  sc.onerror = () => {{ if (cb) cb(null); }};
   document.head.appendChild(sc);
 }}
 
@@ -1166,7 +1658,7 @@ function renderLollipopAndLoadSat() {{
   const tr = ATLAS.tracks[gene] || [];
   if (!tr.length) return;
   const L = tr.length;
-  const W = 1260, H = 195, padL = 52, padR = 24;
+  const W = 1320, H = 178, padL = 96, padR = 24;
   const plotW = W - padL - padR;
   const xOf = pos => padL + ((pos - 1) / Math.max(1, L - 1)) * plotW;
 
@@ -1183,23 +1675,23 @@ function renderLollipopAndLoadSat() {{
     const [pos, wt, plddt, pkt, am, e2, if1, tcgaN, cvN, pdb] = c;
     const x = xOf(pos);
     if (pkt === 1) {{
-      pockets += `<rect x="${{x-1.2}}" y="122" width="2.6" height="16" fill="#dc2626" opacity="0.68" style="cursor:pointer" onclick="selectCodonFromTrack(${{pos}})"><title>${{gene}} ${{wt}}${{pos}} (3D pocket &le;6&Aring; in ${{pdb}})</title></rect>`;
+      pockets += `<rect x="${{x-1.2}}" y="108" width="2.4" height="14" fill="#b91c1c" opacity="0.78" style="cursor:pointer" onclick="selectCodonFromTrack(${{pos}})"><title>${{gene}} ${{wt}}${{pos}} · 3D active site (&le;6&Aring; in ${{pdb}})</title></rect>`;
     }} else if (pdb) {{
-      pockets += `<rect x="${{x-0.8}}" y="125" width="1.8" height="10" fill="#0ea5e9" opacity="0.35"></rect>`;
+      pockets += `<rect x="${{x-0.8}}" y="111" width="1.6" height="8" fill="#00709b" opacity="0.30"></rect>`;
     }}
     if (am !== null) {{
-      const yAm = 176 - am * 28;
+      const yAm = 160 - am * 26;
       amPath += (amPath ? ' L' : 'M') + x.toFixed(1) + ',' + yAm.toFixed(1);
     }}
     if (tcgaN > 0 || cvN > 0) {{
-      const h = 15 + (Math.log2(tcgaN + cvN + 1) / Math.log2(maxCnt + 1)) * 84;
-      const yTop = 118 - h;
-      const col = pkt === 1 ? '#dc2626' : (cvN > 0 ? '#7c3aed' : '#0f5499');
-      const r = Math.min(6.5, 2.8 + Math.log2(tcgaN + cvN + 1));
+      const h = 14 + (Math.log2(tcgaN + cvN + 1) / Math.log2(maxCnt + 1)) * 74;
+      const yTop = 104 - h;
+      const col = pkt === 1 ? '#b91c1c' : (cvN > 0 ? '#007c82' : '#515154');
+      const r = Math.min(5.8, 2.5 + Math.log2(tcgaN + cvN + 1));
       stems += `<g style="cursor:pointer" onclick="selectCodonFromTrack(${{pos}})">
-        <line x1="${{x.toFixed(1)}}" y1="118" x2="${{x.toFixed(1)}}" y2="${{yTop.toFixed(1)}}" stroke="${{col}}" stroke-width="1.3" opacity="0.75"/>
-        <circle cx="${{x.toFixed(1)}}" cy="${{yTop.toFixed(1)}}" r="${{r.toFixed(1)}}" fill="${{col}}" stroke="#fff" stroke-width="0.7">
-          <title>${{gene}} ${{wt}}${{pos}} | TCGA somatic calls: ${{tcgaN}} | ClinVar Pathogenic: ${{cvN}} | Mean AlphaMissense: ${{am ?? 'NA'}} | Click to view in 3D</title>
+        <line x1="${{x.toFixed(1)}}" y1="104" x2="${{x.toFixed(1)}}" y2="${{yTop.toFixed(1)}}" stroke="${{col}}" stroke-width="1.15" opacity="0.72"/>
+        <circle cx="${{x.toFixed(1)}}" cy="${{yTop.toFixed(1)}}" r="${{r.toFixed(1)}}" fill="${{col}}" stroke="#ffffff" stroke-width="0.7">
+          <title>${{gene}} ${{wt}}${{pos}} · TCGA: ${{tcgaN}} · ClinVar P/LP: ${{cvN}} · AlphaMissense: ${{am ?? 'NA'}}</title>
         </circle>
       </g>`;
     }}
@@ -1209,25 +1701,25 @@ function renderLollipopAndLoadSat() {{
   const step = L > 1200 ? 200 : (L > 500 ? 100 : 50);
   for (let p = 1; p <= L; p += step) {{
     const tx = xOf(p);
-    ticks += `<text x="${{tx.toFixed(1)}}" y="190" font-size="10" fill="#475569" text-anchor="middle">${{p}}</text>`;
+    ticks += `<text x="${{tx.toFixed(1)}}" y="174" font-size="10" font-family="-apple-system,sans-serif" fill="#6e6e73" text-anchor="middle">${{p}}</text>`;
   }}
-  ticks += `<text x="${{xOf(L).toFixed(1)}}" y="190" font-size="10" fill="#475569" text-anchor="end">${{L}} aa</text>`;
+  ticks += `<text x="${{xOf(L).toFixed(1)}}" y="174" font-size="10" font-family="-apple-system,sans-serif" fill="#6e6e73" text-anchor="end">${{L}} aa</text>`;
 
-  const svg = `<svg viewBox="0 0 ${{W}} ${{H}}" width="100%" height="195">
-    <text x="6" y="24" font-size="10.5" font-weight="700" fill="#0f172a">Somatic / ClinVar</text>
-    <text x="6" y="134" font-size="10.5" font-weight="700" fill="#0f172a">3D PDB / Pocket</text>
-    <text x="6" y="166" font-size="10.5" font-weight="700" fill="#0f172a">AlphaMissense</text>
-    <rect x="${{padL}}" y="122" width="${{plotW}}" height="16" rx="4" fill="#e2e8f0"/>
+  const svg = `<svg viewBox="0 0 ${{W}} ${{H}}" width="100%" height="178">
+    <text x="6" y="22" font-size="10" font-weight="600" fill="#6e6e73" letter-spacing="0.03em">VARIANTS</text>
+    <text x="6" y="119" font-size="10" font-weight="600" fill="#6e6e73" letter-spacing="0.03em">3D COVERAGE</text>
+    <text x="6" y="152" font-size="10" font-weight="600" fill="#6e6e73" letter-spacing="0.03em">CONSTRAINT</text>
+    <rect x="${{padL}}" y="108" width="${{plotW}}" height="14" rx="3" fill="#e8e8ed"/>
     ${{pockets}}
     ${{stems}}
-    <path d="${{amPath}}" fill="none" stroke="#ea580c" stroke-width="1.15" opacity="0.85"/>
-    <line x1="${{padL}}" y1="${{176 - 0.564*28}}" x2="${{W-padR}}" y2="${{176 - 0.564*28}}" stroke="#dc2626" stroke-dasharray="3,3" stroke-width="0.8"/>
+    <path d="${{amPath}}" fill="none" stroke="#00709b" stroke-width="1.05" opacity="0.82"/>
+    <line x1="${{padL}}" y1="${{160 - 0.564*26}}" x2="${{W-padR}}" y2="${{160 - 0.564*26}}" stroke="#b91c1c" stroke-dasharray="3,3" stroke-width="0.75" opacity="0.65"/>
     ${{ticks}}
-    <g transform="translate(${{W - 430}}, 14)" font-size="10.5" fill="#334155">
-      <circle cx="0" cy="-3" r="4" fill="#dc2626"/><text x="8" y="0">3D Pocket (&le;6&Aring;)</text>
-      <circle cx="115" cy="-3" r="4" fill="#7c3aed"/><text x="123" y="0">ClinVar Pathogenic</text>
-      <circle cx="240" cy="-3" r="4" fill="#0f5499"/><text x="248" y="0">TCGA Somatic</text>
-      <rect x="335" y="-7" width="8" height="8" fill="#0ea5e9" opacity="0.5"/><text x="347" y="0">PDB Resolved</text>
+    <g transform="translate(${{W - 445}}, 14)" font-size="10.5" fill="#515154">
+      <circle cx="0" cy="-3" r="3.5" fill="#b91c1c"/><text x="7" y="0">Active pocket (&le;6&Aring;)</text>
+      <circle cx="122" cy="-3" r="3.5" fill="#007c82"/><text x="129" y="0">ClinVar P/LP</text>
+      <circle cx="212" cy="-3" r="3.5" fill="#515154"/><text x="219" y="0">TCGA somatic</text>
+      <rect x="308" y="-7" width="7" height="7" fill="#00709b" opacity="0.4"/><text x="319" y="0">Experimental PDB</text>
     </g>
   </svg>`;
   document.getElementById('lollipop-svg-wrap').innerHTML = svg;
@@ -1237,7 +1729,6 @@ function renderLollipopAndLoadSat() {{
     const gCache = window.SAT_CACHE[gene] || {{}};
     const m = rawQ.match(/^([A-Z])?(\\d+)([A-Z])?$/);
     if (!m || !gCache[m[2]] || (m[1] && gCache[m[2]].m[0] !== m[1])) {{
-      // Pick top mutated / pocket codon in this protein automatically when switching genes
       const bestTrack = tr.slice().sort((a,b) => ((b[7]+b[8])*2 + b[3]*5) - ((a[7]+a[8])*2 + a[3]*5))[0];
       const defPos = bestTrack ? bestTrack[0] : 1;
       const entry = gCache[String(defPos)];
@@ -1294,7 +1785,6 @@ function computeMutant3DGeometry(st, pos, wtAA, mutAA) {{
   resRows.forEach(r => {{ bb[r[1]] = [r[2], r[3], r[4], r[5]]; }});
   if (!bb.N || !bb.CA || !bb.C) return null;
 
-  // Collect neighbor heavy atoms within 10 A (excluding current residue sidechain)
   const ca = bb.CA;
   const envAtoms = [];
   let caNeighbors8A = 0;
@@ -1309,7 +1799,6 @@ function computeMutant3DGeometry(st, pos, wtAA, mutAA) {{
     }}
   }});
 
-  // Wild-type closest heavy-atom contact
   let wtMinDist = 99.9;
   resRows.forEach(r => {{
     if (['N','CA','C','O'].includes(r[1])) return;
@@ -1320,7 +1809,6 @@ function computeMutant3DGeometry(st, pos, wtAA, mutAA) {{
   }});
   if (wtMinDist > 50) wtMinDist = null;
 
-  // Orthonormal frame at CA
   const u = vecNorm(vecSub(bb.N, bb.CA));
   const w = vecNorm(vecCross(u, vecSub(bb.C, bb.CA)));
   const v = vecCross(w, u);
@@ -1373,7 +1861,6 @@ function computeMutant3DGeometry(st, pos, wtAA, mutAA) {{
           }}
         }});
       }});
-      // Slight preference for native template angle (deg === 0)
       clashScore += Math.abs(deg) * 0.0005;
       if (clashScore < bestScore) {{
         bestScore = clashScore;
@@ -1444,7 +1931,7 @@ function ensureViewerInitialized() {{
   if (viewer3d) return viewer3d;
   const el = document.getElementById('mol3d-canvas');
   if (!el || typeof $3Dmol === 'undefined') return null;
-  viewer3d = $3Dmol.createViewer(el, {{ backgroundColor: '#0b1120', antialias: true }});
+  viewer3d = $3Dmol.createViewer(el, {{ backgroundColor: '#111315', antialias: true }});
   return viewer3d;
 }}
 
@@ -1454,6 +1941,7 @@ function refresh3DScene(keepCamera) {{
   const {{ gene, pos, wt, mut }} = active3DState;
   const mode = document.getElementById('mol3d-mode').value;
   const colorMode = document.getElementById('mol3d-color').value;
+  const pInfo = ATLAS.panel.find(p => p.geneSymbol === gene) || {{}};
 
   if (mode === 'rcsb') {{
     renderExperimentalRCSB(gene, pos, wt, mut);
@@ -1462,6 +1950,7 @@ function refresh3DScene(keepCamera) {{
 
   ensureStruct3DLoaded(gene, st => {{
     if (!st) return;
+    document.getElementById('mol3d-hud').textContent = `${{gene}} · ${{st.u}} · AlphaFold v6 (${{st.s.length}} aa)`;
     const geom = computeMutant3DGeometry(st, pos, wt, mut);
     const pdbs = buildPdbModels(gene, st, pos, wt, mut, geom, colorMode);
     active3DState.lastPdbText = pdbs.wtPdb + (mode !== 'wt' ? ('\\n' + pdbs.mutPdb) : '');
@@ -1470,25 +1959,24 @@ function refresh3DScene(keepCamera) {{
     v.removeAllShapes();
     v.removeAllLabels();
 
-    const m0 = v.addModel(pdbs.wtPdb, 'pdb');
+    v.addModel(pdbs.wtPdb, 'pdb');
     const colorFunc = atom => {{
       const b = atom.b;
       if (colorMode === 'plddt') {{
-        if (b >= 90) return '#1d4ed8';
-        if (b >= 70) return '#38bdf8';
-        if (b >= 50) return '#facc15';
-        return '#f97316';
+        if (b >= 90) return '#0053d6';
+        if (b >= 70) return '#65cbf3';
+        if (b >= 50) return '#ffdb13';
+        return '#ff7d45';
       }} else if (colorMode === 'am') {{
-        if (b >= 56.4) return '#dc2626';
-        if (b >= 34.0) return '#f59e0b';
-        return '#3b82f6';
+        if (b >= 56.4) return '#b91c1c';
+        if (b >= 34.0) return '#d97706';
+        return '#00709b';
       }} else {{
-        return b >= 80 ? '#ef4444' : '#475569';
+        return b >= 80 ? '#e11d48' : '#64748b';
       }}
     }};
     v.setStyle({{model: 0}}, {{cartoon: {{colorfunc: colorFunc, opacity: 0.86}}}});
 
-    // 8 A neighbor sidechains
     if (showNeighbors && geom && geom.bb.CA) {{
       const [cx, cy, cz] = geom.bb.CA;
       const nbrRes = [];
@@ -1496,29 +1984,27 @@ function refresh3DScene(keepCamera) {{
         if (c[0] !== pos && Math.hypot(c[1]-cx, c[2]-cy, c[3]-cz) <= 8.5) nbrRes.push(c[0]);
       }});
       if (nbrRes.length) {{
-        v.addStyle({{model: 0, resi: nbrRes}}, {{stick: {{radius: 0.11, colorscheme: 'Jmol', opacity: 0.55}}}});
+        v.addStyle({{model: 0, resi: nbrRes}}, {{stick: {{radius: 0.10, colorscheme: 'Jmol', opacity: 0.52}}}});
       }}
     }}
 
-    // Wild-type side chain highlight
     if (mode === 'overlay' || mode === 'wt') {{
       v.addStyle(
         {{model: 0, resi: pos}},
         {{
-          stick: {{radius: 0.22, color: '#06b6d4', opacity: mode === 'overlay' ? 0.72 : 1.0}},
-          sphere: {{scale: 0.26, color: '#06b6d4', opacity: mode === 'overlay' ? 0.72 : 1.0}}
+          stick: {{radius: 0.21, color: '#0095c8', opacity: mode === 'overlay' ? 0.72 : 1.0}},
+          sphere: {{scale: 0.25, color: '#0095c8', opacity: mode === 'overlay' ? 0.72 : 1.0}}
         }}
       );
     }}
 
-    // Mutated 3D rotamer model + contacts/clashes
     if ((mode === 'overlay' || mode === 'mutant') && pdbs.mutPdb && wt !== mut) {{
       v.addModel(pdbs.mutPdb, 'pdb');
       v.setStyle(
         {{model: 1}},
         {{
-          stick: {{radius: 0.25, color: '#ef4444'}},
-          sphere: {{scale: 0.30, color: '#ef4444'}}
+          stick: {{radius: 0.24, color: '#e11d48'}},
+          sphere: {{scale: 0.28, color: '#e11d48'}}
         }}
       );
       if (geom) {{
@@ -1526,14 +2012,14 @@ function refresh3DScene(keepCamera) {{
           v.addCylinder({{
             start: {{x:ct.from[0], y:ct.from[1], z:ct.from[2]}},
             end: {{x:ct.to[0], y:ct.to[1], z:ct.to[2]}},
-            radius: 0.05, dashed: true, dashLength: 0.22, gapLength: 0.16, color: '#f59e0b'
+            radius: 0.045, dashed: true, dashLength: 0.22, gapLength: 0.16, color: '#f59e0b'
           }});
         }});
         geom.clashes.forEach(cl => {{
           v.addCylinder({{
             start: {{x:cl.from[0], y:cl.from[1], z:cl.from[2]}},
             end: {{x:cl.to[0], y:cl.to[1], z:cl.to[2]}},
-            radius: 0.08, dashed: true, dashLength: 0.18, gapLength: 0.12, color: '#ff2e4c'
+            radius: 0.075, dashed: true, dashLength: 0.18, gapLength: 0.12, color: '#ff3b30'
           }});
         }});
       }}
@@ -1541,18 +2027,18 @@ function refresh3DScene(keepCamera) {{
 
     if (geom && geom.bb.CA) {{
       const [lx, ly, lz] = geom.bb.CA;
-      const lblTxt = wt === mut ? `${{gene}} ${{wt}}${{pos}} (WT)` : `${{gene}} ${{wt}}${{pos}}${{mut}}`;
+      const lblTxt = wt === mut ? `${{gene}} ${{wt}}${{pos}}` : `${{gene}} ${{wt}}${{pos}}${{mut}}`;
       v.addLabel(lblTxt, {{
         position: {{x: lx, y: ly + 1.8, z: lz}},
-        backgroundColor: wt === mut ? '#0e7490' : '#b91c1c',
-        fontColor: '#ffffff',
-        fontSize: 12,
-        backgroundOpacity: 0.88,
-        borderThickness: 0
+        backgroundColor: '#1d1d1f',
+        fontColor: '#f5f5f7',
+        fontSize: 11.5,
+        backgroundOpacity: 0.86,
+        borderColor: '#3c4047',
+        borderThickness: 1
       }});
     }}
 
-    // Click any residue on 3D ribbon to inspect
     v.setClickable({{model: 0}}, true, atom => {{
       if (atom && atom.resi) selectCodonFromTrack(atom.resi);
     }});
@@ -1575,19 +2061,20 @@ function renderExperimentalRCSB(gene, pos, wt, mut) {{
     return;
   }}
 
+  document.getElementById('mol3d-hud').textContent = `${{gene}} · Experimental RCSB PDB ${{pdbRaw}}`;
   const drawCif = cifTxt => {{
     v.removeAllModels();
     v.removeAllShapes();
     v.removeAllLabels();
     v.addModel(cifTxt, 'cif');
     v.setStyle({{}}, {{cartoon: {{color: '#64748b', opacity: 0.82}}}});
-    v.addStyle({{resn: ['A','U','G','C','DA','DT','DG','DC']}}, {{cartoon: {{color: '#f59e0b'}}, stick: {{radius: 0.14, color: '#fbbf24'}}}});
-    v.addStyle({{elem: ['MG','ZN','CA','MN']}}, {{sphere: {{radius: 1.35, color: '#22c55e'}}}});
-    v.addStyle({{resi: pos}}, {{stick: {{radius: 0.28, color: '#ef4444'}}, sphere: {{scale: 0.32, color: '#ef4444'}}}});
-    v.addLabel(`Experimental PDB ${{pdbRaw}} • ${{gene}} ${{wt}}${{pos}}`, {{
-      resi: pos, backgroundColor: '#991b1b', fontColor: '#fff', fontSize: 12, backgroundOpacity: 0.9
+    v.addStyle({{resn: ['A','U','G','C','DA','DT','DG','DC']}}, {{cartoon: {{color: '#d97706'}}, stick: {{radius: 0.13, color: '#f59e0b'}}}});
+    v.addStyle({{elem: ['MG','ZN','CA','MN']}}, {{sphere: {{radius: 1.3, color: '#10b981'}}}});
+    v.addStyle({{resi: pos}}, {{stick: {{radius: 0.26, color: '#e11d48'}}, sphere: {{scale: 0.30, color: '#e11d48'}}}});
+    v.addLabel(`PDB ${{pdbRaw}} · ${{gene}} ${{wt}}${{pos}}`, {{
+      resi: pos, backgroundColor: '#1d1d1f', fontColor: '#f5f5f7', fontSize: 11.5, backgroundOpacity: 0.88
     }});
-    v.zoomTo({{resi: pos}}, 450);
+    v.zoomTo({{resi: pos}}, 420);
     v.render();
   }};
 
@@ -1607,18 +2094,18 @@ function renderExperimentalRCSB(gene, pos, wt, mut) {{
 function zoomToMutatedResidue() {{
   if (!viewer3d) return;
   const pos = active3DState.pos;
-  viewer3d.zoomTo({{model: 0, resi: [Math.max(1, pos-4), pos, pos+4]}}, 400);
-  viewer3d.zoom(0.82, 200);
+  viewer3d.zoomTo({{model: 0, resi: [Math.max(1, pos-4), pos, pos+4]}}, 380);
+  viewer3d.zoom(0.82, 180);
 }}
 
 function resetFullProtein3D() {{
   if (!viewer3d) return;
-  viewer3d.zoomTo({{model: 0}}, 450);
+  viewer3d.zoomTo({{model: 0}}, 420);
 }}
 
 function toggleNeighbors3D() {{
   showNeighbors = !showNeighbors;
-  document.getElementById('btn-nbrs').textContent = `8Å Sidechains: ${{showNeighbors ? 'ON' : 'OFF'}}`;
+  document.getElementById('btn-nbrs').textContent = `Shell: ${{showNeighbors ? 'On' : 'Off'}}`;
   refresh3DScene(true);
 }}
 
@@ -1626,7 +2113,7 @@ function toggleSpin3D() {{
   if (!viewer3d) return;
   spinActive = !spinActive;
   viewer3d.spin(spinActive ? 'y' : false);
-  document.getElementById('btn-spin').textContent = spinActive ? 'Stop Spin' : 'Spin';
+  document.getElementById('btn-spin').textContent = spinActive ? 'Stop' : 'Spin';
 }}
 
 function downloadMutatedPDB() {{
@@ -1653,134 +2140,135 @@ function renderPropertyDeltaCard(gene, pos, wt, mut, entry, subRow) {{
   const dvol = mp.vol - wp.vol;
   const dkd = mp.kd - wp.kd;
   const gDist = granthamDist(wt, mut);
-  const gLabel = gDist === 0 ? 'Identical (WT)' : (gDist <= 50 ? 'Conservative' : (gDist <= 100 ? 'Moderately Conservative' : (gDist <= 150 ? 'Moderately Radical' : 'Radical Shift')));
-  const gPill = gDist <= 50 ? 'pill-blue' : (gDist <= 100 ? 'pill-amber' : 'pill-red');
+  const gLabel = gDist === 0 ? 'Reference' : (gDist <= 50 ? 'Conservative' : (gDist <= 100 ? 'Moderate' : (gDist <= 150 ? 'Moderately radical' : 'Radical')));
+  const gDot = gDist <= 50 ? 'dot-petrol' : (gDist <= 100 ? 'dot-amber' : 'dot-crimson');
 
-  let chargeNote = 'Neutral / Preserved';
-  let chargePill = 'pill-blue';
-  if (wp.q * mp.q < -0.2) {{ chargeNote = 'Charge Inversion!'; chargePill = 'pill-red'; }}
-  else if (Math.abs(dq) >= 0.8) {{ chargeNote = dq > 0 ? 'Gain of (+) Charge' : 'Gain of (-) / Loss of (+)'; chargePill = 'pill-orange'; }}
+  let chargeNote = 'Preserved';
+  let chargeDot = 'dot-slate';
+  if (wp.q * mp.q < -0.2) {{ chargeNote = 'Charge inversion'; chargeDot = 'dot-crimson'; }}
+  else if (Math.abs(dq) >= 0.8) {{ chargeNote = dq > 0 ? 'Gain of (+) charge' : 'Loss of (+) / gain of (-)'; chargeDot = 'dot-amber'; }}
 
   const alerts = [];
-  if (mut === 'P' && wt !== 'P') alerts.push('<span class="pill pill-red">Proline Helix/Sheet Breaker</span>');
-  if (wt === 'G' && mut !== 'G') alerts.push('<span class="pill pill-orange">Loss of Glycine Torsional Freedom</span>');
-  if ((wt === 'C') !== (mut === 'C')) alerts.push('<span class="pill pill-amber">Thiol / Disulfide Change</span>');
-  if (wp.metal && !mp.metal && dmet !== null && dmet <= 6.0) alerts.push('<span class="pill pill-red">Catalytic Metal-Chelator Loss</span>');
-  if (!wp.arom && mp.arom) alerts.push('<span class="pill pill-amber">Bulky Aromatic Ring Introduced</span>');
+  if (mut === 'P' && wt !== 'P') alerts.push('Proline backbone rigidity');
+  if (wt === 'G' && mut !== 'G') alerts.push('Loss of glycine flexibility');
+  if ((wt === 'C') !== (mut === 'C')) alerts.push('Thiol / disulfide change');
+  if (wp.metal && !mp.metal && dmet !== null && dmet <= 6.0) alerts.push('Metal-chelator loss');
+  if (!wp.arom && mp.arom) alerts.push('Aromatic ring gain');
 
   const constrained = (am !== null && am >= 0.564) || (e2 !== null && e2 <= -5.0);
-  const regimeBadge = wt === mut
-    ? '<span class="pill pill-green">Wild-Type Reference</span>'
+  const regimeTag = wt === mut
+    ? tagDot('dot-emerald', 'Wild-type reference')
     : (constrained
-        ? ((if1 !== null && if1 > -1.5) ? '<span class="pill pill-red">Fold-Preserving Catalytic / Interface</span>' : '<span class="pill pill-orange">Thermodynamic Fold-Destabilising</span>')
-        : '<span class="pill pill-blue">Tolerated / Neutral</span>');
+        ? ((if1 !== null && if1 > -1.5) ? tagDot('dot-crimson', 'Fold-preserving active / interface') : tagDot('dot-amber', 'Predicted fold-destabilising'))
+        : tagDot('dot-petrol', 'Tolerated / neutral'));
 
   const burialStr = geom
-    ? (geom.caNeighbors8A >= 13 ? `Buried Core (${{geom.caNeighbors8A}} C&alpha; &le;8&Aring;)` : (geom.caNeighbors8A >= 8 ? `Partially Buried / Cleft (${{geom.caNeighbors8A}} C&alpha;)` : `Solvent-Exposed (${{geom.caNeighbors8A}} C&alpha;)`))
+    ? (geom.caNeighbors8A >= 13 ? `Buried (${{geom.caNeighbors8A}} C&alpha; &le;8&Aring;)` : (geom.caNeighbors8A >= 8 ? `Intermediate / cleft (${{geom.caNeighbors8A}} C&alpha;)` : `Solvent-exposed (${{geom.caNeighbors8A}} C&alpha;)`))
     : '&mdash;';
   const clashCount = geom ? geom.clashes.length : 0;
-  const clashBadge = clashCount > 0
-    ? `<span class="pill pill-red">${{clashCount}} Steric Clash${{clashCount>1?'es':''}} (&lt;2.4&Aring;; min ${{geom.mutMinDist ? geom.mutMinDist.toFixed(2) : '?'}}&Aring;)</span>`
-    : `<span class="pill pill-green">0 Clashes (min ${{geom && geom.mutMinDist ? geom.mutMinDist.toFixed(2) : '&gt;2.5'}}&Aring;)</span>`;
+  const clashTag = clashCount > 0
+    ? tagDot('dot-crimson', `${{clashCount}} clash${{clashCount>1?'es':''}} (<2.4Å; min ${{geom.mutMinDist ? geom.mutMinDist.toFixed(2) : '?'}}Å)`)
+    : tagDot('dot-emerald', `0 clashes (min ${{geom && geom.mutMinDist ? geom.mutMinDist.toFixed(2) : '>2.5'}}Å)`);
 
-  // 19-AA quick switcher buttons at this codon
-  const aaBtns = entry.s.map(r => {{
+  const aaCells = entry.s.map(r => {{
     const a = r[0], rAm = r[1], rE2 = r[2], rIf1 = r[4];
     const cns = (rAm !== null && rAm >= 0.564) || (rE2 !== null && rE2 <= -5.0);
-    const bg = cns ? ((rIf1 !== null && rIf1 > -1.5) ? '#fee2e2' : '#ffedd5') : '#eff6ff';
-    const fg = cns ? ((rIf1 !== null && rIf1 > -1.5) ? '#991b1b' : '#9a3412') : '#1e40af';
-    return `<button class="aa-btn ${{a===mut?'active':''}}" style="background:${{bg}};color:${{fg}};" onclick="selectMutAA(${{pos}},'${{wt}}','${{a}}')" title="Mutate ${{wt}}${{pos}} to ${{a}} (AM=${{rAm??'NA'}}, IF1=${{rIf1??'NA'}})">${{a}}</button>`;
-  }}).join(' ');
+    const topCol = cns ? ((rIf1 !== null && rIf1 > -1.5) ? '#b91c1c' : '#d97706') : '#00709b';
+    return `<button class="aa-cell ${{a===mut?'active':''}}" style="border-top-color:${{topCol}};" onclick="selectMutAA(${{pos}},'${{wt}}','${{a}}')" title="${{wt}}${{pos}}${{a}} · AM=${{rAm??'NA'}} · IF1=${{rIf1??'NA'}}">${{a}}</button>`;
+  }}).join('');
 
-  // Mechanistic plain-English synthesis
   let mechTxt = '';
   if (wt === mut) {{
-    mechTxt = `Wild-type <strong>${{wp.name}} (${{wt}}${{pos}})</strong> resides in a ${{burialStr.toLowerCase().replace(/<[^>]+>/g,'')}} environment (AFDB pLDDT ${{plddt ?? 'NA'}}). Select any of the 19 amino acid buttons above to model the 3D side-chain substitution and physicochemical shift.`;
+    mechTxt = `Wild-type ${{wp.name}} (${{wt}}${{pos}}) occupies a ${{burialStr.toLowerCase().replace(/<[^>]+>/g,'')}} site (AlphaFold pLDDT ${{plddt ?? 'NA'}}). Select any substitution above to compute the mutant 3D side-chain rotamer and physicochemical shifts.`;
   }} else {{
     const pocketParts = [];
-    if (dmet !== null && dmet <= 6.0) pocketParts.push(`${{dmet}} &Aring; from catalytic divalent metal`);
-    if (dna !== null && dna <= 6.0) pocketParts.push(`${{dna}} &Aring; from bound RNA/DNA`);
-    if (dprt !== null && dprt <= 6.0) pocketParts.push(`${{dprt}} &Aring; from partner subunit`);
-    const locPhrase = pocketParts.length ? `within the experimental 3D active site (${{pocketParts.join(', ')}} in PDB ${{pdb}})` : `in a ${{burialStr.toLowerCase().replace(/<[^>]+>/g,'')}} region`;
+    if (dmet !== null && dmet <= 6.0) pocketParts.push(`${{dmet}} Å from catalytic metal`);
+    if (dna !== null && dna <= 6.0) pocketParts.push(`${{dna}} Å from bound RNA/DNA`);
+    if (dprt !== null && dprt <= 6.0) pocketParts.push(`${{dprt}} Å from cofactor subunit`);
+    const locPhrase = pocketParts.length ? `at the experimental active site (${{pocketParts.join(', ')}} in PDB ${{pdb}})` : `in a ${{burialStr.toLowerCase().replace(/<[^>]+>/g,'')}} environment`;
     const stabPhrase = (if1 !== null && if1 <= -1.5)
-      ? `destabilises local 3D backbone fold thermodynamics (ESM-IF1 &Delta;logP = ${{if1.toFixed(2)}}${{clashCount>0 ? ', ' + clashCount + ' steric clash(es) <2.4 Å' : ''}})`
+      ? `is predicted to destabilise local backbone fold thermodynamics (ESM-IF1 ΔlogP = ${{if1.toFixed(2)}}${{clashCount>0 ? ', ' + clashCount + ' steric clash(es) <2.4 Å' : ''}})`
       : (constrained
-          ? `preserves global 3D backbone fold stability (ESM-IF1 &Delta;logP = ${{if1 !== null ? if1.toFixed(2) : 'NA'}}, ${{clashCount}} steric clashes) while perturbing active-site/interface chemistry`
-          : `is biophysically tolerated on both evolutionary conservation (AlphaMissense ${{am !== null ? am.toFixed(3) : 'NA'}}) and 3D fold stability`);
-    mechTxt = `<strong>${{gene}} ${{wt}}${{pos}}${{mut}} (${{wp.three}}&rarr;${{mp.three}})</strong> replaces ${{wp.cls.toLowerCase()}} <strong>${{wp.name}}</strong> with ${{mp.cls.toLowerCase()}} <strong>${{mp.name}}</strong> ${{locPhrase}} (&Delta;q = ${{dq>=0?'+':''}}${{dq.toFixed(1)}} e, &Delta;Volume = ${{dvol>=0?'+':''}}${{dvol.toFixed(1)}} &Aring;&sup3;, Grantham D = ${{gDist}}), which ${{stabPhrase}}.`;
+          ? `maintains backbone fold stability (ESM-IF1 ΔlogP = ${{if1 !== null ? if1.toFixed(2) : 'NA'}}, ${{clashCount}} steric clashes) while altering active-site or interface chemistry`
+          : `is predicted tolerated across evolutionary conservation (AlphaMissense ${{am !== null ? am.toFixed(3) : 'NA'}}) and 3D inverse folding`);
+    mechTxt = `<strong>${{gene}} p.${{wp.three}}${{pos}}${{mp.three}} (${{wt}}${{pos}}${{mut}})</strong> substitutes ${{wp.cls.toLowerCase()}} ${{wp.name}} with ${{mp.cls.toLowerCase()}} ${{mp.name}} ${{locPhrase}} (Δq = ${{dq>=0?'+':''}}${{dq.toFixed(1)}} e, ΔV = ${{dvol>=0?'+':''}}${{dvol.toFixed(1)}} Å³, Grantham D = ${{gDist}}), and ${{stabPhrase}}.`;
   }}
 
   box.innerHTML = `
-    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px;margin-bottom:8px;">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px;">
       <div>
-        <span style="font-size:1.05rem;font-weight:800;color:#0f172a;">${{gene}} <code>p.${{wp.three}}${{pos}}${{mp.three}}</code> (${{wt}}${{pos}}${{mut}})</span>
-        ${{tn > 0 ? `<span class="pill pill-dark" style="margin-left:4px;">TCGA n=${{tn}}</span>` : ''}}
-        ${{cv ? `<span class="pill pill-amber" style="margin-left:4px;">ClinVar: ${{cv}}</span>` : ''}}
+        <div style="font-size:15.5px;font-weight:650;letter-spacing:-0.015em;">
+          ${{gene}} <code>p.${{wp.three}}${{pos}}${{mp.three}}</code> <span style="color:var(--ink-tertiary);font-weight:400;">(${{wt}}${{pos}}${{mut}})</span>
+        </div>
+        <div style="font-size:11.5px;color:var(--ink-tertiary);margin-top:2px;">
+          TCGA somatic: <strong>${{tn}}</strong> &middot; ClinVar: <strong>${{cv || 'Unreported'}}</strong> &middot; PDB: <strong>${{pdb || 'AlphaFold v6'}}</strong>
+        </div>
       </div>
-      <div>${{regimeBadge}}</div>
+      <div>${{regimeTag}}</div>
     </div>
 
-    <div style="margin-bottom:9px;">
-      <div style="font-size:0.74rem;color:var(--muted);margin-bottom:4px;font-weight:600;">Click any amino acid to mutate codon ${{wt}}${{pos}} in 3D (<span style="color:#991b1b;">red</span>=pocket/interface, <span style="color:#9a3412;">orange</span>=fold-destabilising, <span style="color:#1e40af;">blue</span>=neutral):</div>
-      <div style="display:flex;flex-wrap:wrap;gap:4px;">${{aaBtns}}</div>
+    <div style="margin-top:11px;font-size:11px;color:var(--ink-tertiary);display:flex;justify-content:space-between;flex-wrap:wrap;">
+      <span>Substitute codon ${{wt}}${{pos}}:</span>
+      <span><i class="dot dot-crimson"></i> Active/interface &nbsp;<i class="dot dot-amber"></i> Destabilising &nbsp;<i class="dot dot-petrol"></i> Neutral</span>
     </div>
+    <div class="aa-strip">${{aaCells}}</div>
 
     <div class="table-wrap" style="max-height:none;">
-      <table style="font-size:0.78rem;">
+      <table>
         <thead>
-          <tr><th>Protein Property</th><th>Wild-Type (${{wt}})</th><th>Mutant (${{mut}})</th><th>&Delta; Change &amp; Structural Effect</th></tr>
+          <tr><th>Property</th><th>WT (${{wt}})</th><th>Mut (${{mut}})</th><th>Shift &amp; Assessment</th></tr>
         </thead>
         <tbody>
           <tr>
-            <td><strong>Side-Chain Class</strong></td>
+            <td><strong>Chemical group</strong></td>
             <td>${{wp.cls}}</td>
-            <td><strong>${{mp.cls}}</strong></td>
-            <td>${{wp.cls === mp.cls ? '<span class="pill pill-blue">Same Class</span>' : '<span class="pill pill-orange">Class Switch</span>'}}</td>
+            <td>${{mp.cls}}</td>
+            <td>${{wp.cls === mp.cls ? 'Conserved group' : 'Group transition'}}</td>
           </tr>
           <tr>
-            <td><strong>Net Charge (pH 7.4)</strong></td>
+            <td><strong>Net charge (pH 7.4)</strong></td>
             <td>${{wp.q >= 0 ? '+' : ''}}${{wp.q.toFixed(1)}} e</td>
-            <td><strong>${{mp.q >= 0 ? '+' : ''}}${{mp.q.toFixed(1)}} e</strong></td>
-            <td><strong>${{dq >= 0 ? '+' : ''}}${{dq.toFixed(1)}} e</strong> &bull; <span class="pill ${{chargePill}}">${{chargeNote}}</span></td>
+            <td>${{mp.q >= 0 ? '+' : ''}}${{mp.q.toFixed(1)}} e</td>
+            <td>${{dq >= 0 ? '+' : ''}}${{dq.toFixed(1)}} e &middot; ${{tagDot(chargeDot, chargeNote)}}</td>
           </tr>
           <tr>
-            <td><strong>Steric Volume</strong></td>
+            <td><strong>Side-chain volume</strong></td>
             <td>${{wp.vol.toFixed(1)}} &Aring;&sup3;</td>
-            <td><strong>${{mp.vol.toFixed(1)}} &Aring;&sup3;</strong></td>
-            <td><strong>${{dvol >= 0 ? '+' : ''}}${{dvol.toFixed(1)}} &Aring;&sup3;</strong> (${{dvol >= 0 ? '+' : ''}}${{((dvol/wp.vol)*100).toFixed(0)}}% ${{Math.abs(dvol) < 15 ? 'isosteric' : (dvol > 0 ? 'bulkier' : 'cavity shift')}})</td>
+            <td>${{mp.vol.toFixed(1)}} &Aring;&sup3;</td>
+            <td>${{dvol >= 0 ? '+' : ''}}${{dvol.toFixed(1)}} &Aring;&sup3; (${{dvol >= 0 ? '+' : ''}}${{((dvol/wp.vol)*100).toFixed(0)}}%)</td>
           </tr>
           <tr>
             <td><strong>Hydropathy (KD)</strong></td>
             <td>${{wp.kd.toFixed(1)}}</td>
-            <td><strong>${{mp.kd.toFixed(1)}}</strong></td>
-            <td><strong>${{dkd >= 0 ? '+' : ''}}${{dkd.toFixed(1)}}</strong> (${{dkd > 1.5 ? 'More Hydrophobic' : (dkd < -1.5 ? 'More Polar/Charged' : 'Similar Polarity')}})</td>
+            <td>${{mp.kd.toFixed(1)}}</td>
+            <td>${{dkd >= 0 ? '+' : ''}}${{dkd.toFixed(1)}} (${{dkd > 1.5 ? 'More hydrophobic' : (dkd < -1.5 ? 'More polar' : 'Comparable')}})</td>
           </tr>
           <tr>
-            <td><strong>H-Bonds / Metal</strong></td>
-            <td>${{wp.hd}}D / ${{wp.ha}}A${{wp.metal ? ' (Chelator)' : ''}}</td>
-            <td><strong>${{mp.hd}}D / ${{mp.ha}}A${{mp.metal ? ' (Chelator)' : ''}}</strong></td>
-            <td>&Delta;Donors=${{mp.hd-wp.hd>=0?'+':''}}${{mp.hd-wp.hd}}, &Delta;Acceptors=${{mp.ha-wp.ha>=0?'+':''}}${{mp.ha-wp.ha}}</td>
+            <td><strong>H-bond / metal</strong></td>
+            <td>${{wp.hd}}D / ${{wp.ha}}A${{wp.metal ? ' · Metal' : ''}}</td>
+            <td>${{mp.hd}}D / ${{mp.ha}}A${{mp.metal ? ' · Metal' : ''}}</td>
+            <td>&Delta;D=${{mp.hd-wp.hd>=0?'+':''}}${{mp.hd-wp.hd}}, &Delta;A=${{mp.ha-wp.ha>=0?'+':''}}${{mp.ha-wp.ha}}</td>
           </tr>
           <tr>
-            <td><strong>Grantham &amp; Alerts</strong></td>
-            <td colspan="2">Grantham D = <strong>${{gDist}}</strong> <span class="pill ${{gPill}}">${{gLabel}}</span></td>
-            <td>${{alerts.length ? alerts.join(' ') : '<span style="color:var(--muted);">No special backbone alert</span>'}}</td>
+            <td><strong>Grantham / alerts</strong></td>
+            <td colspan="2">D = <strong>${{gDist}}</strong> &middot; ${{tagDot(gDot, gLabel)}}</td>
+            <td>${{alerts.length ? alerts.join('; ') : 'None'}}</td>
           </tr>
           <tr>
-            <td><strong>3D Packing &amp; Clash</strong></td>
+            <td><strong>3D environment</strong></td>
             <td>${{burialStr}}</td>
-            <td>WT min: ${{geom && geom.wtMinDist ? geom.wtMinDist.toFixed(2)+'&Aring;' : '&mdash;'}}</td>
-            <td>${{clashBadge}}</td>
+            <td>WT ${{geom && geom.wtMinDist ? geom.wtMinDist.toFixed(2)+'&Aring;' : '&mdash;'}}</td>
+            <td>${{clashTag}}</td>
           </tr>
           <tr>
-            <td><strong>PLM &amp; 3D Scores</strong></td>
-            <td colspan="2">AM: <strong>${{am !== null ? am.toFixed(3) : '&mdash;'}}</strong> &bull; ESM-2: <strong>${{e2 !== null ? e2.toFixed(2) : '&mdash;'}}</strong></td>
-            <td>ESM-IF1 3D &Delta;logP: <strong>${{if1 !== null ? if1.toFixed(2) : '&mdash;'}}</strong></td>
+            <td><strong>Model scores</strong></td>
+            <td colspan="2">AM ${{am !== null ? am.toFixed(3) : '&mdash;'}} &middot; ESM-2 ${{e2 !== null ? e2.toFixed(2) : '&mdash;'}}</td>
+            <td>ESM-IF1 &Delta;logP: <strong>${{if1 !== null ? if1.toFixed(2) : '&mdash;'}}</strong></td>
           </tr>
         </tbody>
       </table>
     </div>
-    <div class="mech-note">${{mechTxt}}</div>
+    <div class="interp-box">${{mechTxt}}</div>
   `;
 }}
 
@@ -1799,20 +2287,19 @@ function inspectSaturationCodon() {{
   }}
   const mVar = rawQ.match(/^([A-Z])?(\\d+)([A-Z*])?$/);
   if (!mVar) {{
-    box.innerHTML = `<p style="font-size:0.82rem;color:#b91c1c;">Enter a codon number (e.g. <code>1705</code>) or single-AA substitution (e.g. <code>E1705K</code>).</p>`;
+    box.innerHTML = `<p style="font-size:12.5px;color:var(--crimson);">Enter a residue position (e.g. <code>1705</code>) or missense change (e.g. <code>E1705K</code>).</p>`;
     return;
   }}
   const posStr = mVar[2];
   const pos = parseInt(posStr, 10);
   const entry = gCache[posStr];
   if (!entry) {{
-    box.innerHTML = `<p style="font-size:0.82rem;color:#b91c1c;">Codon ${{pos}} is outside ${{gene}} canonical length (1..${{Object.keys(gCache).length}} aa).</p>`;
+    box.innerHTML = `<p style="font-size:12.5px;color:var(--crimson);">Position ${{pos}} exceeds ${{gene}} canonical length (1&ndash;${{Object.keys(gCache).length}} aa).</p>`;
     return;
   }}
   const [wt, pdb, dna, dmet, dprt, plddt] = entry.m;
   let targetAlt = (mVar[3] && mVar[3] !== '*') ? mVar[3] : '';
 
-  // Pick active mutant AA for 3D viewer (explicitly typed alt, or highest-impact/observed substitution at this codon)
   let activeSubRow = null;
   if (targetAlt && targetAlt !== wt) {{
     activeSubRow = entry.s.find(r => r[0] === targetAlt) || null;
@@ -1831,30 +2318,31 @@ function inspectSaturationCodon() {{
   let rows = entry.s;
   if (targetAlt && targetAlt !== wt) rows = rows.filter(r => r[0] === targetAlt);
 
-  let html = `<div style="background:#f8fafc;border:1px solid #cbd5e1;border-radius:8px;padding:10px 12px;">
-    <div style="font-size:0.85rem;margin-bottom:8px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;">
+  let html = `<div>
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:8px;font-size:12.5px;color:var(--ink-secondary);">
       <span>
-        <strong>All Substitutions at ${{gene}} Codon ${{wt}}${{pos}}</strong> &bull; AFDB pLDDT: <strong>${{plddt ?? 'NA'}}</strong>
-        &bull; Experimental PDB: <strong>${{pdb || 'Unresolved (AFDB)'}}</strong>
-        &bull; Dist RNA/DNA: <strong>${{dna !== null ? dna + ' &Aring;' : '&mdash;'}}</strong>
-        &bull; Dist Metal: <strong>${{dmet !== null ? dmet + ' &Aring;' : '&mdash;'}}</strong>
-        &bull; Dist Partner: <strong>${{dprt !== null ? dprt + ' &Aring;' : '&mdash;'}}</strong>
+        <strong>Codon ${{gene}} ${{wt}}${{pos}} saturation profile</strong> &middot;
+        pLDDT ${{plddt ?? 'NA'}} &middot;
+        PDB ${{pdb || 'AlphaFold v6'}} &middot;
+        RNA/DNA ${{dna !== null ? dna + ' Å' : '—'}} &middot;
+        Metal ${{dmet !== null ? dmet + ' Å' : '—'}} &middot;
+        Partner ${{dprt !== null ? dprt + ' Å' : '—'}}
       </span>
-      ${{targetAlt ? `<button class="ghost-btn" onclick="document.getElementById('sat-query').value='${{pos}}';inspectSaturationCodon();">Show All 19 Substitutions at ${{wt}}${{pos}}</button>` : ''}}
+      ${{targetAlt ? `<button class="btn-quiet" onclick="document.getElementById('sat-query').value='${{pos}}';inspectSaturationCodon();">Show all 19 substitutions</button>` : ''}}
     </div>
-    <div class="table-wrap" style="max-height:245px;">
+    <div class="table-wrap" style="max-height:240px;">
       <table>
-        <thead><tr><th>3D</th><th>Substitution</th><th>Grantham D</th><th>&Delta;Charge</th><th>&Delta;Vol (&Aring;&sup3;)</th><th>AlphaMissense</th><th>ESM-2 (3B)</th><th>ESM-1v</th><th>ESM-IF1 3D</th><th>Biophysical Regime</th><th>TCGA</th><th>ClinVar Assertion</th></tr></thead>
+        <thead><tr><th>3D</th><th>Variant</th><th>Grantham</th><th>&Delta;q</th><th>&Delta;Vol (&Aring;&sup3;)</th><th>AlphaMissense</th><th>ESM-2 3B</th><th>ESM-1v</th><th>ESM-IF1 3D</th><th>Regime</th><th>TCGA</th><th>ClinVar</th></tr></thead>
         <tbody>`;
   rows.forEach(r => {{
     const [alt, am, e2, e1v, if1, tn, cv] = r;
     const wp = AA_PROPS[wt] || AA_PROPS.A, mp = AA_PROPS[alt] || wp;
     const dq = mp.q - wp.q, dv = mp.vol - wp.vol, gd = granthamDist(wt, alt);
     const constrained = (am !== null && am >= 0.564) || (e2 !== null && e2 <= -5.0);
-    const regime = constrained ? ((if1 !== null && if1 > -1.5) ? '<span class="pill pill-red">Fold-Preserving Active/Interface</span>' : '<span class="pill pill-orange">Predicted Fold-Destabilising</span>') : '<span class="pill pill-blue">Tolerated / Neutral</span>';
+    const regime = constrained ? ((if1 !== null && if1 > -1.5) ? tagDot('dot-crimson','Active / interface') : tagDot('dot-amber','Fold-destabilising')) : tagDot('dot-petrol','Neutral');
     html += `<tr>
-      <td><button class="ghost-btn" style="padding:2px 7px;font-size:0.73rem;" onclick="selectMutAA(${{pos}},'${{wt}}','${{alt}}')">3D</button></td>
-      <td><strong><code>${{wt}}${{pos}}${{alt}}</code></strong></td>
+      <td><button class="btn-quiet" style="height:23px;padding:0 7px;font-size:11px;" onclick="selectMutAA(${{pos}},'${{wt}}','${{alt}}')">View</button></td>
+      <td><code>${{wt}}${{pos}}${{alt}}</code></td>
       <td>${{gd}}</td>
       <td>${{dq>=0?'+':''}}${{dq.toFixed(1)}}</td>
       <td>${{dv>=0?'+':''}}${{dv.toFixed(0)}}</td>
@@ -1864,7 +2352,7 @@ function inspectSaturationCodon() {{
       <td>${{if1 !== null ? if1.toFixed(2) : '&mdash;'}}</td>
       <td>${{regime}}</td>
       <td>${{tn > 0 ? '<strong>' + tn + '</strong>' : '0'}}</td>
-      <td>${{cv ? '<span class="pill pill-amber">' + cv + '</span>' : '&mdash;'}}</td>
+      <td>${{cv || '&mdash;'}}</td>
     </tr>`;
   }});
   html += `</tbody></table></div></div>`;
@@ -1872,18 +2360,18 @@ function inspectSaturationCodon() {{
 }}
 
 function tierPill(t) {{
-  if (t === '3D_Catalytic_or_Substrate_Pocket_Driver') return '<span class="pill pill-red">3D Pocket &le;6&Aring;</span>';
-  if (t === 'Pathogenic_Fold_or_Interface_Missense') return '<span class="pill pill-orange">Pathogenic Fold</span>';
-  if (t === 'Truncating_LoF') return '<span class="pill pill-dark">Truncating LoF</span>';
-  if (t === 'Ambiguous_Missense_VUS') return '<span class="pill pill-amber">Ambiguous VUS</span>';
-  if (t === 'Likely_Benign_Passenger_Missense') return '<span class="pill pill-blue">Likely Benign VUS</span>';
-  return `<span class="pill pill-dark">${{t}}</span>`;
+  if (t === '3D_Catalytic_or_Substrate_Pocket_Driver') return tagDot('dot-crimson', '3D pocket (≤6Å)');
+  if (t === 'Pathogenic_Fold_or_Interface_Missense') return tagDot('dot-amber', 'Pathogenic fold');
+  if (t === 'Truncating_LoF') return tagDot('dot-slate', 'Truncating LoF');
+  if (t === 'Ambiguous_Missense_VUS') return tagDot('dot-slate', 'Ambiguous VUS');
+  if (t === 'Likely_Benign_Passenger_Missense') return tagDot('dot-petrol', 'Likely benign');
+  return tagDot('dot-slate', t);
 }}
 
 function mechPill(m) {{
-  if (m === 'Fold_Preserving_Catalytic_or_Interface') return '<span class="pill pill-red">Fold-Preserving Active/Interface</span>';
-  if (m === 'Thermodynamic_Fold_Destabilizing') return '<span class="pill pill-orange">Fold-Destabilising Core</span>';
-  if (m === 'Tolerated_Neutral') return '<span class="pill pill-blue">Tolerated Neutral</span>';
+  if (m === 'Fold_Preserving_Catalytic_or_Interface') return tagDot('dot-crimson', 'Active / interface');
+  if (m === 'Thermodynamic_Fold_Destabilizing') return tagDot('dot-amber', 'Fold-destabilising');
+  if (m === 'Tolerated_Neutral') return tagDot('dot-petrol', 'Neutral');
   return '&mdash;';
 }}
 
@@ -1900,25 +2388,25 @@ function renderVariants() {{
     if (q && !(v.p.toUpperCase().includes(q) || v.g.toUpperCase().includes(q) || v.cohorts.toUpperCase().includes(q) || v.cv.toUpperCase().includes(q))) return false;
     return true;
   }});
-  document.getElementById('var-count').textContent = `Showing ${{Math.min(250, currentFilteredVars.length)}} of ${{currentFilteredVars.length}} unique protein variants (${{currentFilteredVars.reduce((a,b)=>a+b.n,0)}} TCGA somatic calls).`;
+  document.getElementById('var-count').textContent = `Showing ${{Math.min(250, currentFilteredVars.length)}} of ${{currentFilteredVars.length}} unique variants (${{currentFilteredVars.reduce((a,b)=>a+b.n,0)}} somatic calls)`;
   document.querySelector('#var-table tbody').innerHTML = currentFilteredVars.slice(0, 250).map(v => {{
     const cleanP = v.p.replace(/^p\\./i, '');
     const isMissense = /^[A-Z]\\d+[A-Z]$/.test(cleanP);
     const jumpArg = isMissense ? cleanP : (v.pos > 0 ? String(v.pos) : '');
-    const btn3d = jumpArg ? `<button class="ghost-btn" style="padding:2px 7px;font-size:0.73rem;" onclick="openVariantIn3D('${{v.g}}','${{jumpArg}}')">3D</button>` : '&mdash;';
+    const btn3d = jumpArg ? `<button class="btn-quiet" style="height:23px;padding:0 7px;font-size:11px;" onclick="openVariantIn3D('${{v.g}}','${{jumpArg}}')">View</button>` : '&mdash;';
     return `
     <tr>
       <td>${{btn3d}}</td>
       <td><strong>${{v.g}}</strong></td>
       <td><code>${{v.p}}</code></td>
       <td>${{v.n}}</td>
-      <td>${{v.cv ? '<span class="pill pill-amber">' + v.cv + '</span>' : '&mdash;'}}</td>
+      <td>${{v.cv || '&mdash;'}}</td>
       <td>${{tierPill(v.tier)}}</td>
       <td>${{mechPill(v.mech)}}</td>
-      <td>${{v.pdb || '&mdash;'}}</td>
+      <td><code>${{v.pdb || '&mdash;'}}</code></td>
       <td>${{v.dna !== null ? v.dna.toFixed(2) : '&mdash;'}}</td>
       <td>${{v.dmet !== null ? v.dmet.toFixed(2) : '&mdash;'}}</td>
-      <td>${{v.am !== null ? v.am.toFixed(3) + ' (' + v.amc + ')' : '&mdash;'}}</td>
+      <td>${{v.am !== null ? v.am.toFixed(3) : '&mdash;'}}</td>
       <td>${{v.esm !== null ? v.esm.toFixed(2) : '&mdash;'}}</td>
       <td>${{v.esm1v !== null ? v.esm1v.toFixed(2) : '&mdash;'}}</td>
       <td>${{v.if1 !== null ? v.if1.toFixed(2) : '&mdash;'}}</td>
@@ -1932,11 +2420,11 @@ function renderGtexBars() {{
   const vals = ATLAS.gtex_tpm[g] || [];
   const pairs = ATLAS.gtex_tissues.map((t, i) => [t, vals[i] || 0]).sort((a,b) => b[1] - a[1]);
   const mx = Math.max(1, ...pairs.map(x => x[1]));
-  document.getElementById('gtex-bars').innerHTML = '<table><thead><tr><th>GTEx v10 Adult Tissue (54 Sites)</th><th>Median TPM</th><th>Relative Abundance</th></tr></thead><tbody>' +
+  document.getElementById('gtex-bars').innerHTML = '<table><thead><tr><th>GTEx v10 Adult Tissue (54 Sites)</th><th>Median TPM</th><th>Relative Expression</th></tr></thead><tbody>' +
     pairs.map(([t, v]) => `<tr>
       <td>${{t.replace(/_/g, ' ')}}</td>
       <td><strong>${{v.toFixed(2)}}</strong></td>
-      <td><div style="width:${{Math.max(2, (v/mx)*280).toFixed(0)}}px;height:10px;background:#0f5499;border-radius:3px;"></div></td>
+      <td><div style="width:${{Math.max(2, (v/mx)*280).toFixed(0)}}px;height:8px;background:var(--embl-petrol);border-radius:2px;"></div></td>
     </tr>`).join('') + '</tbody></table>';
 }}
 
@@ -1950,7 +2438,7 @@ function renderAllTables() {{
       <td>${{b.group_B}} (n=${{b.n_group_B}})</td>
       <td>${{Number(b.median_group_B).toFixed(4)}}</td>
       <td><strong>${{(Number(b.median_shift_A_minus_B)>=0?'+':'') + Number(b.median_shift_A_minus_B).toFixed(4)}}</strong></td>
-      <td><strong>${{b.p_value_two_sided}}</strong></td>
+      <td>${{b.p_value_two_sided}}</td>
     </tr>
   `).join('');
 
@@ -1959,7 +2447,7 @@ function renderAllTables() {{
     <tr>
       <td><code>${{d.s}}</code></td>
       <td><strong>${{d.t}}</strong></td>
-      <td>${{d.c === 'DICER1_RNaseIIIb_3D_Catalytic_Pocket' ? '<span class="pill pill-red">RNase IIIb 3D Pocket (&le;8&Aring;)</span>' : d.c}}</td>
+      <td>${{d.c === 'DICER1_RNaseIIIb_3D_Catalytic_Pocket' ? tagDot('dot-crimson','RNase IIIb 3D pocket') : d.c}}</td>
       <td><strong>${{d.d53.toFixed(4)}}</strong></td>
       <td>${{d.f5 !== null ? d.f5.toFixed(4) : '&mdash;'}}</td>
       <td>${{d.l7z !== null && d.l7z !== undefined ? (d.l7z>=0?'+':'') + d.l7z.toFixed(3) : '&mdash;'}}</td>
@@ -1968,7 +2456,7 @@ function renderAllTables() {{
 
   document.querySelector('#top-axes-table tbody').innerHTML = ATLAS.top_axes.map(ax => `
     <tr>
-      <td>#${{ax.rank}}</td>
+      <td>${{ax.rank}}</td>
       <td><code>${{ax.matureMiRNA}}</code></td>
       <td><strong>${{ax.targetGeneSymbol}}</strong></td>
       <td>${{ax.n_dual_tumours}}</td>
@@ -1984,8 +2472,8 @@ function renderAllTables() {{
       <td>${{r.n_pos}}</td>
       <td>${{r.n_neg}}</td>
       <td><strong>${{Number(r.roc_auc).toFixed(4)}}</strong> [${{Number(r.roc_ci95_low).toFixed(3)}}&ndash;${{Number(r.roc_ci95_high).toFixed(3)}}]</td>
-      <td><strong>${{Number(r.pr_auc).toFixed(4)}}</strong> (base ${{Number(r.pr_baseline).toFixed(3)}})</td>
-      <td><strong>${{r.mann_whitney_p}}</strong></td>
+      <td>${{Number(r.pr_auc).toFixed(4)}} (${{Number(r.pr_baseline).toFixed(3)}})</td>
+      <td>${{r.mann_whitney_p}}</td>
     </tr>
   `).join('');
 
@@ -1993,12 +2481,12 @@ function renderAllTables() {{
     <tr>
       <td><strong>${{m.geneSymbol}}</strong></td>
       <td>${{Number(m.msk_N_profiled).toLocaleString()}}</td>
-      <td><strong>${{(Number(m.msk_mut_freq)*100).toFixed(2)}}%</strong> (n=${{m.msk_mut_samples_n}})</td>
+      <td><strong>${{(Number(m.msk_mut_freq)*100).toFixed(2)}}%</strong> (${{m.msk_mut_samples_n}})</td>
       <td>${{(Number(m.tcga_mut_freq_N10195)*100).toFixed(2)}}%</td>
       <td>${{(Number(m.msk_nonhypermut_mut_freq)*100).toFixed(2)}}%</td>
-      <td>${{(Number(m.msk_truncating_freq)*100).toFixed(2)}}% (n=${{m.msk_truncating_n}})</td>
-      <td><strong>${{(Number(m.msk_3dpocket_or_hotspot_freq)*100).toFixed(2)}}%</strong> (n=${{m.msk_3dpocket_or_hotspot_n}})</td>
-      <td>${{(Number(m.msk_primary_mut_freq)*100).toFixed(2)}}% vs ${{(Number(m.msk_metastasis_mut_freq)*100).toFixed(2)}}%</td>
+      <td>${{(Number(m.msk_truncating_freq)*100).toFixed(2)}}% (${{m.msk_truncating_n}})</td>
+      <td><strong>${{(Number(m.msk_3dpocket_or_hotspot_freq)*100).toFixed(2)}}%</strong> (${{m.msk_3dpocket_or_hotspot_n}})</td>
+      <td>${{(Number(m.msk_primary_mut_freq)*100).toFixed(2)}}% / ${{(Number(m.msk_metastasis_mut_freq)*100).toFixed(2)}}%</td>
     </tr>
   `).join('');
 
@@ -2022,7 +2510,7 @@ function renderAllTables() {{
       <td>${{p.gtex_pan54_median_tpm !== '' ? Number(p.gtex_pan54_median_tpm).toFixed(2) : '&mdash;'}}</td>
       <td>${{p.gtex_top_tissue}} (${{Number(p.gtex_top_tissue_tpm||0).toFixed(1)}})</td>
       <td>${{p.gtex_tau_tissue_specificity}}</td>
-      <td>${{p.opentargets_sm_tractable === '1' ? '<span class="pill pill-green">SM Ligand/Pocket</span> ' : ''}}${{p.opentargets_protac_tractable === '1' ? '<span class="pill pill-blue">PROTAC</span>' : ''}}</td>
+      <td>${{p.opentargets_sm_tractable === '1' ? tagDot('dot-emerald','Small-molecule') + ' ' : ''}}${{p.opentargets_protac_tractable === '1' ? tagDot('dot-petrol','PROTAC') : ''}}</td>
       <td>${{p.clinvar_pathogenic_or_likely_pathogenic_n}} / ${{p.clinvar_total_single_gene_n}}</td>
     </tr>
   `).join('');
@@ -2040,7 +2528,7 @@ function renderAllTables() {{
       <td>${{c.post_transcriptional_CNA_attenuation || '&mdash;'}}</td>
       <td><strong>${{d.median_chronos_gene_effect}}</strong></td>
       <td>${{(Number(d.prop_dependent_le_m05)*100).toFixed(1)}}%</td>
-      <td>${{p.depmapIsCommonEssential === '1' ? '<span class="pill pill-red">Essential</span>' : '<span class="pill pill-blue">Buffered / Context</span>'}}</td>
+      <td>${{p.depmapIsCommonEssential === '1' ? tagDot('dot-crimson','Pan-essential') : tagDot('dot-petrol','Context / buffered')}}</td>
     </tr>`;
   }}).join('');
 
@@ -2054,7 +2542,7 @@ function renderAllTables() {{
       <td><strong>${{Number(s.hazard_ratio_stratified).toFixed(3)}}</strong> [${{Number(s.hr_ci95_low).toFixed(3)}}&ndash;${{Number(s.hr_ci95_high).toFixed(3)}}]</td>
       <td>${{s.p_value_two_sided}}</td>
       <td>${{s.multivar_cox_hr !== '' && s.multivar_cox_hr !== undefined ? '<strong>' + Number(s.multivar_cox_hr).toFixed(3) + '</strong> [' + Number(s.multivar_ci95_low).toFixed(3) + '&ndash;' + Number(s.multivar_ci95_high).toFixed(3) + ']' : '&mdash;'}}</td>
-      <td><strong>${{s.multivar_p_value || '&mdash;'}}</strong></td>
+      <td>${{s.multivar_p_value || '&mdash;'}}</td>
     </tr>
   `).join('');
 
@@ -2067,7 +2555,7 @@ function renderAllTables() {{
       <td>${{i.group_B}} (n=${{i.n_group_B}})</td>
       <td>${{Number(i.median_group_B).toFixed(4)}}</td>
       <td><strong>${{(Number(i.median_shift_A_minus_B)>=0?'+':'') + Number(i.median_shift_A_minus_B).toFixed(4)}}</strong></td>
-      <td><strong>${{i.p_value_two_sided}}</strong></td>
+      <td>${{i.p_value_two_sided}}</td>
     </tr>
   `).join('');
 }}
@@ -2093,8 +2581,8 @@ window.addEventListener('DOMContentLoaded', () => {{
   ATLAS.panel.forEach(p => {{
     const g = p.geneSymbol;
     selVar.insertAdjacentHTML('beforeend', `<option value="${{g}}">${{g}} (${{p.uniprotAccession}})</option>`);
-    selLol.insertAdjacentHTML('beforeend', `<option value="${{g}}" ${{g==='DICER1'?'selected':''}}>${{g}} (${{p.proteinLengthAa}} aa, ${{p.pdbComplexIds}})</option>`);
-    selGtex.insertAdjacentHTML('beforeend', `<option value="${{g}}" ${{g==='LIN28B'?'selected':''}}>${{g}} (median ${{Number(p.gtex_pan54_median_tpm||0).toFixed(2)}} TPM, &tau;=${{p.gtex_tau_tissue_specificity}})</option>`);
+    selLol.insertAdjacentHTML('beforeend', `<option value="${{g}}" ${{g==='DICER1'?'selected':''}}>${{g}} · ${{p.uniprotAccession}} (${{p.proteinLengthAa}} aa)</option>`);
+    selGtex.insertAdjacentHTML('beforeend', `<option value="${{g}}" ${{g==='LIN28B'?'selected':''}}>${{g}} (&tau; = ${{p.gtex_tau_tissue_specificity}})</option>`);
   }});
   document.getElementById('sat-query').value = 'E1705K';
   renderHeatmap();

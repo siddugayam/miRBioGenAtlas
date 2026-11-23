@@ -66,7 +66,7 @@ boxes <- tibble(
     "1. Panel & Cohort Scope",
     "2. Multi-Consortium Frozen Snapshot",
     "3. 3D, Functional & Sample Harmonisation",
-    "4. Deposited Data Records & Web Portal (v2.0.1)",
+    "4. Deposited Data Records & Web Portal (v2.0.2)",
     "5. Multi-Modal Technical Validation Suite"
   ),
   body = c(

@@ -480,7 +480,7 @@ def main():
 
     manifest = {
         "dataset": "miRBioGenAtlas",
-        "snapshot_version": "2.0.1",
+        "snapshot_version": "2.0.2",
         "retrieved_utc": datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "cbioportal_portal_version": info.get("portalVersion"),
         "cbioportal_db_version": info.get("dbVersion"),

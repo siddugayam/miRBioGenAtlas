@@ -16,11 +16,11 @@ DATA_DIR = REPO_ROOT / "data"
 
 
 class TestMiRBioGenAtlasIntegrity(unittest.TestCase):
-    def test_01_snapshot_manifest_sha256_all_45_archives(self):
+    def test_01_snapshot_manifest_sha256_all_46_archives(self):
         manifest_path = DATA_DIR / "raw_snapshot" / "snapshot_manifest.json"
         self.assertTrue(manifest_path.exists())
         manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
-        self.assertEqual(len(manifest["files"]), 45)
+        self.assertEqual(len(manifest["files"]), 46)
         for item in manifest["files"]:
             fp = REPO_ROOT / item["path"]
             self.assertTrue(fp.exists(), f"Missing snapshot: {item['path']}")
@@ -109,12 +109,15 @@ class TestMiRBioGenAtlasIntegrity(unittest.TestCase):
             self.assertIsNone(path_pat.search(txt_no_urls), f"Hard-coded local path in {fp.name}")
             self.assertIsNone(hw_pat.search(txt), f"Workstation-specific term in {fp.name}")
 
-    def test_06_web_explorer_and_15_saturation_chunks_present(self):
+    def test_06_web_explorer_saturation_and_3d_chunks_present(self):
         idx = REPO_ROOT / "docs" / "index.html"
         self.assertTrue(idx.exists())
         self.assertGreater(idx.stat().st_size, 500_000)
+        self.assertTrue((REPO_ROOT / "docs" / "vendor" / "3Dmol-min.js").exists())
         sat_js = list((REPO_ROOT / "docs" / "sat").glob("*.js"))
         self.assertEqual(len(sat_js), 15)
+        struct_js = list((REPO_ROOT / "docs" / "struct3d").glob("*.js"))
+        self.assertEqual(len(struct_js), 15)
 
     def test_07_cli_variant_query_utility(self):
         res = subprocess.run(

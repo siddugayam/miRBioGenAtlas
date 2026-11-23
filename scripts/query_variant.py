@@ -203,7 +203,7 @@ def query_codon_profile(gene: str, codon: int, as_json: bool = False):
 
 
 def main():
-    ap = argparse.ArgumentParser(description="Query miRBioGenAtlas v2.0.1 structural, PLM, clinical, and somatic profiles.")
+    ap = argparse.ArgumentParser(description="Query miRBioGenAtlas v2.0.2 structural, PLM, clinical, and somatic profiles.")
     ap.add_argument("gene", nargs="?", help="Gene symbol (e.g. DICER1, DROSHA, AGO2)")
     ap.add_argument("variant", nargs="?", help="Missense substitution (e.g. E1705K or p.Glu1705Lys)")
     ap.add_argument("--codon", nargs=2, metavar=("GENE", "POS"), help="List all 19 single-AA substitutions at a codon (e.g. --codon DICER1 1705)")

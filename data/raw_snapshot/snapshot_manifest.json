@@ -8,6 +8,71 @@
   "n_genes": 15,
   "files": [
     {
+      "path": "data/miRNA_biogenesis_residue_biophysical_11260_profile.csv.gz",
+      "sha256": "3634c935fe0967c03d7adce3fd8dbcbb0a8951bdcd0a72e18b2d2d621944e902",
+      "size_bytes": 269218
+    },
+    {
+      "path": "data/miRNA_biogenesis_saturation_mutagenesis_213940_atlas.csv.gz",
+      "sha256": "4f99b150f29829300d3d916ddae11510e57a7f2f43e8f0472de5351d78bb9c91",
+      "size_bytes": 4515691
+    },
+    {
+      "path": "data/raw_snapshot/external/afdb_v6_15genes_heavy_atoms.json.gz",
+      "size_bytes": 953571,
+      "sha256": "819859fd42c70145701bc47fe378c8a3fdb233017b3d82b0a02c6fe56cdedf0f"
+    },
+    {
+      "path": "data/raw_snapshot/external/alphamissense_15genes_lookup.json.gz",
+      "sha256": "f5d0845e7f9d5fd08acf334908bc847c40ba0a390ed11f45ddb42d1c029e316b",
+      "size_bytes": 1136522
+    },
+    {
+      "path": "data/raw_snapshot/external/clinvar_15genes_benchmark_and_clinical.json.gz",
+      "size_bytes": 210295,
+      "sha256": "e932527d82877933018920aef58344de50590479af770c595f38bc08426a97c4"
+    },
+    {
+      "path": "data/raw_snapshot/external/cptac_pancan_15genes.json.gz",
+      "sha256": "c9d2c81b1c9522f74091e17d2560ca276a776c3698a982efea484d84246d45de",
+      "size_bytes": 443224
+    },
+    {
+      "path": "data/raw_snapshot/external/depmap_crispr_and_ccle_15genes.json.gz",
+      "sha256": "ec4252c014f1853ae44119bc3f6969863176cd31a7b1b6668cf727370d100f49",
+      "size_bytes": 178952
+    },
+    {
+      "path": "data/raw_snapshot/external/gene_clinical_constraint_gtex_hpa_ot.json.gz",
+      "size_bytes": 10144,
+      "sha256": "388b315476dcb7de95fa32035d6e6c0c9e5d224d76135956e17dc4579556515c"
+    },
+    {
+      "path": "data/raw_snapshot/external/msk_impact_10945_replication.json.gz",
+      "size_bytes": 182550,
+      "sha256": "a020faf117ee25445f7929dd673e6fba3069c8ec2bf59204d9e78b15552a797c"
+    },
+    {
+      "path": "data/raw_snapshot/external/plm_if1_saturation_and_mirna_svd.json.gz",
+      "sha256": "7838257ec25994fd0556e7ba3ba5b581787b8aa47b9145b3ecfd2380ca7c465f",
+      "size_bytes": 507326
+    },
+    {
+      "path": "data/raw_snapshot/external/structural_3d_and_uniprot_15genes.json.gz",
+      "sha256": "e695afed28adf8dee9340e47f99f1265286e773333c90ccf8ea6d599ebced94a",
+      "size_bytes": 108292
+    },
+    {
+      "path": "data/raw_snapshot/external/tcga_pancan_mirnaseq_per_sample.json.gz",
+      "sha256": "0692490b2fd1a05e94a1afb91686778cadaed1e31b1531b2002c0078d10fc760",
+      "size_bytes": 1614665
+    },
+    {
+      "path": "data/raw_snapshot/external/thorsson_panimmune_tcga.json.gz",
+      "size_bytes": 298951,
+      "sha256": "143619a17cbfd8879d8d99a6dde1f2d773ed04d9cf5fe9e534c101f2353f4683"
+    },
+    {
       "path": "data/raw_snapshot/portal_and_genes_metadata.json.gz",
       "size_bytes": 6670,
       "sha256": "fca9e54bb6a102646e918f6f3fad1b0601f5a52309ff0afc46b76ac73e81ce46"
@@ -171,66 +236,6 @@
       "path": "data/raw_snapshot/studies/uvm_tcga_pan_can_atlas_2018.json.gz",
       "size_bytes": 77250,
       "sha256": "e45f6c638094ca34fecdab3fb8330a3c2ba4af0b2455d26469d8d51bdd361f5f"
-    },
-    {
-      "path": "data/raw_snapshot/external/alphamissense_15genes_lookup.json.gz",
-      "sha256": "f5d0845e7f9d5fd08acf334908bc847c40ba0a390ed11f45ddb42d1c029e316b",
-      "size_bytes": 1136522
-    },
-    {
-      "path": "data/raw_snapshot/external/cptac_pancan_15genes.json.gz",
-      "sha256": "c9d2c81b1c9522f74091e17d2560ca276a776c3698a982efea484d84246d45de",
-      "size_bytes": 443224
-    },
-    {
-      "path": "data/raw_snapshot/external/depmap_crispr_and_ccle_15genes.json.gz",
-      "sha256": "ec4252c014f1853ae44119bc3f6969863176cd31a7b1b6668cf727370d100f49",
-      "size_bytes": 178952
-    },
-    {
-      "path": "data/raw_snapshot/external/structural_3d_and_uniprot_15genes.json.gz",
-      "sha256": "e695afed28adf8dee9340e47f99f1265286e773333c90ccf8ea6d599ebced94a",
-      "size_bytes": 108292
-    },
-    {
-      "path": "data/raw_snapshot/external/tcga_pancan_mirnaseq_per_sample.json.gz",
-      "sha256": "0692490b2fd1a05e94a1afb91686778cadaed1e31b1531b2002c0078d10fc760",
-      "size_bytes": 1614665
-    },
-    {
-      "path": "data/raw_snapshot/external/plm_if1_saturation_and_mirna_svd.json.gz",
-      "sha256": "7838257ec25994fd0556e7ba3ba5b581787b8aa47b9145b3ecfd2380ca7c465f",
-      "size_bytes": 507326
-    },
-    {
-      "path": "data/miRNA_biogenesis_saturation_mutagenesis_213940_atlas.csv.gz",
-      "sha256": "4f99b150f29829300d3d916ddae11510e57a7f2f43e8f0472de5351d78bb9c91",
-      "size_bytes": 4515691
-    },
-    {
-      "path": "data/miRNA_biogenesis_residue_biophysical_11260_profile.csv.gz",
-      "sha256": "3634c935fe0967c03d7adce3fd8dbcbb0a8951bdcd0a72e18b2d2d621944e902",
-      "size_bytes": 269218
-    },
-    {
-      "path": "data/raw_snapshot/external/gene_clinical_constraint_gtex_hpa_ot.json.gz",
-      "size_bytes": 10144,
-      "sha256": "388b315476dcb7de95fa32035d6e6c0c9e5d224d76135956e17dc4579556515c"
-    },
-    {
-      "path": "data/raw_snapshot/external/clinvar_15genes_benchmark_and_clinical.json.gz",
-      "size_bytes": 210295,
-      "sha256": "e932527d82877933018920aef58344de50590479af770c595f38bc08426a97c4"
-    },
-    {
-      "path": "data/raw_snapshot/external/msk_impact_10945_replication.json.gz",
-      "size_bytes": 182550,
-      "sha256": "a020faf117ee25445f7929dd673e6fba3069c8ec2bf59204d9e78b15552a797c"
-    },
-    {
-      "path": "data/raw_snapshot/external/thorsson_panimmune_tcga.json.gz",
-      "size_bytes": 298951,
-      "sha256": "143619a17cbfd8879d8d99a6dde1f2d773ed04d9cf5fe9e534c101f2353f4683"
     }
   ],
   "external_layers_version": "2.0.1"

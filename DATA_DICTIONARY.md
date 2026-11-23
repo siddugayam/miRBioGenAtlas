@@ -1,7 +1,7 @@
-# Data Dictionary — miRBioGenAtlas (v2.0.1)
+# Data Dictionary — miRBioGenAtlas (v2.0.2)
 
 **Dataset:** Multi-consortium, structurally and functionally calibrated alteration landscape of the miRNA biogenesis machinery across 32 TCGA cancer studies (`N = 10,195` matched tumours; `152,925` sample × gene records; `9,578` matched mature `miRNA-seq` profiles; `9,353` dual-profiled `miRNA × mRNA` tumours across `13,369,752` pairs; `213,940` proteome-wide saturation mutagenesis substitutions across `11,260` codons; `6,292` 3D Cryo-EM/PLM/AlphaMissense/ClinVar-annotated TCGA somatic variants; `16,569` NCBI ClinVar clinical variant records; `10,945` MSK-IMPACT clinical sequencing tumours; `810` GTEx v10 54-tissue healthy adult baselines; `1,002` CPTAC mass-spectrometry proteomes; `1,208` Broad DepMap CRISPR-Cas9 cell lines; TCGA-CDR curated survival and Thorsson Pan-Cancer Immune/HRD profiles).  
-**Version:** `2.0.1` · **Zenodo Dataset DOI:** [`10.5281/zenodo.24393421`](https://doi.org/10.5281/zenodo.24393421) · **Interactive Explorer:** `docs/index.html` + `docs/sat/*.js` (`https://siddugayam.github.io/miRBioGenAtlas/`).
+**Version:** `2.0.2` · **Zenodo Dataset DOI:** [`10.5281/zenodo.24455067`](https://doi.org/10.5281/zenodo.24455067) · **Interactive Explorer:** `docs/index.html` + `docs/sat/*.js` (`https://siddugayam.github.io/miRBioGenAtlas/`).
 
 ## Global Conventions
 

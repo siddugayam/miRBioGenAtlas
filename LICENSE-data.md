@@ -27,8 +27,8 @@ Human-readable summary: https://creativecommons.org/licenses/by/4.0/
 
 > Gayam, P. K. R., Earny, V. A., Aranjani, J. M. & Mahammad, F. S. miRBioGenAtlas:
 > Sample-level multi-modal somatic alteration landscape of the miRNA biogenesis
-> machinery across 32 TCGA cancer studies (version 2.0.1). *Zenodo*
-> https://doi.org/10.5281/zenodo.24393421 (2026). Licensed under CC BY 4.0.
+> machinery across 32 TCGA cancer studies (version 2.0.2). *Zenodo*
+> https://doi.org/10.5281/zenodo.24455067 (2026). Licensed under CC BY 4.0.
 
 ## Underlying data attribution
 

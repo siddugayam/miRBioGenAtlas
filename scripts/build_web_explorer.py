@@ -454,6 +454,39 @@ def build_web_explorer():
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>miRBioGenAtlas — MicroRNA Biogenesis Structural &amp; Genomic Reference</title>
+<meta name="description" content="Open-access structural, genomic, and small-RNA reference of the human microRNA biogenesis machinery across 21,140 sequenced tumours and 213,940 3D missense variants.">
+<meta property="og:title" content="miRBioGenAtlas (v2.0.2) — Structural &amp; Pan-Cancer miRNA Biogenesis Reference">
+<meta property="og:description" content="Interactive 3D mutant rotamer viewer, 2D DMS saturation heatmap, GRCh38/GRCh37 VCF translator, 5p:3p small-RNA benchmarks, and static JSON API across 21,140 tumours.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://siddugayam.github.io/miRBioGenAtlas/">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="canonical" href="https://siddugayam.github.io/miRBioGenAtlas/">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23111315'/%3E%3Ccircle cx='11.5' cy='16' r='5' fill='%23009f4d'/%3E%3Ccircle cx='20.5' cy='16' r='5' fill='%2300709b'/%3E%3C/svg%3E">
+<script type="application/ld+json">
+{{
+  "@context": "https://schema.org",
+  "@type": "Dataset",
+  "name": "miRBioGenAtlas: Pan-cancer alteration and 3D saturation mutagenesis atlas of the human miRNA biogenesis machinery",
+  "version": "2.0.2",
+  "identifier": "https://doi.org/10.5281/zenodo.24455067",
+  "url": "https://siddugayam.github.io/miRBioGenAtlas/",
+  "sameAs": "https://github.com/siddugayam/miRBioGenAtlas",
+  "description": "Multi-consortium structural, genomic, and functional small-RNA reference covering 15 human miRNA biogenesis and regulatory proteins across 21,140 sequenced tumours (TCGA PanCancer Atlas and MSK-IMPACT), 213,940 single-amino-acid substitutions, 16 experimental PDB complexes, and 9,578 mature miRNA-seq transcriptomes.",
+  "license": "https://creativecommons.org/licenses/by/4.0/",
+  "isAccessibleForFree": true,
+  "keywords": ["microRNA biogenesis", "DICER1", "DROSHA", "AGO2", "saturation mutagenesis", "AlphaMissense", "ESM-IF1", "TCGA PanCancer Atlas", "5p:3p strand ratio"],
+  "creator": [
+    {{"@type": "Person", "name": "Gayam Prasanna Kumar Reddy", "identifier": "https://orcid.org/0000-0001-5032-364X"}},
+    {{"@type": "Person", "name": "Venkat Abhiram Earny", "identifier": "https://orcid.org/0009-0008-6926-553X"}},
+    {{"@type": "Person", "name": "Jesil Mathew Aranjani", "identifier": "https://orcid.org/0000-0002-7666-3252"}},
+    {{"@type": "Person", "name": "Fayaz Shaik Mahammad", "identifier": "https://orcid.org/0000-0002-1212-7952"}}
+  ],
+  "distribution": [
+    {{"@type": "DataDownload", "encodingFormat": "application/zip", "contentUrl": "https://doi.org/10.5281/zenodo.24455067"}},
+    {{"@type": "DataDownload", "encodingFormat": "application/json", "contentUrl": "https://siddugayam.github.io/miRBioGenAtlas/api/v2/index.json"}}
+  ]
+}}
+</script>
 <link rel="stylesheet" href="vendor/katex/katex.min.css">
 <script src="vendor/katex/katex.min.js"></script>
 <script src="vendor/3Dmol-min.js"></script>

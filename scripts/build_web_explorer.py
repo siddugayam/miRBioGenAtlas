@@ -1187,7 +1187,7 @@ def build_web_explorer():
   .popover {{
     position: fixed;
     z-index: 9999;
-    width: 380px;
+    width: 416px;
     max-width: calc(100vw - 24px);
     background: #ffffff;
     color: var(--ink);
@@ -1293,6 +1293,48 @@ def build_web_explorer():
     display: flex;
     align-items: center;
     justify-content: center;
+  }}
+  .eq-vars {{
+    margin-top: 9px;
+    padding: 8px 11px;
+    background: #fafbfc;
+    border: 1px solid var(--line-soft);
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }}
+  .eq-vars-hdr {{
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--ink-3);
+    margin-bottom: 1px;
+  }}
+  .eq-var-row {{
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 4px 9px;
+    font-size: 11.5px;
+    line-height: 1.42;
+  }}
+  .eq-var-sym {{
+    display: inline-block;
+    background: #ffffff;
+    border: 1px solid var(--line-soft);
+    border-radius: 5px;
+    padding: 1px 7px;
+    font-size: 11.5px;
+    color: var(--ink);
+    flex-shrink: 0;
+  }}
+  .eq-var-desc {{
+    color: var(--ink-2);
+    flex: 1;
+    min-width: 170px;
   }}
   .eq-cite {{
     margin-top: 4px;
@@ -2455,6 +2497,7 @@ def build_web_explorer():
   <div class="pop-title" id="tp-title"></div>
   <div class="pop-desc" id="tp-meaning"></div>
   <div class="pop-math" id="tp-math"></div>
+  <div id="tp-vars" class="eq-vars" style="margin-top:0;margin-bottom:8px;"></div>
   <div class="pop-thresh" id="tp-thresh"></div>
   <div class="pop-cite" id="tp-cite"></div>
 </div>
@@ -2467,8 +2510,9 @@ def build_web_explorer():
     <button class="btn-subtle" onclick="closeGuideDrawer()">Close</button>
   </div>
   <h3 id="gd-title" style="margin:0 0 4px;font-size:17px;"></h3>
-  <p id="gd-sub" style="margin:0 0 16px;font-size:12.5px;color:var(--ink-2);"></p>
-  <div id="gd-math" class="eq-math-box" style="margin-bottom:16px;"></div>
+  <p id="gd-sub" style="margin:0 0 14px;font-size:12.5px;color:var(--ink-2);"></p>
+  <div id="gd-math" class="eq-math-box" style="margin-bottom:8px;"></div>
+  <div id="gd-vars" class="eq-vars" style="margin-top:0;margin-bottom:16px;"></div>
   <ul id="gd-points" style="padding-left:18px;margin:0 0 20px;color:var(--ink-2);font-size:13px;line-height:1.6;"></ul>
   <button class="btn-action" style="width:100%;" onclick="closeGuideDrawer();openFormulaTab();">Browse All 16 LaTeX Equations &rarr;</button>
 </aside>
@@ -2779,12 +2823,28 @@ function openFormulaTab(eqId) {{
   }}
 }}
 
+function renderFormulaVars(varsList, boxEl, hdrLabel) {{
+  if (!boxEl) return;
+  if (!Array.isArray(varsList) || !varsList.length) {{
+    boxEl.innerHTML = '';
+    boxEl.style.display = 'none';
+    return;
+  }}
+  boxEl.style.display = 'flex';
+  boxEl.innerHTML = `<div class="eq-vars-hdr">${{hdrLabel || 'Where (Symbols & Variables)'}}</div>` +
+    varsList.map(pair => `<div class="eq-var-row"><span class="eq-var-sym"></span><span class="eq-var-desc">${{pair[1] || ''}}</span></div>`).join('');
+  boxEl.querySelectorAll('.eq-var-sym').forEach((sp, k) => {{
+    renderLatex((varsList[k] && varsList[k][0]) || '', sp, false);
+  }});
+}}
+
 function openGuideDrawer(key) {{
   const g = ATLAS.guides && ATLAS.guides[key];
   if (!g) return;
   document.getElementById('gd-title').textContent = g.title;
   document.getElementById('gd-sub').textContent = g.subtitle;
   renderLatex(g.latex, document.getElementById('gd-math'), true);
+  renderFormulaVars(g.vars, document.getElementById('gd-vars'), 'Symbols in Formula');
   document.getElementById('gd-points').innerHTML = g.points.map(p => `<li style="margin-bottom:8px;">${{p}}</li>`).join('');
   document.getElementById('drawer-backdrop').classList.add('open');
   document.getElementById('guide-drawer').classList.add('open');
@@ -3144,6 +3204,7 @@ function showTermPopover(targetEl, pin) {{
   document.getElementById('tp-title').textContent = item.title || key;
   document.getElementById('tp-meaning').textContent = item.meaning || '';
   renderLatex(item.latex || '', document.getElementById('tp-math'), false);
+  renderFormulaVars(item.vars, document.getElementById('tp-vars'), 'Symbols in Formula');
   document.getElementById('tp-thresh').textContent = item.thresholds || '';
 
   const citeEl = document.getElementById('tp-cite');
@@ -4223,13 +4284,14 @@ function renderGtexBars() {{
   markSortableHeaders(gBox);
 }}
 
-/* Render Authentic KaTeX Formula Cards with Primary Literature Citations */
+/* Render Authentic KaTeX Formula Cards with Symbol Keys & Primary Literature Citations */
 function renderFormulas() {{
   const cat = document.getElementById('formula-cat').value;
   const q = (document.getElementById('formula-q').value || '').trim().toLowerCase();
   const list = (ATLAS.formulas || []).filter(f => {{
     if (cat !== 'ALL' && f.cat !== cat) return false;
-    if (q && !(`${{f.id}} ${{f.title}} ${{f.summary}} ${{f.cat}} ${{f.citation || ''}}`.toLowerCase().includes(q))) return false;
+    const varTxt = (f.vars || []).map(v => v.join(' ')).join(' ');
+    if (q && !(`${{f.id}} ${{f.title}} ${{f.summary}} ${{f.cat}} ${{f.citation || ''}} ${{varTxt}}`.toLowerCase().includes(q))) return false;
     return true;
   }});
   const wrap = document.getElementById('formula-cards-wrap');
@@ -4246,6 +4308,7 @@ function renderFormulas() {{
         </div>
         <div style="font-size:14px;font-weight:600;margin-bottom:10px;">${{f.title}}</div>
         <div class="eq-math-box" id="katex-eq-${{idx}}"></div>
+        <div class="eq-vars" id="katex-eq-vars-${{idx}}"></div>
       </div>
       <div>
         <div style="font-size:12.5px;color:var(--ink-2);">${{f.summary}}</div>
@@ -4254,7 +4317,10 @@ function renderFormulas() {{
     </div>
     `;
   }}).join('');
-  list.forEach((f, idx) => renderLatex(f.latex, document.getElementById(`katex-eq-${{idx}}`), true));
+  list.forEach((f, idx) => {{
+    renderLatex(f.latex, document.getElementById(`katex-eq-${{idx}}`), true);
+    renderFormulaVars(f.vars, document.getElementById(`katex-eq-vars-${{idx}}`), 'Where (Symbols, Alphabets & Operators)');
+  }});
 }}
 
 function renderDatasetsCatalogue() {{
@@ -4275,7 +4341,10 @@ function renderGlossaryCards() {{
   const entries = Object.entries(ATLAS.glossary || {{}})
     .map(([k, v]) => ({{key: k, ...v}}))
     .sort((a, b) => a.title.localeCompare(b.title))
-    .filter(g => !q || (`${{g.title}} ${{g.cat}} ${{g.meaning}} ${{g.thresholds}}`.toLowerCase().includes(q)));
+    .filter(g => {{
+      const varTxt = (g.vars || []).map(v => v.join(' ')).join(' ');
+      return !q || (`${{g.title}} ${{g.cat}} ${{g.meaning}} ${{g.thresholds}} ${{varTxt}}`.toLowerCase().includes(q));
+    }});
   document.getElementById('gloss-count').textContent = `${{entries.length}} terms`;
   const wrap = document.getElementById('glossary-cards-wrap');
   wrap.innerHTML = entries.map((g, i) => {{
@@ -4292,6 +4361,7 @@ function renderGlossaryCards() {{
         </div>
         <div style="font-size:12.5px;color:var(--ink-2);margin-bottom:10px;">${{g.meaning}}</div>
         <div class="eq-math-box" style="min-height:44px;padding:8px 10px;" id="katex-gl-${{i}}"></div>
+        <div class="eq-vars" id="katex-gl-vars-${{i}}"></div>
       </div>
       <div>
         <div class="meta-note">${{g.thresholds}}</div>
@@ -4300,7 +4370,10 @@ function renderGlossaryCards() {{
     </div>
     `;
   }}).join('');
-  entries.forEach((g, i) => renderLatex(g.latex, document.getElementById(`katex-gl-${{i}}`), false));
+  entries.forEach((g, i) => {{
+    renderLatex(g.latex, document.getElementById(`katex-gl-${{i}}`), false);
+    renderFormulaVars(g.vars, document.getElementById(`katex-gl-vars-${{i}}`), 'Symbols in Formula');
+  }});
 }}
 
 function renderAllTables() {{

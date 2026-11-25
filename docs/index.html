@@ -33,10 +33,10 @@
     font-family: var(--sans);
     background: var(--bg);
     color: var(--ink);
-    font-size: 13.5px;
-    line-height: 1.5;
+    font-size: 14px;
+    line-height: 1.52;
   }
-  .wrap { max-width: 1360px; margin: 0 auto; padding: 0 24px; }
+  .wrap { max-width: 1520px; margin: 0 auto; padding: 0 28px; }
 
   /* Minimal Google / Apple Top Navigation Bar */
   .topbar {
@@ -47,7 +47,7 @@
     backdrop-filter: saturate(180%) blur(16px);
     -webkit-backdrop-filter: saturate(180%) blur(16px);
     border-bottom: 1px solid var(--line-soft);
-    height: 56px;
+    height: 60px;
   }
   .topbar-inner {
     height: 100%;
@@ -60,7 +60,7 @@
     display: flex;
     align-items: center;
     gap: 9px;
-    font-size: 16px;
+    font-size: 16.5px;
     font-weight: 600;
     letter-spacing: -0.02em;
     color: var(--ink);
@@ -81,13 +81,13 @@
     font-weight: 500;
     color: var(--ink-2);
     background: var(--subtle);
-    padding: 1px 6px;
+    padding: 1px 7px;
     border-radius: 999px;
   }
   .nav-tabs {
     display: flex;
     align-items: center;
-    gap: 4px;
+    gap: 5px;
     overflow-x: auto;
     scrollbar-width: none;
   }
@@ -95,10 +95,10 @@
   .nav-tab {
     border: none;
     background: transparent;
-    padding: 7px 13px;
+    padding: 8px 14px;
     border-radius: 999px;
     font-family: var(--sans);
-    font-size: 13px;
+    font-size: 13.5px;
     font-weight: 500;
     color: var(--ink-2);
     cursor: pointer;
@@ -114,8 +114,8 @@
   .top-links {
     display: flex;
     align-items: center;
-    gap: 12px;
-    font-size: 12px;
+    gap: 14px;
+    font-size: 12.5px;
     white-space: nowrap;
   }
   .top-links a {
@@ -126,21 +126,21 @@
 
   /* Google-Simple Centered Search Hero */
   .search-hero {
-    padding: 28px 0 20px;
+    padding: 30px 0 22px;
     text-align: center;
     border-bottom: 1px solid var(--line-soft);
     background: var(--bg);
   }
   .search-shell {
     position: relative;
-    max-width: 640px;
+    max-width: 720px;
     margin: 0 auto;
   }
   .search-box {
     display: flex;
     align-items: center;
-    height: 46px;
-    padding: 0 14px 0 16px;
+    height: 50px;
+    padding: 0 16px 0 18px;
     background: #ffffff;
     border: 1px solid var(--line);
     border-radius: 999px;
@@ -149,20 +149,20 @@
   }
   .search-box:focus-within {
     border-color: rgba(0, 112, 155, 0.55);
-    box-shadow: 0 2px 12px rgba(0, 112, 155, 0.14);
+    box-shadow: 0 2px 14px rgba(0, 112, 155, 0.15);
   }
   .search-icon {
-    width: 17px;
-    height: 17px;
+    width: 18px;
+    height: 18px;
     color: var(--ink-3);
-    margin-right: 10px;
+    margin-right: 11px;
     flex-shrink: 0;
   }
   .search-box input {
     flex: 1;
     border: none;
     outline: none;
-    font-size: 14px;
+    font-size: 15px;
     font-family: var(--sans);
     color: var(--ink);
     background: transparent;
@@ -178,7 +178,7 @@
   }
   .suggest-menu {
     position: absolute;
-    top: 52px;
+    top: 56px;
     left: 0;
     right: 0;
     background: #ffffff;
@@ -195,10 +195,10 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 8px 12px;
+    padding: 9px 13px;
     border-radius: 8px;
     cursor: pointer;
-    font-size: 13px;
+    font-size: 13.5px;
   }
   .sug-row:hover { background: var(--canvas); }
   .sug-cat {
@@ -211,15 +211,15 @@
     justify-content: center;
     align-items: center;
     flex-wrap: wrap;
-    gap: 7px;
-    margin-top: 12px;
+    gap: 8px;
+    margin-top: 13px;
   }
   .chip {
     border: 1px solid var(--line-soft);
     background: var(--canvas);
     color: var(--ink-2);
-    font-size: 12px;
-    padding: 4px 11px;
+    font-size: 12.5px;
+    padding: 5px 12px;
     border-radius: 999px;
     cursor: pointer;
     transition: all 0.14s ease;
@@ -230,12 +230,12 @@
     background: #ffffff;
   }
   .stat-ribbon {
-    margin-top: 12px;
+    margin-top: 13px;
     display: flex;
     justify-content: center;
     flex-wrap: wrap;
-    gap: 18px;
-    font-size: 12px;
+    gap: 20px;
+    font-size: 12.5px;
     color: var(--ink-3);
   }
   .stat-ribbon span[data-term] {
@@ -248,7 +248,7 @@
   main.workspace {
     background: var(--canvas);
     min-height: calc(100vh - 210px);
-    padding: 24px 0 48px;
+    padding: 26px 0 52px;
   }
   .panel { display: none; }
   .panel.active { display: block; }
@@ -269,16 +269,16 @@
     flex-wrap: wrap;
     gap: 2px;
     background: #e9ecef;
-    padding: 3px;
+    padding: 3.5px;
     border-radius: 10px;
   }
   .seg-btn {
     border: none;
     background: transparent;
-    padding: 6px 13px;
+    padding: 7px 15px;
     border-radius: 7px;
     font-family: var(--sans);
-    font-size: 12.5px;
+    font-size: 13px;
     font-weight: 500;
     color: var(--ink-2);
     cursor: pointer;
@@ -295,13 +295,13 @@
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    height: 32px;
-    padding: 0 12px;
+    height: 34px;
+    padding: 0 13px;
     border-radius: 999px;
     border: 1px solid var(--line);
     background: #ffffff;
     color: var(--ink-2);
-    font-size: 12px;
+    font-size: 12.5px;
     font-weight: 500;
     cursor: pointer;
     transition: all 0.14s ease;
@@ -311,8 +311,8 @@
   .card {
     background: var(--surface);
     border: 1px solid var(--line-soft);
-    border-radius: 14px;
-    padding: 20px 22px;
+    border-radius: 15px;
+    padding: 22px 24px;
     box-shadow: 0 1px 3px rgba(32, 33, 36, 0.03);
   }
   .card-head {
@@ -321,15 +321,15 @@
     align-items: center;
     flex-wrap: wrap;
     gap: 10px;
-    margin-bottom: 14px;
+    margin-bottom: 15px;
   }
   .card-head h2 {
     margin: 0;
-    font-size: 15.5px;
+    font-size: 16.5px;
     font-weight: 600;
     letter-spacing: -0.015em;
   }
-  .meta-note { font-size: 12px; color: var(--ink-3); }
+  .meta-note { font-size: 12.5px; color: var(--ink-3); }
 
   /* Minimal Controls */
   .controls {
@@ -340,151 +340,212 @@
     margin-bottom: 14px;
   }
   select, input[type="text"].ctrl-input {
-    height: 34px;
-    padding: 0 11px;
+    height: 36px;
+    padding: 0 12px;
     border: 1px solid var(--line);
     border-radius: 8px;
-    font-size: 12.5px;
+    font-size: 13px;
     font-family: var(--sans);
     color: var(--ink);
     background: #ffffff;
   }
-  select:focus, input[type="text"].ctrl-input:focus {
+  select:focus, input[type="text"].ctrl-input:focus, textarea.batch-area:focus {
     outline: none;
     border-color: var(--accent);
   }
+  textarea.batch-area {
+    width: 100%;
+    min-height: 92px;
+    padding: 10px 12px;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    font-size: 13px;
+    font-family: var(--mono);
+    color: var(--ink);
+    background: #ffffff;
+    resize: vertical;
+    line-height: 1.5;
+  }
   .btn-action {
-    height: 34px;
+    height: 36px;
     background: var(--ink);
     color: #ffffff;
     border: none;
-    padding: 0 14px;
+    padding: 0 15px;
     border-radius: 8px;
-    font-size: 12.5px;
+    font-size: 13px;
     font-weight: 500;
     cursor: pointer;
   }
   .btn-action:hover { opacity: 0.88; }
   .btn-subtle {
-    height: 28px;
+    height: 30px;
     background: #ffffff;
     color: var(--ink-2);
     border: 1px solid var(--line);
-    padding: 0 10px;
+    padding: 0 11px;
     border-radius: 7px;
     font-size: 12px;
     cursor: pointer;
+    transition: background 0.12s ease, color 0.12s ease, border-color 0.12s ease;
   }
-  .btn-subtle:hover { color: var(--ink); background: var(--canvas); }
+  .btn-subtle:hover { color: var(--ink); background: var(--canvas); border-color: #bdc1c6; }
+  .step-group {
+    display: inline-flex;
+    align-items: center;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    overflow: hidden;
+    background: #ffffff;
+  }
+  .step-btn {
+    height: 34px;
+    width: 30px;
+    border: none;
+    background: #ffffff;
+    color: var(--ink-2);
+    font-size: 16px;
+    line-height: 1;
+    cursor: pointer;
+    padding: 0;
+  }
+  .step-btn:hover { background: var(--canvas); color: var(--accent); }
+  .step-group input.ctrl-input {
+    border: none;
+    border-left: 1px solid var(--line-soft);
+    border-right: 1px solid var(--line-soft);
+    border-radius: 0;
+    height: 34px;
+  }
 
-  /* Lollipop & 3D Workbench */
+  /* Lollipop & Enlarged 3D Workbench */
   .svg-track {
     width: 100%;
     overflow-x: auto;
     border: 1px solid var(--line-soft);
-    border-radius: 10px;
+    border-radius: 11px;
     background: #fbfcfd;
-    padding: 6px 10px 2px;
-    margin-bottom: 16px;
+    padding: 8px 12px 4px;
+    margin-bottom: 18px;
   }
   .workbench {
     display: grid;
-    grid-template-columns: 1.2fr 1fr;
-    gap: 18px;
+    grid-template-columns: 1.52fr 1fr;
+    gap: 22px;
+    align-items: stretch;
   }
-  @media (max-width: 1040px) {
+  .workbench.theatre {
+    grid-template-columns: 1fr;
+  }
+  @media (max-width: 1100px) {
     .workbench { grid-template-columns: 1fr; }
   }
   .vp-shell {
-    border-radius: 12px;
+    border-radius: 13px;
     overflow: hidden;
     background: #111315;
     border: 1px solid #26292e;
+    box-shadow: 0 4px 16px rgba(17, 19, 21, 0.10);
   }
   .vp-bar {
     background: #1a1d21;
-    padding: 8px 10px;
+    padding: 9px 12px;
     display: flex;
     flex-wrap: wrap;
-    gap: 6px;
+    gap: 7px;
     justify-content: space-between;
     align-items: center;
   }
   .vp-bar select {
-    height: 27px;
+    height: 30px;
     background: #272b31;
     color: #f1f3f4;
     border: 1px solid #3c4043;
-    font-size: 11.5px;
+    font-size: 12px;
     border-radius: 6px;
-    padding: 0 8px;
+    padding: 0 9px;
   }
   .vp-btn {
-    height: 27px;
+    height: 30px;
     background: #272b31;
     color: #e8eaed;
     border: 1px solid #3c4043;
     border-radius: 6px;
-    padding: 0 9px;
-    font-size: 11.5px;
+    padding: 0 10px;
+    font-size: 12px;
     cursor: pointer;
+    transition: background 0.12s ease;
   }
   .vp-btn:hover { background: #353a42; }
-  .mol3d-stage { position: relative; width: 100%; height: 440px; background: #111315; }
+  .vp-btn.active-vp { background: var(--accent); border-color: var(--accent); color: #ffffff; }
+  .mol3d-stage {
+    position: relative;
+    width: 100%;
+    height: 600px;
+    background: #111315;
+    transition: height 0.18s ease;
+  }
+  .workbench.theatre .mol3d-stage {
+    height: 760px;
+  }
+  @media (max-width: 720px) {
+    .mol3d-stage { height: 440px; }
+  }
   .mol3d-hud {
     position: absolute;
-    top: 10px;
-    left: 12px;
+    top: 12px;
+    left: 14px;
     color: #e8eaed;
     font-family: var(--mono);
-    font-size: 11px;
-    background: rgba(26, 29, 33, 0.78);
-    padding: 4px 9px;
-    border-radius: 6px;
+    font-size: 11.5px;
+    background: rgba(26, 29, 33, 0.80);
+    padding: 5px 10px;
+    border-radius: 7px;
     pointer-events: none;
     z-index: 5;
   }
   .mol3d-legend {
     position: absolute;
-    bottom: 10px;
-    left: 12px;
-    right: 12px;
-    background: rgba(20, 22, 26, 0.82);
+    bottom: 12px;
+    left: 14px;
+    right: 14px;
+    background: rgba(20, 22, 26, 0.84);
     color: #dadce0;
-    padding: 6px 10px;
-    border-radius: 6px;
-    font-size: 11px;
+    padding: 7px 12px;
+    border-radius: 7px;
+    font-size: 11.5px;
     display: flex;
     flex-wrap: wrap;
-    gap: 14px;
+    gap: 15px;
     z-index: 5;
   }
-  .swatch { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 5px; }
+  .swatch { display: inline-block; width: 8.5px; height: 8.5px; border-radius: 50%; margin-right: 5px; }
 
-  /* Clean Visual Residue Scorecard (replaces dense 8-row prose table) */
+  /* Clean Visual Residue Scorecard */
   .scorecard {
     border: 1px solid var(--line-soft);
-    border-radius: 12px;
-    padding: 16px 18px;
+    border-radius: 13px;
+    padding: 20px 22px;
     background: #ffffff;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    gap: 14px;
   }
   .aa-strip {
     display: grid;
     grid-template-columns: repeat(19, minmax(22px, 1fr));
-    gap: 3px;
-    margin: 10px 0 14px;
+    gap: 3.5px;
+    margin: 12px 0 16px;
   }
   .aa-cell {
     background: var(--canvas);
     border: 1px solid var(--line);
-    border-top-width: 2.5px;
+    border-top-width: 3px;
     border-radius: 5px;
-    height: 28px;
+    height: 32px;
     font-family: var(--mono);
-    font-size: 11.5px;
+    font-size: 12px;
     font-weight: 600;
     color: var(--ink);
     cursor: pointer;
@@ -496,7 +557,7 @@
   .metric-tiles {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 8px;
+    gap: 10px;
     margin-bottom: 12px;
   }
   @media (max-width: 560px) {
@@ -505,51 +566,51 @@
   .m-tile {
     background: var(--canvas);
     border: 1px solid var(--line-soft);
-    border-radius: 9px;
-    padding: 9px 11px;
+    border-radius: 10px;
+    padding: 11px 13px;
   }
   .m-lbl {
-    font-size: 11px;
+    font-size: 11.5px;
     color: var(--ink-3);
     display: block;
-    margin-bottom: 2px;
+    margin-bottom: 3px;
   }
   .m-val {
-    font-size: 15px;
+    font-size: 17px;
     font-weight: 600;
     color: var(--ink);
     font-variant-numeric: tabular-nums;
   }
   .m-sub {
-    font-size: 11px;
+    font-size: 11.5px;
     color: var(--ink-2);
-    margin-top: 1px;
+    margin-top: 2px;
   }
   .summary-pill {
-    padding: 10px 12px;
-    border-radius: 9px;
+    padding: 12px 14px;
+    border-radius: 10px;
     background: var(--canvas);
-    font-size: 12.5px;
+    font-size: 13px;
     color: var(--ink-2);
-    line-height: 1.45;
+    line-height: 1.5;
   }
 
-  /* Clean Minimal Tables */
+  /* Clean Minimal Tables with Universal One-Click Sorting */
   .table-wrap {
     overflow-x: auto;
-    max-height: 520px;
+    max-height: 620px;
     overflow-y: auto;
     border: 1px solid var(--line-soft);
-    border-radius: 10px;
+    border-radius: 11px;
   }
   table {
     width: 100%;
     border-collapse: collapse;
-    font-size: 12.5px;
+    font-size: 13px;
     font-variant-numeric: tabular-nums;
   }
   th, td {
-    padding: 9px 12px;
+    padding: 10px 13px;
     border-bottom: 1px solid var(--line-soft);
     text-align: left;
     white-space: nowrap;
@@ -559,13 +620,33 @@
     position: sticky;
     top: 0;
     z-index: 2;
-    font-size: 11px;
+    font-size: 11.5px;
     font-weight: 600;
     color: var(--ink-2);
     border-bottom: 1px solid var(--line);
   }
+  th.sortable {
+    cursor: pointer;
+    user-select: none;
+    transition: background 0.12s ease, color 0.12s ease;
+  }
+  th.sortable:hover {
+    background: #f1f3f5;
+    color: var(--ink);
+  }
+  th.sortable::after {
+    content: " ↕";
+    font-size: 10px;
+    color: #bdc1c6;
+    font-weight: 400;
+  }
+  th.sortable.sort-asc { color: var(--accent); }
+  th.sortable.sort-asc::after { content: " ▲"; color: var(--accent); font-size: 9.5px; }
+  th.sortable.sort-desc { color: var(--accent); }
+  th.sortable.sort-desc::after { content: " ▼"; color: var(--accent); font-size: 9.5px; }
   tbody tr:hover td { background: #f8fafd; }
-  code { font-family: var(--mono); font-size: 12px; }
+  tbody tr.row-flash td { background: rgba(0, 112, 155, 0.11); transition: background 0.6s ease; }
+  code { font-family: var(--mono); font-size: 12.5px; }
 
   .tag {
     display: inline-flex;
@@ -585,12 +666,36 @@
   .dot-emerald { background: var(--emerald); }
   .dot-slate { background: var(--ink-3); }
 
-  .hm-cell { text-align: center; font-family: var(--mono); font-size: 11px; padding: 6px 4px; }
+  .hm-cell {
+    text-align: center;
+    font-family: var(--mono);
+    font-size: 11.5px;
+    padding: 7px 5px;
+    cursor: pointer;
+    transition: outline 0.08s ease;
+  }
+  .hm-cell:hover {
+    outline: 2px solid var(--ink);
+    outline-offset: -2px;
+    position: relative;
+    z-index: 1;
+  }
+  .hm-ramp {
+    width: 110px;
+    height: 9px;
+    border-radius: 999px;
+    border: 1px solid var(--line);
+    background: linear-gradient(90deg, #ffffff 0%, #7fb8cd 50%, #00587c 100%);
+    display: inline-block;
+  }
 
   /* Dotted Interactive Terms & Light Floating KaTeX Popover */
   [data-term] {
     border-bottom: 1px dotted rgba(95, 99, 104, 0.55);
     cursor: help;
+  }
+  th.sortable[data-term] {
+    cursor: pointer;
   }
   [data-term]:hover {
     color: var(--accent);
@@ -599,7 +704,7 @@
   .popover {
     position: fixed;
     z-index: 9999;
-    width: 370px;
+    width: 380px;
     max-width: calc(100vw - 24px);
     background: #ffffff;
     color: var(--ink);
@@ -617,7 +722,7 @@
     letter-spacing: 0.05em;
     color: var(--accent);
   }
-  .pop-title { font-size: 13.5px; font-weight: 600; margin: 2px 0 6px; }
+  .pop-title { font-size: 14px; font-weight: 600; margin: 2px 0 6px; }
   .pop-desc { font-size: 12.5px; color: var(--ink-2); margin-bottom: 10px; }
   .pop-math {
     background: var(--canvas);
@@ -645,7 +750,7 @@
     top: 0;
     right: 0;
     bottom: 0;
-    width: 440px;
+    width: 450px;
     max-width: 92vw;
     background: #ffffff;
     border-left: 1px solid var(--line);
@@ -662,7 +767,7 @@
   .eq-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 14px;
+    gap: 16px;
   }
   @media (max-width: 1024px) {
     .eq-grid { grid-template-columns: 1fr; }
@@ -683,7 +788,7 @@
     padding: 14px 12px;
     overflow-x: auto;
     text-align: center;
-    min-height: 58px;
+    min-height: 60px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -709,7 +814,7 @@
     background: #ffffff;
     padding: 20px 0;
     color: var(--ink-3);
-    font-size: 12px;
+    font-size: 12.5px;
   }
 
   /* Clean Home-Page About, Authors & Citation Section */
@@ -782,6 +887,39 @@
     font-size: 12.5px;
     color: var(--ink-2);
   }
+
+  /* 1-Page Printable Variant Report Mode */
+  #print-report-banner, #print-3d-img { display: none; }
+  @media print {
+    body { background: #ffffff; font-size: 11.5px; }
+    .topbar, .search-hero, .view-bar, #exp-tcga, #exp-batch, .about-section, footer, .vp-bar, .guide-btn, .no-print, #lollipop-svg-wrap, .popover, .drawer, .drawer-backdrop {
+      display: none !important;
+    }
+    main.workspace { background: #ffffff; padding: 0; min-height: auto; }
+    .wrap { max-width: 100%; padding: 0; }
+    #print-report-banner {
+      display: flex !important;
+      justify-content: space-between;
+      align-items: baseline;
+      border-bottom: 2px solid #202124;
+      padding-bottom: 8px;
+      margin-bottom: 12px;
+    }
+    .card { border: none; padding: 0; box-shadow: none; }
+    #struct3d-card > .card-head { display: none !important; }
+    .workbench { grid-template-columns: 1fr 1fr !important; gap: 14px; }
+    .mol3d-stage { display: none !important; }
+    #print-3d-img {
+      display: block !important;
+      width: 100%;
+      max-height: 310px;
+      object-fit: contain;
+      background: #111315;
+    }
+    .aa-strip { display: none !important; }
+    #exp-codon { display: block !important; margin-top: 14px; }
+    #exp-codon .table-wrap { max-height: none !important; overflow: visible !important; }
+  }
 </style>
 </head>
 <body>
@@ -832,6 +970,7 @@
       <button class="chip" onclick="loadPresetMutation('DROSHA','E1147K')">DROSHA E1147K</button>
       <button class="chip" onclick="loadPresetMutation('TP53','R175H')">TP53 R175H</button>
       <button class="chip" onclick="loadPresetMutation('AGO2','M364T')">AGO2 M364T</button>
+      <button class="chip" onclick="openBatchTriage()">Batch Variant Triage</button>
       <button class="chip" onclick="openFormulaTab()">LaTeX Equations &rarr;</button>
     </div>
 
@@ -851,11 +990,23 @@
 
     <!-- TAB 1: 3D VARIANT & SATURATION EXPLORER -->
     <section id="tab-variants" class="panel active">
+      <div id="print-report-banner">
+        <div>
+          <strong style="font-size:15px;">miRBioGenAtlas (v2.0.2) — 3D Structural &amp; Biophysical Variant Report</strong>
+          <div style="font-size:11px;color:#5f6368;">DOI: 10.5281/zenodo.24455067 &middot; https://siddugayam.github.io/miRBioGenAtlas/</div>
+        </div>
+        <span id="print-report-date" style="font-family:var(--mono);font-size:11px;color:#5f6368;"></span>
+      </div>
+
       <div class="card" id="struct3d-card">
         <div class="card-head">
           <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
             <select id="lol-gene" onchange="renderLollipopAndLoadSat()" style="font-weight:600;"></select>
-            <input type="text" class="ctrl-input" id="sat-query" placeholder="Codon or variant (E1705K)" oninput="inspectSaturationCodon()" style="width:155px;font-family:var(--mono);font-weight:500;">
+            <div class="step-group" title="Step along residues with ‹ / › or Left / Right arrow keys">
+              <button class="step-btn" onclick="stepCodon(-1)" aria-label="Previous residue">&lsaquo;</button>
+              <input type="text" class="ctrl-input" id="sat-query" placeholder="Codon or variant (E1705K)" oninput="inspectSaturationCodon()" style="width:150px;font-family:var(--mono);font-weight:500;">
+              <button class="step-btn" onclick="stepCodon(1)" aria-label="Next residue">&rsaquo;</button>
+            </div>
             <span class="meta-note" id="sat-status"></span>
           </div>
           <button class="guide-btn" onclick="openGuideDrawer('explorer')">&#9432; How this works</button>
@@ -863,7 +1014,7 @@
 
         <div id="lollipop-svg-wrap" class="svg-track"></div>
 
-        <div class="workbench">
+        <div class="workbench" id="explorer-workbench">
           <div>
             <div class="vp-shell">
               <div class="vp-bar">
@@ -885,9 +1036,12 @@
                   <button class="vp-btn" onclick="resetFullProtein3D()">Full</button>
                   <button class="vp-btn" id="btn-nbrs" onclick="toggleNeighbors3D()">Shell: On</button>
                   <button class="vp-btn" id="btn-spin" onclick="toggleSpin3D()">Spin</button>
-                  <button class="vp-btn" onclick="downloadMutatedPDB()">PDB</button>
+                  <button class="vp-btn" onclick="download3DSnapshotPNG()" title="Save 3D PNG image">PNG</button>
+                  <button class="vp-btn" onclick="downloadMutatedPDB()" title="Download atomic PDB coordinates">PDB</button>
+                  <button class="vp-btn" id="btn-expand3d" onclick="toggleTheatre3D()" title="Expand 3D viewer to full width">Expand</button>
                 </div>
               </div>
+              <img id="print-3d-img" alt="3D Structural Snapshot">
               <div class="mol3d-stage">
                 <div class="mol3d-hud" id="mol3d-hud">DICER1</div>
                 <div id="mol3d-canvas" style="width:100%;height:100%;position:relative;"></div>
@@ -907,10 +1061,11 @@
       </div>
 
       <!-- Segmented Sub-View Below 3D Workbench -->
-      <div class="view-bar" style="margin-top:18px;">
+      <div class="view-bar" style="margin-top:20px;">
         <div class="seg-group">
-          <button class="seg-btn active" onclick="switchSub('exp-sub', 'exp-codon', this)">Codon 19-AA Scan</button>
-          <button class="seg-btn" onclick="switchSub('exp-sub', 'exp-tcga', this)">Observed Tumour Variants (6,292)</button>
+          <button class="seg-btn active" id="seg-exp-codon" onclick="switchSub('exp-sub', 'exp-codon', this)">Codon 19-AA Scan</button>
+          <button class="seg-btn" id="seg-exp-tcga" onclick="switchSub('exp-sub', 'exp-tcga', this)">Observed Tumour Variants (6,292)</button>
+          <button class="seg-btn" id="seg-exp-batch" onclick="switchSub('exp-sub', 'exp-batch', this)">Batch Variant Triage</button>
         </div>
       </div>
 
@@ -967,6 +1122,42 @@
           </div>
         </div>
       </div>
+
+      <div id="exp-batch" class="subpanel exp-sub">
+        <div class="card">
+          <div class="card-head">
+            <div>
+              <h2>Batch Variant Triage (213,940-Variant Reference)</h2>
+              <div class="meta-note" style="margin-top:2px;">Paste clinical panel, exome, or CRISPR edits (1 per line or comma-separated, e.g. <code>DICER1 E1705K</code> or <code>DROSHA p.Glu1147Lys</code>)</div>
+            </div>
+            <span class="meta-note" id="batch-summary"></span>
+          </div>
+          <textarea id="batch-input" class="batch-area" placeholder="DICER1 E1705K&#10;DICER1 D1810Y&#10;DROSHA E1147K&#10;AGO2 p.Met364Thr&#10;TP53 R175H&#10;DICER1 K868R"></textarea>
+          <div class="controls" style="margin-top:10px;">
+            <button class="btn-action" onclick="runBatchTriage()">Score Variants</button>
+            <button class="btn-subtle" style="height:34px;" onclick="loadBatchExample()">Load Example Panel</button>
+            <button class="btn-subtle" style="height:34px;" onclick="clearBatchTriage()">Clear</button>
+            <button class="btn-subtle" style="height:34px;" onclick="exportBatchTriageCSV()">Export Triage CSV</button>
+          </div>
+          <div class="table-wrap">
+            <table id="batch-table">
+              <thead>
+                <tr>
+                  <th>3D</th><th>Input</th><th>Gene</th><th>Variant</th>
+                  <th data-term="mech_regime">3D Mechanism</th>
+                  <th data-term="alphamissense">AlphaMissense</th>
+                  <th data-term="esm_if1">ESM-IF1 3D &Delta;logP</th>
+                  <th data-term="esm2_llr">ESM-2</th>
+                  <th data-term="grantham">Grantham D</th>
+                  <th data-term="dist_na">Pocket (&Aring;)</th>
+                  <th>TCGA</th><th>ClinVar</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
     </section>
 
     <!-- TAB 2: PAN-CANCER LANDSCAPE -->
@@ -983,8 +1174,12 @@
       <div id="pc-matrix" class="subpanel pc-sub active">
         <div class="card">
           <div class="card-head">
-            <h2>Pan-Cancer Alteration Matrix</h2>
-            <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <div>
+              <h2>Pan-Cancer Alteration Matrix</h2>
+              <div class="meta-note" style="margin-top:2px;">Click any cell to inspect observed variants for that gene &amp; cancer cohort</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+              <div id="hm-legend" style="display:flex;align-items:center;gap:7px;font-size:11.5px;color:var(--ink-2);font-family:var(--mono);"></div>
               <select id="hm-metric" onchange="renderHeatmap()">
                 <option value="hc">Strict: Mutation or Focal GISTIC2 &plusmn;2</option>
                 <option value="fcna">Focal High-Level CNA Only (&plusmn;2)</option>
@@ -1078,9 +1273,16 @@
       <div id="mir-dicer" class="subpanel mir-sub">
         <div class="card">
           <div class="card-head">
-            <h2>DICER1-Altered Tumours: 5p:3p Ratio &amp; let-7 Derepression</h2>
-            <button class="btn-action" onclick="exportDicerMirnaCSV()">Export CSV</button>
+            <div>
+              <h2>DICER1-Altered Tumours: Endogenous 5p:3p Strand Collapse &amp; let-7 Derepression</h2>
+              <div class="meta-note" style="margin-top:2px;">Click any tumour dot in the plot below to locate that sample in the table</div>
+            </div>
+            <div style="display:flex;gap:8px;align-items:center;">
+              <button class="btn-subtle" id="dicer-reset-btn" style="display:none;" onclick="resetDicerSelection()">Show All Tumours</button>
+              <button class="btn-action" onclick="exportDicerMirnaCSV()">Export CSV</button>
+            </div>
           </div>
+          <div id="dicer-svg-plot" class="svg-track" style="margin-bottom:16px;"></div>
           <div class="table-wrap">
             <table id="dicer-mir-table">
               <thead>
@@ -1581,6 +1783,9 @@ const AA_PROPS = {
   V: {three:'VAL', name:'Valine', cls:'Hydrophobic', q:0.0, vol:140.0, kd:4.2, hd:0, ha:0, arom:0, metal:0}
 };
 
+const THREE_TO_ONE = {};
+Object.entries(AA_PROPS).forEach(([one, info]) => { THREE_TO_ONE[info.three] = one; });
+
 const GRANTHAM_CPV = {
   S:[1.42,9.2,32], R:[0.65,10.5,124], L:[0.00,4.9,111], P:[0.39,8.0,32.5], T:[0.71,8.6,61],
   A:[0.00,8.1,31], V:[0.00,5.9,84], G:[0.74,9.0,3], I:[0.00,5.2,111], F:[0.00,5.2,132],
@@ -1600,18 +1805,35 @@ function tagDot(cls, label) {
 let viewer3d = null;
 let spinActive = false;
 let showNeighbors = true;
+let theatre3D = false;
+let suppressHashSync = false;
 let active3DState = { gene: 'DICER1', pos: 1705, wt: 'E', mut: 'K', lastPdbText: '' };
 
-function switchTab(id, btn) {
+function syncUrlHash(customHash) {
+  if (suppressHashSync || !window.history || !window.history.replaceState) return;
+  try {
+    window.history.replaceState(null, '', customHash);
+  } catch (e) {}
+}
+
+function switchTab(id, btn, skipHash) {
   document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.nav-tab').forEach(b => b.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
+  const panelEl = document.getElementById(id);
+  if (panelEl) panelEl.classList.add('active');
   if (btn) btn.classList.add('active');
   if (id === 'tab-variants') {
     setTimeout(() => {
       if (viewer3d) viewer3d.resize();
       refresh3DScene(true);
     }, 40);
+    if (!skipHash) {
+      const { gene, wt, pos, mut } = active3DState;
+      syncUrlHash(`#variant=${gene}:${wt}${pos}${mut}`);
+    }
+  } else if (!skipHash) {
+    const mapTab = { 'tab-heatmap':'pancancer', 'tab-mirna':'mirna', 'tab-clinical':'clinical', 'tab-docs':'docs' };
+    if (mapTab[id]) syncUrlHash(`#tab=${mapTab[id]}`);
   }
 }
 
@@ -1625,16 +1847,19 @@ function switchSub(groupCls, targetId, btn) {
 }
 
 function openFormulaTab(eqId) {
-  switchTab('tab-docs', document.getElementById('btn-tab-docs'));
+  switchTab('tab-docs', document.getElementById('btn-tab-docs'), true);
   switchSub('doc-sub', 'doc-formulas', document.getElementById('seg-eq'));
   if (eqId) {
     document.getElementById('formula-cat').value = 'ALL';
     document.getElementById('formula-q').value = '';
     renderFormulas();
+    syncUrlHash(`#eq=${eqId}`);
     setTimeout(() => {
       const el = document.getElementById(eqId);
       if (el) el.scrollIntoView({behavior: 'smooth', block: 'center'});
     }, 40);
+  } else {
+    syncUrlHash('#tab=docs');
   }
 }
 
@@ -1652,6 +1877,17 @@ function openGuideDrawer(key) {
 function closeGuideDrawer() {
   document.getElementById('drawer-backdrop').classList.remove('open');
   document.getElementById('guide-drawer').classList.remove('open');
+}
+
+function normalizeMutToken(rawMut) {
+  let s = (rawMut || '').trim().replace(/^p\./i, '');
+  const m3 = s.match(/^([A-Za-z]{3})(\d+)([A-Za-z]{3}|\*)$/);
+  if (m3) {
+    const w1 = THREE_TO_ONE[m3[1].toUpperCase()];
+    const a1 = m3[3] === '*' ? '*' : THREE_TO_ONE[m3[3].toUpperCase()];
+    if (w1 && a1) return w1 + m3[2] + a1;
+  }
+  return s.toUpperCase();
 }
 
 /* Google-style Instant Search Suggestions */
@@ -1719,13 +1955,14 @@ function handleSearchKey(e) {
 }
 
 function runGlobalSearch(raw) {
-  const q = (raw || '').trim().toUpperCase().replace(/^P\./, '');
-  if (!q) return;
-  const parts = q.split(/[\s:]+/);
-  if (parts.length >= 2 && GENE_SET.has(parts[0])) {
-    loadPresetMutation(parts[0], parts[1]);
+  const trimmed = (raw || '').trim();
+  if (!trimmed) return;
+  const parts = trimmed.split(/[\s:]+/);
+  if (parts.length >= 2 && GENE_SET.has(parts[0].toUpperCase())) {
+    loadPresetMutation(parts[0].toUpperCase(), normalizeMutToken(parts[1]));
     return;
   }
+  const q = normalizeMutToken(trimmed);
   if (GENE_SET.has(q)) {
     loadPresetMutation(q, '');
     return;
@@ -1742,7 +1979,7 @@ function runGlobalSearch(raw) {
     switchSub('pc-sub', 'pc-codes', document.querySelectorAll('#tab-heatmap .seg-btn')[2]);
     return;
   }
-  const qLow = raw.trim().toLowerCase();
+  const qLow = trimmed.toLowerCase();
   const fHit = (ATLAS.formulas || []).find(f => (`${f.id} ${f.title}`).toLowerCase().includes(qLow));
   if (fHit) {
     openFormulaTab(fHit.id);
@@ -1752,13 +1989,13 @@ function runGlobalSearch(raw) {
   if (gHit) {
     switchTab('tab-docs', document.getElementById('btn-tab-docs'));
     switchSub('doc-sub', 'doc-glossary', document.getElementById('seg-gl'));
-    document.getElementById('gloss-q').value = raw.trim();
+    document.getElementById('gloss-q').value = trimmed;
     renderGlossaryCards();
     return;
   }
   switchTab('tab-variants', document.getElementById('btn-tab-variants'));
-  switchSub('exp-sub', 'exp-tcga', document.querySelectorAll('#tab-variants .seg-btn')[1]);
-  document.getElementById('var-q').value = raw.trim();
+  switchSub('exp-sub', 'exp-tcga', document.getElementById('seg-exp-tcga'));
+  document.getElementById('var-q').value = trimmed;
   renderVariants();
 }
 
@@ -1809,28 +2046,61 @@ document.addEventListener('click', e => {
   const sug = document.getElementById('suggest-menu');
   if (sug && !e.target.closest('.search-shell')) sug.classList.remove('open');
   if (pop && pop.contains(e.target)) return;
+  if (e.target.closest('th.sortable')) {
+    hideTermPopover(true);
+    return;
+  }
   const t = e.target.closest('[data-term]');
   if (t) { e.stopPropagation(); showTermPopover(t, true); return; }
   if (tpPinned) hideTermPopover(true);
 });
 document.addEventListener('keydown', e => {
+  const tag = document.activeElement ? document.activeElement.tagName : '';
+  const inField = (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT');
   if (e.key === 'Escape') { hideTermPopover(true); closeGuideDrawer(); }
-  if (e.key === '/' && document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'SELECT') {
+  if (!inField && e.key === '/') {
     e.preventDefault();
     document.getElementById('global-search').focus();
+  }
+  if (!inField && document.getElementById('tab-variants').classList.contains('active') && !e.metaKey && !e.ctrlKey && !e.altKey) {
+    if (e.key === 'ArrowLeft') { e.preventDefault(); stepCodon(-1); }
+    else if (e.key === 'ArrowRight') { e.preventDefault(); stepCodon(1); }
   }
 });
 
 function loadPresetMutation(gene, mutStr) {
   document.getElementById('lol-gene').value = gene;
-  document.getElementById('sat-query').value = mutStr || '';
-  switchTab('tab-variants', document.getElementById('btn-tab-variants'));
+  document.getElementById('sat-query').value = normalizeMutToken(mutStr || '');
+  switchTab('tab-variants', document.getElementById('btn-tab-variants'), true);
   renderLollipopAndLoadSat();
 }
 
 function openVariantIn3D(gene, mutStr) {
   loadPresetMutation(gene, mutStr);
   document.getElementById('struct3d-card').scrollIntoView({behavior: 'smooth', block: 'start'});
+}
+
+function stepCodon(delta) {
+  const gene = document.getElementById('lol-gene').value;
+  const gCache = window.SAT_CACHE ? window.SAT_CACHE[gene] : null;
+  if (!gCache) return;
+  const maxPos = Object.keys(gCache).length;
+  const nextPos = Math.min(maxPos, Math.max(1, (active3DState.pos || 1) + delta));
+  if (nextPos === active3DState.pos) return;
+  selectCodonFromTrack(nextPos);
+}
+
+function shareCurrentVariant(btnEl) {
+  const { gene, wt, pos, mut } = active3DState;
+  const url = `${window.location.origin}${window.location.pathname}#variant=${gene}:${wt}${pos}${mut}`;
+  syncUrlHash(`#variant=${gene}:${wt}${pos}${mut}`);
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    const orig = btnEl.textContent;
+    navigator.clipboard.writeText(url).then(() => {
+      btnEl.textContent = 'Copied Link ✓';
+      setTimeout(() => { btnEl.textContent = orig; }, 1600);
+    });
+  }
 }
 
 function heatColor(val, maxScale) {
@@ -1841,15 +2111,35 @@ function heatColor(val, maxScale) {
   return `background:rgb(${r},${g},${b});color:${t > 0.52 ? '#fff' : '#202124'};`;
 }
 
+function drillDownHeatmapCell(gene, study) {
+  document.getElementById('lol-gene').value = gene;
+  document.getElementById('sat-query').value = '';
+  switchTab('tab-variants', document.getElementById('btn-tab-variants'));
+  renderLollipopAndLoadSat();
+  switchSub('exp-sub', 'exp-tcga', document.getElementById('seg-exp-tcga'));
+  document.getElementById('var-gene').value = gene;
+  document.getElementById('var-tier').value = 'ALL';
+  document.getElementById('var-mech').value = 'ALL';
+  document.getElementById('var-q').value = study;
+  renderVariants();
+  setTimeout(() => {
+    document.getElementById('exp-tcga').scrollIntoView({behavior: 'smooth', block: 'start'});
+  }, 60);
+}
+
 function renderHeatmap() {
   const metric = document.getElementById('hm-metric').value;
   const maxScale = (metric === 'mut' || metric === 'nhm') ? 0.12 : (metric === 'any' ? 0.85 : 0.40);
+  const legEl = document.getElementById('hm-legend');
+  if (legEl) {
+    legEl.innerHTML = `<span>0%</span><i class="hm-ramp"></i><span>${Math.round(maxScale * 100)}%+</span>`;
+  }
   const studies = [...new Set(ATLAS.long.map(r => r.t))].sort();
   const genes = ATLAS.panel.map(p => p.geneSymbol);
   const map = {};
   ATLAS.long.forEach(r => { map[r.g + '|' + r.t] = r; });
 
-  let html = '<table><thead><tr><th>Gene</th>';
+  let html = '<table class="no-auto-sort"><thead><tr><th>Gene</th>';
   studies.forEach(s => { html += `<th style="text-align:center">${s}${LOW_N.has(s)?'*':''}</th>`; });
   html += '</tr></thead><tbody>';
   genes.forEach(g => {
@@ -1857,8 +2147,8 @@ function renderHeatmap() {
     studies.forEach(s => {
       const r = map[g + '|' + s];
       const v = r ? r[metric] : 0;
-      const tip = r ? `${g} in ${s} (N=${r.N}): ${v.toFixed(3)} | mut=${r.mut_n}, +2=${r.amp_n}, -2=${r.dd_n}` : '';
-      html += `<td class="hm-cell" style="${heatColor(v, maxScale)}" title="${tip}">${v.toFixed(2)}</td>`;
+      const tip = r ? `${g} in ${s} (N=${r.N}): ${(v*100).toFixed(1)}% (${v.toFixed(3)}) | mut=${r.mut_n}, +2=${r.amp_n}, -2=${r.dd_n} — Click to inspect variants` : '';
+      html += `<td class="hm-cell" style="${heatColor(v, maxScale)}" title="${tip}" onclick="drillDownHeatmapCell('${g}','${s}')">${v.toFixed(2)}</td>`;
     });
     html += '</tr>';
   });
@@ -1930,12 +2220,28 @@ function selectMutAA(pos, wt, mutAA) {
   inspectSaturationCodon();
 }
 
+function updateLollipopActiveMarker(pos) {
+  const marker = document.getElementById('lol-active-needle');
+  const label = document.getElementById('lol-active-lbl');
+  const gene = document.getElementById('lol-gene').value;
+  const tr = ATLAS.tracks[gene] || [];
+  if (!marker || !tr.length) return;
+  const L = tr.length, W = 1420, padL = 94, padR = 26;
+  const x = padL + ((Math.min(L, Math.max(1, pos)) - 1) / Math.max(1, L - 1)) * (W - padL - padR);
+  marker.setAttribute('x1', x.toFixed(1));
+  marker.setAttribute('x2', x.toFixed(1));
+  if (label) {
+    label.setAttribute('x', Math.min(W - 46, Math.max(padL + 24, x)).toFixed(1));
+    label.textContent = `aa ${pos}`;
+  }
+}
+
 function renderLollipopAndLoadSat() {
   const gene = document.getElementById('lol-gene').value;
   const tr = ATLAS.tracks[gene] || [];
   if (!tr.length) return;
   const L = tr.length;
-  const W = 1300, H = 158, padL = 86, padR = 24;
+  const W = 1420, H = 192, padL = 94, padR = 26;
   const plotW = W - padL - padR;
   const xOf = pos => padL + ((pos - 1) / Math.max(1, L - 1)) * plotW;
 
@@ -1947,22 +2253,22 @@ function renderLollipopAndLoadSat() {
     const [pos, wt, plddt, pkt, am, e2, if1, tcgaN, cvN, pdb] = c;
     const x = xOf(pos);
     if (pkt === 1) {
-      pockets += `<rect x="${x-1.2}" y="96" width="2.4" height="12" fill="#c5221f" opacity="0.8" style="cursor:pointer" onclick="selectCodonFromTrack(${pos})"><title>${gene} ${wt}${pos} · 3D pocket (${pdb})</title></rect>`;
+      pockets += `<rect x="${x-1.4}" y="114" width="2.8" height="15" fill="#c5221f" opacity="0.84" style="cursor:pointer" onclick="selectCodonFromTrack(${pos})"><title>${gene} ${wt}${pos} · 3D pocket (${pdb})</title></rect>`;
     } else if (pdb) {
-      pockets += `<rect x="${x-0.8}" y="99" width="1.6" height="6" fill="#00709b" opacity="0.28"></rect>`;
+      pockets += `<rect x="${x-0.9}" y="118" width="1.8" height="7" fill="#00709b" opacity="0.30"></rect>`;
     }
     if (am !== null) {
-      const yAm = 142 - am * 22;
+      const yAm = 170 - am * 28;
       amPath += (amPath ? ' L' : 'M') + x.toFixed(1) + ',' + yAm.toFixed(1);
     }
     if (tcgaN > 0 || cvN > 0) {
-      const h = 12 + (Math.log2(tcgaN + cvN + 1) / Math.log2(maxCnt + 1)) * 66;
-      const yTop = 92 - h;
+      const h = 14 + (Math.log2(tcgaN + cvN + 1) / Math.log2(maxCnt + 1)) * 82;
+      const yTop = 109 - h;
       const col = pkt === 1 ? '#c5221f' : (cvN > 0 ? '#00709b' : '#5f6368');
-      const r = Math.min(5.4, 2.4 + Math.log2(tcgaN + cvN + 1));
+      const r = Math.min(6.4, 2.8 + Math.log2(tcgaN + cvN + 1));
       stems += `<g style="cursor:pointer" onclick="selectCodonFromTrack(${pos})">
-        <line x1="${x.toFixed(1)}" y1="92" x2="${x.toFixed(1)}" y2="${yTop.toFixed(1)}" stroke="${col}" stroke-width="1.1" opacity="0.7"/>
-        <circle cx="${x.toFixed(1)}" cy="${yTop.toFixed(1)}" r="${r.toFixed(1)}" fill="${col}" stroke="#fff" stroke-width="0.7">
+        <line x1="${x.toFixed(1)}" y1="109" x2="${x.toFixed(1)}" y2="${yTop.toFixed(1)}" stroke="${col}" stroke-width="1.25" opacity="0.72"/>
+        <circle cx="${x.toFixed(1)}" cy="${yTop.toFixed(1)}" r="${r.toFixed(1)}" fill="${col}" stroke="#fff" stroke-width="0.8">
           <title>${gene} ${wt}${pos} · TCGA: ${tcgaN} · ClinVar P/LP: ${cvN}</title>
         </circle>
       </g>`;
@@ -1972,18 +2278,20 @@ function renderLollipopAndLoadSat() {
   let ticks = '';
   const step = L > 1200 ? 200 : (L > 500 ? 100 : 50);
   for (let p = 1; p <= L; p += step) {
-    ticks += `<text x="${xOf(p).toFixed(1)}" y="154" font-size="10" fill="#80868b" text-anchor="middle">${p}</text>`;
+    ticks += `<text x="${xOf(p).toFixed(1)}" y="187" font-size="10.5" fill="#80868b" text-anchor="middle">${p}</text>`;
   }
-  ticks += `<text x="${xOf(L).toFixed(1)}" y="154" font-size="10" fill="#80868b" text-anchor="end">${L} aa</text>`;
+  ticks += `<text x="${xOf(L).toFixed(1)}" y="187" font-size="10.5" fill="#80868b" text-anchor="end">${L} aa</text>`;
 
-  document.getElementById('lollipop-svg-wrap').innerHTML = `<svg viewBox="0 0 ${W} ${H}" width="100%" height="158">
-    <text x="6" y="20" font-size="9.5" font-weight="600" fill="#80868b">VARIANTS</text>
-    <text x="6" y="105" font-size="9.5" font-weight="600" fill="#80868b">POCKET / PDB</text>
-    <text x="6" y="136" font-size="9.5" font-weight="600" fill="#80868b">CONSTRAINT</text>
-    <rect x="${padL}" y="96" width="${plotW}" height="12" rx="3" fill="#ebeef2"/>
+  document.getElementById('lollipop-svg-wrap').innerHTML = `<svg viewBox="0 0 ${W} ${H}" width="100%" height="192">
+    <text x="6" y="24" font-size="10" font-weight="600" fill="#80868b">VARIANTS</text>
+    <text x="6" y="125" font-size="10" font-weight="600" fill="#80868b">POCKET / PDB</text>
+    <text x="6" y="162" font-size="10" font-weight="600" fill="#80868b">CONSTRAINT</text>
+    <rect x="${padL}" y="114" width="${plotW}" height="15" rx="3.5" fill="#ebeef2"/>
+    <line id="lol-active-needle" x1="${padL}" y1="14" x2="${padL}" y2="174" stroke="#00709b" stroke-width="1.6" stroke-dasharray="3,2" opacity="0.85"/>
+    <text id="lol-active-lbl" x="${padL + 24}" y="12" font-size="10" font-family="monospace" font-weight="600" fill="#00709b" text-anchor="middle"></text>
     ${pockets}${stems}
-    <path d="${amPath}" fill="none" stroke="#00709b" stroke-width="1.0" opacity="0.8"/>
-    <line x1="${padL}" y1="${142 - 0.564*22}" x2="${W-padR}" y2="${142 - 0.564*22}" stroke="#c5221f" stroke-dasharray="3,3" stroke-width="0.7" opacity="0.6"/>
+    <path d="${amPath}" fill="none" stroke="#00709b" stroke-width="1.15" opacity="0.82"/>
+    <line x1="${padL}" y1="${170 - 0.564*28}" x2="${W-padR}" y2="${170 - 0.564*28}" stroke="#c5221f" stroke-dasharray="3,3" stroke-width="0.8" opacity="0.65"/>
     ${ticks}
   </svg>`;
 
@@ -2177,7 +2485,7 @@ function refresh3DScene(keepCamera) {
     if (geom && geom.bb.CA) {
       const [lx, ly, lz] = geom.bb.CA;
       v.addLabel(wt === mut ? `${gene} ${wt}${pos}` : `${gene} ${wt}${pos}${mut}`, {
-        position: {x: lx, y: ly + 1.8, z: lz}, backgroundColor: '#202124', fontColor: '#fff', fontSize: 11.5, backgroundOpacity: 0.85
+        position: {x: lx, y: ly + 1.8, z: lz}, backgroundColor: '#202124', fontColor: '#fff', fontSize: 12, backgroundOpacity: 0.85
       });
     }
     v.setClickable({model: 0}, true, atom => { if (atom && atom.resi) selectCodonFromTrack(atom.resi); });
@@ -2203,7 +2511,7 @@ function renderExperimentalRCSB(gene, pos, wt, mut) {
     v.addStyle({resn: ['A','U','G','C','DA','DT','DG','DC']}, {cartoon: {color: '#d97706'}, stick: {radius: 0.13, color: '#f59e0b'}});
     v.addStyle({elem: ['MG','ZN','CA','MN']}, {sphere: {radius: 1.3, color: '#10b981'}});
     v.addStyle({resi: pos}, {stick: {radius: 0.26, color: '#e11d48'}, sphere: {scale: 0.30, color: '#e11d48'}});
-    v.addLabel(`PDB ${pdbRaw} · ${gene} ${wt}${pos}`, {resi: pos, backgroundColor: '#202124', fontColor: '#fff', fontSize: 11.5});
+    v.addLabel(`PDB ${pdbRaw} · ${gene} ${wt}${pos}`, {resi: pos, backgroundColor: '#202124', fontColor: '#fff', fontSize: 12});
     v.zoomTo({resi: pos}, 400); v.render();
   };
   if (window.RCSB_CACHE[pdbRaw]) { drawCif(window.RCSB_CACHE[pdbRaw]); return; }
@@ -2217,6 +2525,40 @@ function zoomToMutatedResidue() { if (viewer3d) { const p = active3DState.pos; v
 function resetFullProtein3D() { if (viewer3d) viewer3d.zoomTo({model: 0}, 400); }
 function toggleNeighbors3D() { showNeighbors = !showNeighbors; document.getElementById('btn-nbrs').textContent = `Shell: ${showNeighbors ? 'On' : 'Off'}`; refresh3DScene(true); }
 function toggleSpin3D() { if (viewer3d) { spinActive = !spinActive; viewer3d.spin(spinActive ? 'y' : false); document.getElementById('btn-spin').textContent = spinActive ? 'Stop' : 'Spin'; } }
+function toggleTheatre3D() {
+  theatre3D = !theatre3D;
+  const wb = document.getElementById('explorer-workbench');
+  const btn = document.getElementById('btn-expand3d');
+  if (wb) wb.classList.toggle('theatre', theatre3D);
+  if (btn) {
+    btn.textContent = theatre3D ? 'Standard' : 'Expand';
+    btn.classList.toggle('active-vp', theatre3D);
+  }
+  setTimeout(() => {
+    if (viewer3d) { viewer3d.resize(); viewer3d.render(); }
+  }, 200);
+}
+function download3DSnapshotPNG() {
+  if (!viewer3d) return;
+  viewer3d.render();
+  const uri = viewer3d.pngURI();
+  if (!uri) return;
+  const { gene, wt, pos, mut } = active3DState;
+  const a = document.createElement('a');
+  a.href = uri;
+  a.download = `${gene}_${wt}${pos}${mut}_3D.png`;
+  a.click();
+}
+function printVariantReport() {
+  if (viewer3d) {
+    viewer3d.render();
+    const imgEl = document.getElementById('print-3d-img');
+    if (imgEl) imgEl.src = viewer3d.pngURI();
+  }
+  const dtEl = document.getElementById('print-report-date');
+  if (dtEl) dtEl.textContent = new Date().toISOString().slice(0, 10);
+  setTimeout(() => window.print(), 80);
+}
 function downloadMutatedPDB() {
   if (!active3DState.lastPdbText) return;
   const { gene, wt, pos, mut } = active3DState;
@@ -2258,11 +2600,15 @@ function renderPropertyDeltaCard(gene, pos, wt, mut, entry, subRow) {
   box.innerHTML = `
     <div>
       <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;">
-        <div style="font-size:17px;font-weight:650;letter-spacing:-0.02em;">
+        <div style="font-size:18px;font-weight:650;letter-spacing:-0.02em;">
           ${gene} <code>${wt}${pos}${mut}</code>
-          <span style="font-size:12.5px;color:var(--ink-3);font-weight:400;margin-left:4px;">p.${wp.three}${pos}${mp.three}</span>
+          <span style="font-size:13px;color:var(--ink-3);font-weight:400;margin-left:4px;">p.${wp.three}${pos}${mp.three}</span>
         </div>
-        ${regimeTag}
+        <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+          ${regimeTag}
+          <button class="btn-subtle no-print" style="height:26px;padding:0 9px;font-size:11.5px;" onclick="shareCurrentVariant(this)" title="Copy direct URL to this 3D variant">Share Link</button>
+          <button class="btn-subtle no-print" style="height:26px;padding:0 9px;font-size:11.5px;" onclick="printVariantReport()" title="Print or save 1-page PDF report">Report / PDF</button>
+        </div>
       </div>
 
       <div class="aa-strip">${aaCells}</div>
@@ -2307,7 +2653,7 @@ function renderPropertyDeltaCard(gene, pos, wt, mut, entry, subRow) {
 
 function inspectSaturationCodon() {
   const gene = document.getElementById('lol-gene').value;
-  const rawQ = document.getElementById('sat-query').value.trim().toUpperCase();
+  const rawQ = normalizeMutToken(document.getElementById('sat-query').value);
   const box = document.getElementById('sat-codon-detail');
   if (!rawQ) return;
   const gCache = window.SAT_CACHE ? window.SAT_CACHE[gene] : null;
@@ -2324,6 +2670,10 @@ function inspectSaturationCodon() {
   const mut3D = activeSubRow ? activeSubRow[0] : wt;
 
   active3DState = { gene, pos, wt, mut: mut3D, lastPdbText: active3DState.lastPdbText };
+  updateLollipopActiveMarker(pos);
+  if (document.getElementById('tab-variants').classList.contains('active')) {
+    syncUrlHash(`#variant=${gene}:${wt}${pos}${mut3D}`);
+  }
   ensureStruct3DLoaded(gene, () => {
     renderPropertyDeltaCard(gene, pos, wt, mut3D, entry, activeSubRow);
     refresh3DScene(false);
@@ -2333,7 +2683,7 @@ function inspectSaturationCodon() {
       <h2>All 19 Substitutions at ${gene} ${wt}${pos}</h2>
       <span class="meta-note">PDB ${pdb || 'AlphaFold v6'} · RNA ${dna ?? '—'} Å · Metal ${dmet ?? '—'} Å</span>
     </div>
-    <div class="table-wrap" style="max-height:300px;">
+    <div class="table-wrap" style="max-height:420px;">
       <table>
         <thead><tr><th>3D</th><th>Variant</th><th data-term="grantham">Grantham</th><th data-term="delta_q">&Delta;q</th><th data-term="delta_vol">&Delta;V (&Aring;&sup3;)</th><th data-term="alphamissense">AlphaMissense</th><th data-term="esm2_llr">ESM-2</th><th data-term="esm1v_llr">ESM-1v</th><th data-term="esm_if1">ESM-IF1</th><th data-term="mech_regime">Mechanism</th><th>TCGA</th><th>ClinVar</th></tr></thead>
         <tbody>`;
@@ -2344,7 +2694,7 @@ function inspectSaturationCodon() {
     const cns = (am !== null && am >= 0.564) || (e2 !== null && e2 <= -5.0);
     const regime = cns ? ((if1 !== null && if1 > -1.5) ? tagDot('dot-crimson','Active site') : tagDot('dot-amber','Unfolding')) : tagDot('dot-petrol','Neutral');
     html += `<tr>
-      <td><button class="btn-subtle" style="height:23px;padding:0 8px;font-size:11px;" onclick="selectMutAA(${pos},'${wt}','${alt}')">View</button></td>
+      <td><button class="btn-subtle" style="height:24px;padding:0 9px;font-size:11.5px;" onclick="selectMutAA(${pos},'${wt}','${alt}')">View</button></td>
       <td><code>${wt}${pos}${alt}</code></td>
       <td>${gd}</td><td>${dq>=0?'+':''}${dq.toFixed(1)}</td><td>${dv>=0?'+':''}${dv.toFixed(0)}</td>
       <td>${am !== null ? am.toFixed(3) : '—'}</td><td>${e2 !== null ? e2.toFixed(2) : '—'}</td>
@@ -2353,6 +2703,7 @@ function inspectSaturationCodon() {
     </tr>`;
   });
   box.innerHTML = html + '</tbody></table></div>';
+  markSortableHeaders(box);
 }
 
 function tierPill(t) {
@@ -2404,8 +2755,10 @@ function renderGtexBars() {
   const vals = ATLAS.gtex_tpm[g] || [];
   const pairs = ATLAS.gtex_tissues.map((t, i) => [t, vals[i] || 0]).sort((a,b) => b[1] - a[1]);
   const mx = Math.max(1, ...pairs.map(x => x[1]));
-  document.getElementById('gtex-bars').innerHTML = '<table><thead><tr><th>Adult Tissue (54 Sites)</th><th data-term="gtex_tpm">Median TPM</th><th>Relative Level</th></tr></thead><tbody>' +
+  const gBox = document.getElementById('gtex-bars');
+  gBox.innerHTML = '<table><thead><tr><th>Adult Tissue (54 Sites)</th><th data-term="gtex_tpm">Median TPM</th><th>Relative Level</th></tr></thead><tbody>' +
     pairs.map(([t, v]) => `<tr><td>${t.replace(/_/g, ' ')}</td><td><strong>${v.toFixed(2)}</strong></td><td><div style="width:${Math.max(2, (v/mx)*240).toFixed(0)}px;height:7px;background:var(--accent);border-radius:3px;"></div></td></tr>`).join('') + '</tbody></table>';
+  markSortableHeaders(gBox);
 }
 
 /* Render Authentic KaTeX Formula Cards */
@@ -2507,15 +2860,7 @@ function renderAllTables() {
     </tr>
   `).join('');
 
-  document.querySelector('#dicer-mir-table tbody').innerHTML = [...ATLAS.dicer_pts].sort((a,b) => a.d53 - b.d53).map(d => `
-    <tr>
-      <td><code>${d.s}</code></td><td><strong>${d.t}</strong></td>
-      <td>${d.c === 'DICER1_RNaseIIIb_3D_Catalytic_Pocket' ? tagDot('dot-crimson','RNase IIIb pocket') : d.c.replace('DICER1_','')}</td>
-      <td><strong>${d.d53.toFixed(3)}</strong></td>
-      <td>${d.f5 !== null ? d.f5.toFixed(3) : '—'}</td>
-      <td>${d.l7z !== null && d.l7z !== undefined ? (d.l7z>=0?'+':'') + d.l7z.toFixed(2) : '—'}</td>
-    </tr>
-  `).join('');
+  renderDicerMirTable();
 
   document.querySelector('#top-axes-table tbody').innerHTML = ATLAS.top_axes.map(ax => `
     <tr>
@@ -2624,6 +2969,365 @@ function renderAllTables() {
   `).join('');
 }
 
+/* Interactive Small-RNA DICER1 5p:3p Strand-Collapse SVG Strip Plot */
+let selectedDicerSample = '';
+function renderDicerMirTable(filterClass) {
+  const rows = [...ATLAS.dicer_pts]
+    .filter(d => !filterClass || d.c === filterClass)
+    .sort((a,b) => a.d53 - b.d53);
+  document.querySelector('#dicer-mir-table tbody').innerHTML = rows.map(d => `
+    <tr id="dicer-row-${d.s}" class="${selectedDicerSample===d.s?'row-flash':''}">
+      <td><code>${d.s}</code></td><td><strong>${d.t}</strong></td>
+      <td>${d.c === 'DICER1_RNaseIIIb_3D_Catalytic_Pocket' ? tagDot('dot-crimson','RNase IIIb pocket') : d.c.replace('DICER1_','')}</td>
+      <td><strong>${d.d53.toFixed(3)}</strong></td>
+      <td>${d.f5 !== null ? d.f5.toFixed(3) : '—'}</td>
+      <td>${d.l7z !== null && d.l7z !== undefined ? (d.l7z>=0?'+':'') + d.l7z.toFixed(2) : '—'}</td>
+    </tr>
+  `).join('');
+}
+
+function selectDicerDot(sampleId) {
+  selectedDicerSample = sampleId;
+  document.getElementById('dicer-reset-btn').style.display = 'inline-block';
+  renderDicerMirTable('');
+  const rowEl = document.getElementById('dicer-row-' + sampleId);
+  if (rowEl) rowEl.scrollIntoView({behavior: 'smooth', block: 'center'});
+}
+
+function filterDicerByClass(cls) {
+  selectedDicerSample = '';
+  document.getElementById('dicer-reset-btn').style.display = 'inline-block';
+  renderDicerMirTable(cls);
+}
+
+function resetDicerSelection() {
+  selectedDicerSample = '';
+  document.getElementById('dicer-reset-btn').style.display = 'none';
+  renderDicerMirTable('');
+}
+
+function renderDicerStripPlot() {
+  const wrap = document.getElementById('dicer-svg-plot');
+  if (!wrap || !ATLAS.dicer_pts || !ATLAS.dicer_pts.length) return;
+
+  const groups = [
+    { key: 'DICER1_RNaseIIIb_3D_Catalytic_Pocket', label: 'RNase IIIb 3D Pocket', color: '#c5221f' },
+    { key: 'DICER1_Truncating_LoF', label: 'Truncating LoF', color: '#4b5563' },
+    { key: 'DICER1_Other_Pathogenic_Missense', label: 'Pathogenic Fold / Interface', color: '#b06000' },
+    { key: 'DICER1_Ambiguous_or_Benign_Missense', label: 'Benign / Passenger VUS', color: '#00709b' }
+  ];
+  const knownKeys = new Set(groups.map(g => g.key));
+  const extraKeys = [...new Set(ATLAS.dicer_pts.map(d => d.c))].filter(k => !knownKeys.has(k));
+  extraKeys.forEach(k => groups.push({ key: k, label: k.replace(/^DICER1_/, '').replace(/_/g, ' '), color: '#00709b' }));
+  const activeGroups = groups.filter(g => ATLAS.dicer_pts.some(d => d.c === g.key));
+
+  const W = 1360, rowH = 44, topPad = 32, botPad = 34, padL = 220, padR = 40;
+  const H = topPad + activeGroups.length * rowH + botPad;
+  const minX = -2.4, maxX = 1.6;
+  const xOf = v => padL + ((Math.min(maxX, Math.max(minX, v)) - minX) / (maxX - minX)) * (W - padL - padR);
+  const wtMed = 0.475;
+
+  let svg = `<svg viewBox="0 0 ${W} ${H}" width="100%" height="${H}">`;
+  [-2.0, -1.5, -1.0, -0.5, 0.0, 0.5, 1.0, 1.5].forEach(tk => {
+    const x = xOf(tk).toFixed(1);
+    svg += `<line x1="${x}" y1="${topPad - 8}" x2="${x}" y2="${H - botPad}" stroke="#ebeef2" stroke-width="1"/>`;
+    svg += `<text x="${x}" y="${H - 12}" font-size="10.5" fill="#80868b" text-anchor="middle">${tk >= 0 ? '+' + tk.toFixed(1) : tk.toFixed(1)}</text>`;
+  });
+
+  const xWt = xOf(wtMed).toFixed(1);
+  svg += `<line x1="${xWt}" y1="${topPad - 12}" x2="${xWt}" y2="${H - botPad}" stroke="#137333" stroke-width="1.5" stroke-dasharray="4,3"/>`;
+  svg += `<text x="${xWt}" y="16" font-size="10.5" font-weight="600" fill="#137333" text-anchor="middle">Wild-Type Median (+0.475, n = 9,129)</text>`;
+
+  activeGroups.forEach((grp, idx) => {
+    const yMid = topPad + idx * rowH + rowH * 0.5;
+    const pts = ATLAS.dicer_pts.filter(d => d.c === grp.key).sort((a,b) => a.d53 - b.d53);
+    const med = pts.length ? pts[Math.floor(pts.length / 2)].d53 : 0;
+    svg += `<line x1="${padL}" y1="${yMid}" x2="${W - padR}" y2="${yMid}" stroke="#f1f3f5" stroke-width="1"/>`;
+    svg += `<text x="${padL - 14}" y="${yMid + 4}" font-size="12" font-weight="600" fill="#202124" text-anchor="end" style="cursor:pointer;" onclick="filterDicerByClass('${grp.key}')">${grp.label} (n=${pts.length})</text>`;
+    const xm = xOf(med).toFixed(1);
+    svg += `<line x1="${xm}" y1="${yMid - 12}" x2="${xm}" y2="${yMid + 12}" stroke="${grp.color}" stroke-width="2.6"/>`;
+    pts.forEach((d, j) => {
+      const jitter = ((j % 5) - 2) * 3.4;
+      const cx = xOf(d.d53).toFixed(1);
+      const cy = (yMid + jitter).toFixed(1);
+      svg += `<circle cx="${cx}" cy="${cy}" r="4.6" fill="${grp.color}" fill-opacity="0.78" stroke="#ffffff" stroke-width="0.9" style="cursor:pointer;" onclick="selectDicerDot('${d.s}')">
+        <title>${d.s} (${d.t}) · ${grp.label} · log2(5p/3p) = ${d.d53.toFixed(3)}${d.l7z!==null?' · let-7 Z = '+d.l7z.toFixed(2):''}</title>
+      </circle>`;
+    });
+  });
+  svg += `</svg>`;
+  wrap.innerHTML = svg;
+}
+
+/* Paste-a-List Batch Variant Triage Across All 213,940 Substitutions */
+let currentBatchRows = [];
+function openBatchTriage() {
+  switchTab('tab-variants', document.getElementById('btn-tab-variants'));
+  switchSub('exp-sub', 'exp-batch', document.getElementById('seg-exp-batch'));
+  if (!document.getElementById('batch-input').value.trim()) loadBatchExample();
+  document.getElementById('exp-batch').scrollIntoView({behavior: 'smooth', block: 'start'});
+}
+
+function loadBatchExample() {
+  document.getElementById('batch-input').value = [
+    'DICER1 E1705K',
+    'DICER1 p.Asp1810Tyr',
+    'DROSHA E1147K',
+    'AGO2 M364T',
+    'TP53 R175H',
+    'XPO5 R1167C',
+    'DICER1 K868R'
+  ].join('\n');
+  runBatchTriage();
+}
+
+function clearBatchTriage() {
+  document.getElementById('batch-input').value = '';
+  document.getElementById('batch-summary').textContent = '';
+  document.querySelector('#batch-table tbody').innerHTML = '';
+  currentBatchRows = [];
+}
+
+function parseBatchLines(rawText) {
+  return (rawText || '')
+    .split(/[\n,;]+/)
+    .map(s => s.trim())
+    .filter(Boolean)
+    .slice(0, 250)
+    .map(line => {
+      const parts = line.split(/[\s:]+/);
+      if (parts.length < 2) return { raw: line, err: 'Use GENE MUT (e.g. DICER1 E1705K)' };
+      const gene = parts[0].toUpperCase();
+      if (!GENE_SET.has(gene)) return { raw: line, gene, err: 'Gene not in 15-gene panel' };
+      const mut = normalizeMutToken(parts[1]);
+      const m = mut.match(/^([A-Z])(\d+)([A-Z*])$/);
+      if (!m) return { raw: line, gene, err: 'Unrecognised substitution format' };
+      return { raw: line, gene, wt: m[1], pos: parseInt(m[2], 10), alt: m[3], norm: `${m[1]}${m[2]}${m[3]}` };
+    });
+}
+
+function runBatchTriage() {
+  const parsed = parseBatchLines(document.getElementById('batch-input').value);
+  if (!parsed.length) return;
+  const neededGenes = [...new Set(parsed.filter(p => p.gene && GENE_SET.has(p.gene)).map(p => p.gene))];
+  document.getElementById('batch-summary').textContent = 'Scoring variants...';
+
+  let pending = neededGenes.length;
+  const finalize = () => {
+    let nScored = 0, nAct = 0, nUnf = 0, nNeu = 0;
+    currentBatchRows = [];
+    const tbodyHtml = parsed.map(item => {
+      if (item.err) {
+        currentBatchRows.push({ input: item.raw, status: item.err });
+        return `<tr><td>—</td><td><code>${item.raw}</code></td><td>${item.gene || '—'}</td><td colspan="9" style="color:var(--crimson);">${item.err}</td></tr>`;
+      }
+      const gCache = window.SAT_CACHE ? window.SAT_CACHE[item.gene] : null;
+      const entry = gCache ? gCache[String(item.pos)] : null;
+      if (!entry) {
+        currentBatchRows.push({ input: item.raw, gene: item.gene, status: `Codon ${item.pos} out of range` });
+        return `<tr><td>—</td><td><code>${item.raw}</code></td><td><strong>${item.gene}</strong></td><td colspan="9" style="color:var(--crimson);">Codon ${item.pos} outside canonical length</td></tr>`;
+      }
+      const [trueWt, pdb, dna, dmet] = entry.m;
+      if (item.alt === '*') {
+        nScored++;
+        currentBatchRows.push({ input: item.raw, gene: item.gene, variant: `${trueWt}${item.pos}*`, mechanism: 'Truncating_LoF' });
+        return `<tr>
+          <td><button class="btn-subtle" style="height:24px;padding:0 9px;font-size:11.5px;" onclick="openVariantIn3D('${item.gene}','${item.pos}')">View</button></td>
+          <td><code>${item.raw}</code></td><td><strong>${item.gene}</strong></td><td><code>${trueWt}${item.pos}*</code></td>
+          <td>${tagDot('dot-slate','Truncating LoF')}</td><td>—</td><td>—</td><td>—</td><td>—</td>
+          <td>${dmet ?? dna ?? '—'}</td><td>—</td><td>—</td>
+        </tr>`;
+      }
+      const sub = entry.s.find(r => r[0] === item.alt);
+      if (!sub) {
+        const msg = item.wt !== trueWt ? `Ref AA at ${item.pos} is ${trueWt} (not ${item.wt})` : 'Synonymous / wild-type';
+        currentBatchRows.push({ input: item.raw, gene: item.gene, status: msg });
+        return `<tr>
+          <td><button class="btn-subtle" style="height:24px;padding:0 9px;font-size:11.5px;" onclick="openVariantIn3D('${item.gene}','${trueWt}${item.pos}${trueWt}')">View</button></td>
+          <td><code>${item.raw}</code></td><td><strong>${item.gene}</strong></td><td><code>${trueWt}${item.pos}${item.alt}</code></td>
+          <td colspan="8" style="color:var(--ink-2);">${msg}</td>
+        </tr>`;
+      }
+      const [alt, am, e2, e1v, if1, tn, cv] = sub;
+      const gd = granthamDist(trueWt, alt);
+      const cns = (am !== null && am >= 0.564) || (e2 !== null && e2 <= -5.0);
+      let mechLbl = 'Neutral', mechHtml = tagDot('dot-petrol', 'Neutral');
+      if (cns) {
+        if (if1 !== null && if1 > -1.5) { mechLbl = 'Fold-preserving active site'; mechHtml = tagDot('dot-crimson', 'Active site'); nAct++; }
+        else { mechLbl = 'Fold-destabilising'; mechHtml = tagDot('dot-amber', 'Unfolding'); nUnf++; }
+      } else { nNeu++; }
+      nScored++;
+      const minPkt = [dna, dmet].filter(x => x !== null);
+      const pktStr = minPkt.length ? Math.min(...minPkt).toFixed(2) : '—';
+      const wtWarn = item.wt !== trueWt ? ` <span style="color:var(--amber);font-size:11px;" title="Canonical WT residue is ${trueWt}">(WT=${trueWt})</span>` : '';
+      currentBatchRows.push({
+        input: item.raw, gene: item.gene, variant: `${trueWt}${item.pos}${alt}`,
+        mechanism: mechLbl, alphamissense: am, esm_if1_3d_dlogp: if1, esm2_3b_llr: e2,
+        grantham_D: gd, min_pocket_A: pktStr, pdb: pdb || 'AFDB_v6', tcga_n: tn, clinvar: cv || ''
+      });
+      return `<tr>
+        <td><button class="btn-subtle" style="height:24px;padding:0 9px;font-size:11.5px;" onclick="openVariantIn3D('${item.gene}','${trueWt}${item.pos}${alt}')">View</button></td>
+        <td><code>${item.raw}</code></td>
+        <td><strong>${item.gene}</strong></td>
+        <td><code>${trueWt}${item.pos}${alt}</code>${wtWarn}</td>
+        <td>${mechHtml}</td>
+        <td><strong>${am !== null ? am.toFixed(3) : '—'}</strong></td>
+        <td>${if1 !== null ? if1.toFixed(2) : '—'}</td>
+        <td>${e2 !== null ? e2.toFixed(2) : '—'}</td>
+        <td>${gd}</td>
+        <td>${pktStr}${pdb ? ' ('+pdb.split(':')[0]+')' : ''}</td>
+        <td>${tn > 0 ? '<strong>'+tn+'</strong>' : '0'}</td>
+        <td>${cv || '—'}</td>
+      </tr>`;
+    }).join('');
+
+    document.querySelector('#batch-table tbody').innerHTML = tbodyHtml;
+    document.getElementById('batch-summary').textContent =
+      `${nScored} / ${parsed.length} scored · ${nAct} active-site · ${nUnf} unfolding · ${nNeu} neutral`;
+    markSortableHeaders(document.getElementById('batch-table'));
+  };
+
+  if (!pending) { finalize(); return; }
+  neededGenes.forEach(g => ensureSatLoaded(g, () => {
+    pending--;
+    if (pending <= 0) finalize();
+  }));
+}
+
+function exportBatchTriageCSV() {
+  if (!currentBatchRows.length) return;
+  downloadCSV('miRBioGenAtlas_batch_triage_results.csv', currentBatchRows);
+}
+
+/* Universal One-Click Table Column Sorting */
+const NUM_HEAD_RE = /^[+-]?\d+(?:\.\d+)?(?:e[+-]?\d+)?(?:\s*(?:%|Å|Å³|e\b|\(|\[|\/|\$))?/i;
+function parseCellNumeric(raw) {
+  const s = (raw || '').trim().replace(/\u2212/g, '-').replace(/,/g, '');
+  if (!s || s === '—' || s === 'N/A') return null;
+  if (!/^[+-]?\d+(?:\.\d+)?(?:e[+-]?\d+)?(?:\s*(?:%|Å|Å³|e\b|\(|\[|\/|$))/i.test(s)) return NaN;
+  const m = s.match(/^[+-]?\d+(?:\.\d+)?(?:e[+-]?\d+)?/i);
+  return m ? parseFloat(m[0]) : NaN;
+}
+
+function markSortableHeaders(rootEl) {
+  (rootEl || document).querySelectorAll('table:not(.no-auto-sort) thead th').forEach(th => {
+    const txt = th.textContent.trim();
+    if (!txt || txt === '3D' || txt === 'Relative Level') return;
+    th.classList.add('sortable');
+  });
+}
+
+function sortTableByTh(th) {
+  const table = th.closest('table');
+  const tbody = table ? table.querySelector('tbody') : null;
+  if (!tbody) return;
+  const ths = Array.from(th.parentElement.children);
+  const colIdx = ths.indexOf(th);
+  if (colIdx < 0) return;
+  const rows = Array.from(tbody.querySelectorAll('tr'));
+  if (rows.length < 2 || rows.some(r => r.children.length <= colIdx)) return;
+
+  const curDir = th.classList.contains('sort-asc') ? 'asc' : (th.classList.contains('sort-desc') ? 'desc' : '');
+  let numValid = 0, nonBlank = 0;
+  const parsed = rows.map((row, idx) => {
+    const txt = (row.children[colIdx] ? row.children[colIdx].textContent : '').trim();
+    const nv = parseCellNumeric(txt);
+    if (nv !== null) {
+      nonBlank++;
+      if (!Number.isNaN(nv)) numValid++;
+    }
+    return { row, idx, txt, nv };
+  });
+  const isNumeric = nonBlank > 0 && (numValid / nonBlank) >= 0.6;
+  const hdrLow = th.textContent.toLowerCase();
+  const preferAsc = !isNumeric || /(rank|gene|code|study|variant|sample|subset|rna|metal|pocket|loeuf|\bp\b|two-sided p|cox p)/i.test(hdrLow);
+  const nextDir = curDir ? (curDir === 'asc' ? 'desc' : 'asc') : (preferAsc ? 'asc' : 'desc');
+
+  ths.forEach(h => h.classList.remove('sort-asc', 'sort-desc'));
+  th.classList.add(nextDir === 'asc' ? 'sort-asc' : 'sort-desc');
+
+  const sign = nextDir === 'asc' ? 1 : -1;
+  parsed.sort((a, b) => {
+    const aBlank = (a.nv === null || a.txt === '' || a.txt === '—');
+    const bBlank = (b.nv === null || b.txt === '' || b.txt === '—');
+    if (aBlank && bBlank) return a.idx - b.idx;
+    if (aBlank) return 1;
+    if (bBlank) return -1;
+    if (isNumeric && !Number.isNaN(a.nv) && !Number.isNaN(b.nv)) {
+      if (a.nv !== b.nv) return (a.nv - b.nv) * sign;
+      return a.idx - b.idx;
+    }
+    const cmp = a.txt.localeCompare(b.txt, undefined, { numeric: true, sensitivity: 'base' });
+    return cmp !== 0 ? cmp * sign : (a.idx - b.idx);
+  });
+  const frag = document.createDocumentFragment();
+  parsed.forEach(p => frag.appendChild(p.row));
+  tbody.appendChild(frag);
+}
+
+function initUniversalTableSorting() {
+  markSortableHeaders(document);
+  document.addEventListener('click', e => {
+    const th = e.target.closest('th.sortable');
+    if (th) sortTableByTh(th);
+  });
+}
+
+/* Deep-Link URL Hash & Query Parameter State Restoration */
+function applyUrlState() {
+  suppressHashSync = true;
+  try {
+    const params = new URLSearchParams(window.location.search || '');
+    const qParam = params.get('q');
+    if (qParam) {
+      document.getElementById('global-search').value = qParam;
+      runGlobalSearch(qParam);
+      return;
+    }
+    const rawHash = decodeURIComponent((window.location.hash || '').replace(/^#/, '').trim());
+    if (!rawHash) return;
+    if (rawHash === 'about-atlas') {
+      const ab = document.getElementById('about-atlas');
+      if (ab) ab.scrollIntoView({behavior: 'smooth'});
+      return;
+    }
+    const kv = {};
+    rawHash.split('&').forEach(pair => {
+      const eq = pair.indexOf('=');
+      if (eq > 0) kv[pair.slice(0, eq).toLowerCase()] = pair.slice(eq + 1);
+    });
+    if (kv.variant) {
+      const parts = kv.variant.split(/[:\s]+/);
+      if (parts[0] && GENE_SET.has(parts[0].toUpperCase())) {
+        loadPresetMutation(parts[0].toUpperCase(), parts[1] || '');
+        return;
+      }
+    }
+    if (kv.gene && GENE_SET.has(kv.gene.toUpperCase())) {
+      loadPresetMutation(kv.gene.toUpperCase(), '');
+      return;
+    }
+    if (kv.eq) {
+      openFormulaTab(kv.eq.toUpperCase());
+      return;
+    }
+    if (kv.tab) {
+      const tMap = {
+        explorer: ['tab-variants', 'btn-tab-variants'],
+        pancancer: ['tab-heatmap', 'btn-tab-heatmap'],
+        mirna: ['tab-mirna', 'btn-tab-mirna'],
+        clinical: ['tab-clinical', 'btn-tab-clinical'],
+        docs: ['tab-docs', 'btn-tab-docs']
+      };
+      const hit = tMap[kv.tab.toLowerCase()];
+      if (hit) switchTab(hit[0], document.getElementById(hit[1]), true);
+      if (kv.tab.toLowerCase() === 'batch') openBatchTriage();
+    }
+  } finally {
+    setTimeout(() => { suppressHashSync = false; }, 120);
+  }
+}
+
 function downloadCSV(filename, rows) {
   if (!rows.length) return;
   const keys = Object.keys(rows[0]);
@@ -2662,11 +3366,15 @@ window.addEventListener('DOMContentLoaded', () => {
   renderHeatmap();
   renderVariants();
   renderAllTables();
+  renderDicerStripPlot();
   renderGtexBars();
   renderFormulas();
   renderDatasetsCatalogue();
   renderGlossaryCards();
+  initUniversalTableSorting();
   renderLollipopAndLoadSat();
+  applyUrlState();
+  window.addEventListener('hashchange', applyUrlState);
 });
 </script>
 </body>

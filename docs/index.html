@@ -888,11 +888,83 @@
     color: var(--ink-2);
   }
 
+  /* SOTA Cross-Portal Reference Strip, AFDB Contact HUD & ProtVar Radar */
+  .xref-strip {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+    margin: -4px 0 14px;
+    font-size: 11.5px;
+  }
+  .xref-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 9px;
+    border-radius: 999px;
+    border: 1px solid var(--line-soft);
+    background: var(--canvas);
+    color: var(--ink-2);
+    text-decoration: none;
+    font-size: 11.5px;
+    transition: all 0.12s ease;
+  }
+  .xref-pill:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: #ffffff;
+  }
+  .loeuf-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 2px 9px;
+    border-radius: 999px;
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 600;
+  }
+  .contact-hud {
+    position: absolute;
+    top: 12px;
+    right: 14px;
+    width: 214px;
+    background: rgba(20, 22, 26, 0.92);
+    border: 1px solid #3c4043;
+    border-radius: 10px;
+    padding: 9px 10px;
+    z-index: 8;
+    display: none;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.38);
+  }
+  .contact-hud.open { display: block; }
+  .score-bottom {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 12px;
+    align-items: center;
+  }
+  @media (max-width: 620px) {
+    .score-bottom { grid-template-columns: 1fr; }
+  }
+  .radar-box {
+    width: 124px;
+    height: 116px;
+    border: 1px solid var(--line-soft);
+    border-radius: 10px;
+    background: var(--canvas);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
   /* 1-Page Printable Variant Report Mode */
   #print-report-banner, #print-3d-img { display: none; }
   @media print {
     body { background: #ffffff; font-size: 11.5px; }
-    .topbar, .search-hero, .view-bar, #exp-tcga, #exp-batch, .about-section, footer, .vp-bar, .guide-btn, .no-print, #lollipop-svg-wrap, .popover, .drawer, .drawer-backdrop {
+    .topbar, .search-hero, .view-bar, #exp-dms, #exp-tcga, #exp-batch, .xref-strip, .contact-hud, .about-section, footer, .vp-bar, .guide-btn, .no-print, #lollipop-svg-wrap, .popover, .drawer, .drawer-backdrop {
       display: none !important;
     }
     main.workspace { background: #ffffff; padding: 0; min-height: auto; }
@@ -958,8 +1030,8 @@
           <circle cx="11" cy="11" r="7"></circle>
           <line x1="20" y1="20" x2="16.35" y2="16.35"></line>
         </svg>
-        <input type="text" id="global-search" autocomplete="off" placeholder="Search gene, mutation, cancer type, or formula (e.g. DICER1 E1705K, AGO2, 5p:3p, LOEUF)..." oninput="updateSearchSuggestions(this.value)" onkeydown="handleSearchKey(event)">
-        <span class="search-kbd">/</span>
+        <input type="text" id="global-search" autocomplete="off" placeholder="Search gene, mutation, cancer type, or formula (e.g. DICER1 E1705K, AGO2, 5p:3p, LOEUF)..." oninput="updateSearchSuggestions(this.value)" onfocus="showRecentOrSuggestions(this.value)" onkeydown="handleSearchKey(event)">
+        <span class="search-kbd">&#8984;K</span>
       </div>
       <div id="suggest-menu" class="suggest-menu"></div>
     </div>
@@ -970,6 +1042,7 @@
       <button class="chip" onclick="loadPresetMutation('DROSHA','E1147K')">DROSHA E1147K</button>
       <button class="chip" onclick="loadPresetMutation('TP53','R175H')">TP53 R175H</button>
       <button class="chip" onclick="loadPresetMutation('AGO2','M364T')">AGO2 M364T</button>
+      <button class="chip" onclick="openDmsLandscape()">2D DMS Heatmap</button>
       <button class="chip" onclick="openBatchTriage()">Batch Variant Triage</button>
       <button class="chip" onclick="openFormulaTab()">LaTeX Equations &rarr;</button>
     </div>
@@ -1009,8 +1082,13 @@
             </div>
             <span class="meta-note" id="sat-status"></span>
           </div>
-          <button class="guide-btn" onclick="openGuideDrawer('explorer')">&#9432; How this works</button>
+          <div style="display:flex;gap:7px;align-items:center;">
+            <button class="btn-subtle" onclick="downloadLollipopSVG()" title="Export publication-ready vector SVG of domain &amp; lollipop track">Track SVG</button>
+            <button class="guide-btn" onclick="openGuideDrawer('explorer')">&#9432; How this works</button>
+          </div>
         </div>
+
+        <div id="gene-xref-strip" class="xref-strip"></div>
 
         <div id="lollipop-svg-wrap" class="svg-track"></div>
 
@@ -1027,6 +1105,7 @@
                   </select>
                   <select id="mol3d-color" onchange="refresh3DScene()" aria-label="Coloring">
                     <option value="plddt">Color: pLDDT</option>
+                    <option value="domain">Color: Domains</option>
                     <option value="am">Color: AlphaMissense</option>
                     <option value="pocket">Color: Active Pocket</option>
                   </select>
@@ -1035,6 +1114,8 @@
                   <button class="vp-btn" onclick="zoomToMutatedResidue()">8&Aring; Focus</button>
                   <button class="vp-btn" onclick="resetFullProtein3D()">Full</button>
                   <button class="vp-btn" id="btn-nbrs" onclick="toggleNeighbors3D()">Shell: On</button>
+                  <button class="vp-btn" id="btn-surf" onclick="toggleSurface3D()" title="Render translucent 8.5Å pocket Van der Waals surface">Surface</button>
+                  <button class="vp-btn" id="btn-2dmap" onclick="toggleContactMap2D()" title="AlphaFold 2D Cα domain packing &amp; contact matrix">2D Map</button>
                   <button class="vp-btn" id="btn-spin" onclick="toggleSpin3D()">Spin</button>
                   <button class="vp-btn" onclick="download3DSnapshotPNG()" title="Save 3D PNG image">PNG</button>
                   <button class="vp-btn" onclick="downloadMutatedPDB()" title="Download atomic PDB coordinates">PDB</button>
@@ -1044,6 +1125,16 @@
               <img id="print-3d-img" alt="3D Structural Snapshot">
               <div class="mol3d-stage">
                 <div class="mol3d-hud" id="mol3d-hud">DICER1</div>
+                <div class="contact-hud" id="contact-hud">
+                  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;color:#e8eaed;font-size:11px;font-family:var(--mono);">
+                    <span>2D C&alpha; Packing (&le;24&Aring;)</span>
+                    <button onclick="toggleContactMap2D()" style="border:none;background:none;color:#9aa0a6;cursor:pointer;font-size:14px;line-height:1;">&times;</button>
+                  </div>
+                  <canvas id="contact-canvas" width="192" height="192" style="width:192px;height:192px;border-radius:6px;cursor:crosshair;display:block;background:#111315;" onclick="handleContactMapClick(event)" title="Click anywhere on 2D matrix to jump to that residue in 3D"></canvas>
+                  <div style="display:flex;justify-content:space-between;margin-top:4px;font-size:10px;color:#9aa0a6;font-family:var(--mono);">
+                    <span>1 aa</span><span>Click to focus 3D</span><span id="contact-max-lbl">L aa</span>
+                  </div>
+                </div>
                 <div id="mol3d-canvas" style="width:100%;height:100%;position:relative;"></div>
                 <div class="mol3d-legend">
                   <span><i class="swatch" style="background:#0095c8;"></i>WT</span>
@@ -1064,6 +1155,7 @@
       <div class="view-bar" style="margin-top:20px;">
         <div class="seg-group">
           <button class="seg-btn active" id="seg-exp-codon" onclick="switchSub('exp-sub', 'exp-codon', this)">Codon 19-AA Scan</button>
+          <button class="seg-btn" id="seg-exp-dms" onclick="switchSub('exp-sub', 'exp-dms', this); renderDmsHeatmap();">2D DMS Landscape</button>
           <button class="seg-btn" id="seg-exp-tcga" onclick="switchSub('exp-sub', 'exp-tcga', this)">Observed Tumour Variants (6,292)</button>
           <button class="seg-btn" id="seg-exp-batch" onclick="switchSub('exp-sub', 'exp-batch', this)">Batch Variant Triage</button>
         </div>
@@ -1071,6 +1163,36 @@
 
       <div id="exp-codon" class="subpanel exp-sub active">
         <div class="card" id="sat-codon-detail"></div>
+      </div>
+
+      <div id="exp-dms" class="subpanel exp-sub">
+        <div class="card">
+          <div class="card-head">
+            <div>
+              <h2>2D Deep Mutational Scanning (DMS) Saturation Heatmap</h2>
+              <div class="meta-note" style="margin-top:2px;">Click any (codon &times; amino acid) cell to model its 3D side-chain rotamer above &middot; <code>&bull;</code> = wild-type &middot; dark ring = observed in TCGA / ClinVar P</div>
+            </div>
+            <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+              <select id="dms-metric" onchange="renderDmsHeatmap()">
+                <option value="am">Metric: AlphaMissense Pathogenicity</option>
+                <option value="if1">Metric: ESM-IF1 3D Fold &Delta;logP</option>
+                <option value="e2">Metric: ESM-2 Evolutionary &Delta;&ell;</option>
+              </select>
+              <select id="dms-span" onchange="renderDmsHeatmap()">
+                <option value="25">Window: &plusmn;25 aa (51 codons)</option>
+                <option value="40">Window: &plusmn;40 aa (81 codons)</option>
+              </select>
+              <select id="dms-domain-sel" onchange="jumpDmsToDomain(this.value)">
+                <option value="">Jump to domain...</option>
+              </select>
+              <div class="step-group">
+                <button class="step-btn" onclick="stepDmsWindow(-25)" title="Shift window N-terminal">&lsaquo;</button>
+                <button class="step-btn" onclick="stepDmsWindow(25)" title="Shift window C-terminal">&rsaquo;</button>
+              </div>
+            </div>
+          </div>
+          <div id="dms-svg-wrap" class="svg-track" style="margin-bottom:0;"></div>
+        </div>
       </div>
 
       <div id="exp-tcga" class="subpanel exp-sub">
@@ -1802,12 +1924,87 @@ function tagDot(cls, label) {
   return `<span class="tag"><i class="dot ${cls}"></i>${label}</span>`;
 }
 
+const PROTEIN_DOMAINS = {
+  DROSHA: [
+    [1, 215, 'P-rich', '#64748b'], [216, 390, 'RS-rich', '#0284c7'],
+    [391, 875, 'CED Central', '#0d9488'], [876, 1056, 'RNase IIIa', '#d97706'],
+    [1107, 1233, 'RNase IIIb', '#c5221f'], [1260, 1334, 'dsRBD', '#4f46e5']
+  ],
+  DGCR8: [
+    [276, 498, 'Rhed Heme-Dimer', '#0d9488'], [511, 576, 'dsRBD 1', '#00709b'],
+    [620, 684, 'dsRBD 2', '#4f46e5'], [700, 750, 'CTT', '#d97706']
+  ],
+  XPO5: [
+    [26, 106, 'IBN-N', '#00709b'], [120, 1190, 'HEAT Solenoid', '#0d9488']
+  ],
+  DICER1: [
+    [51, 227, 'Helicase N', '#0284c7'], [235, 428, 'HEL2i', '#0d9488'],
+    [433, 602, 'Helicase C', '#00709b'], [630, 722, 'DUF283', '#64748b'],
+    [752, 890, 'Platform', '#6366f1'], [895, 1042, 'PAZ', '#4f46e5'],
+    [1276, 1403, 'RNase IIIa', '#d97706'], [1666, 1824, 'RNase IIIb', '#c5221f'],
+    [1849, 1914, 'dsRBD', '#0f766e']
+  ],
+  TARBP2: [
+    [30, 96, 'dsRBD 1', '#00709b'], [159, 226, 'dsRBD 2', '#4f46e5'], [298, 365, 'Medipal / Dicer-BD', '#0d9488']
+  ],
+  PRKRA: [
+    [35, 99, 'dsRBD 1', '#00709b'], [127, 192, 'dsRBD 2', '#4f46e5'], [245, 311, 'Medipal', '#d97706']
+  ],
+  AGO1: [[25, 165, 'N-term', '#64748b'], [225, 367, 'PAZ', '#4f46e5'], [430, 572, 'MID', '#0d9488'], [578, 820, 'PIWI', '#c5221f']],
+  AGO2: [[28, 167, 'N-term', '#64748b'], [227, 369, 'PAZ', '#4f46e5'], [432, 574, 'MID', '#0d9488'], [580, 822, 'PIWI Slicer', '#c5221f']],
+  AGO3: [[28, 168, 'N-term', '#64748b'], [228, 370, 'PAZ', '#4f46e5'], [433, 575, 'MID', '#0d9488'], [581, 823, 'PIWI', '#c5221f']],
+  AGO4: [[24, 164, 'N-term', '#64748b'], [222, 365, 'PAZ', '#4f46e5'], [428, 573, 'MID', '#0d9488'], [579, 824, 'PIWI', '#00709b']],
+  LIN28A: [[39, 112, 'CSD Cold-Shock', '#00709b'], [137, 178, 'CCHC Zn-Knuckles', '#c5221f']],
+  LIN28B: [[29, 102, 'CSD Cold-Shock', '#00709b'], [127, 168, 'CCHC Zn-Knuckles', '#c5221f']],
+  SMAD2: [[14, 176, 'MH1 DNA-BD', '#00709b'], [177, 271, 'Linker', '#94a3b8'], [272, 467, 'MH2 Interface', '#c5221f']],
+  SMAD4: [[18, 142, 'MH1 DNA-BD', '#00709b'], [143, 318, 'Linker', '#94a3b8'], [319, 552, 'MH2 Interface', '#c5221f']],
+  TP53: [[1, 61, 'TAD', '#0d9488'], [62, 94, 'PRD', '#64748b'], [95, 292, 'Core DNA-Binding', '#c5221f'], [325, 356, 'Tetramer', '#4f46e5'], [363, 393, 'CTD', '#d97706']]
+};
+
+function domainAtPos(gene, pos) {
+  const doms = PROTEIN_DOMAINS[gene] || [];
+  for (let i = 0; i < doms.length; i++) {
+    if (pos >= doms[i][0] && pos <= doms[i][1]) return { idx: i, start: doms[i][0], end: doms[i][1], name: doms[i][2], color: doms[i][3] };
+  }
+  return null;
+}
+
 let viewer3d = null;
 let spinActive = false;
 let showNeighbors = true;
+let showSurface3D = false;
+let showContact2D = false;
 let theatre3D = false;
 let suppressHashSync = false;
+let dmsCenterPos = 1705;
 let active3DState = { gene: 'DICER1', pos: 1705, wt: 'E', mut: 'K', lastPdbText: '' };
+
+function recordRecentVariant(gene, label) {
+  try {
+    const key = 'mirbiogen_recent_v2';
+    const cur = JSON.parse(sessionStorage.getItem(key) || '[]');
+    const item = `${gene} ${label}`;
+    const next = [item, ...cur.filter(x => x !== item)].slice(0, 5);
+    sessionStorage.setItem(key, JSON.stringify(next));
+  } catch (e) {}
+}
+
+function showRecentOrSuggestions(val) {
+  if ((val || '').trim()) { updateSearchSuggestions(val); return; }
+  try {
+    const rec = JSON.parse(sessionStorage.getItem('mirbiogen_recent_v2') || '[]');
+    if (!rec.length) return;
+    const menu = document.getElementById('suggest-menu');
+    window._SUG_FNS = rec.map(r => () => runGlobalSearch(r));
+    menu.innerHTML = rec.map((r, i) => `
+      <div class="sug-row" onclick="window._SUG_FNS[${i}]();document.getElementById('suggest-menu').classList.remove('open');">
+        <span>${r}</span>
+        <span class="sug-cat">Recent</span>
+      </div>
+    `).join('');
+    menu.classList.add('open');
+  } catch (e) {}
+}
 
 function syncUrlHash(customHash) {
   if (suppressHashSync || !window.history || !window.history.replaceState) return;
@@ -2057,10 +2254,19 @@ document.addEventListener('click', e => {
 document.addEventListener('keydown', e => {
   const tag = document.activeElement ? document.activeElement.tagName : '';
   const inField = (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT');
-  if (e.key === 'Escape') { hideTermPopover(true); closeGuideDrawer(); }
+  if (e.key === 'Escape') { hideTermPopover(true); closeGuideDrawer(); document.getElementById('suggest-menu').classList.remove('open'); }
+  if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+    e.preventDefault();
+    const gs = document.getElementById('global-search');
+    gs.focus(); gs.select();
+    showRecentOrSuggestions(gs.value);
+    return;
+  }
   if (!inField && e.key === '/') {
     e.preventDefault();
-    document.getElementById('global-search').focus();
+    const gs = document.getElementById('global-search');
+    gs.focus();
+    showRecentOrSuggestions(gs.value);
   }
   if (!inField && document.getElementById('tab-variants').classList.contains('active') && !e.metaKey && !e.ctrlKey && !e.altKey) {
     if (e.key === 'ArrowLeft') { e.preventDefault(); stepCodon(-1); }
@@ -2220,6 +2426,52 @@ function selectMutAA(pos, wt, mutAA) {
   inspectSaturationCodon();
 }
 
+function focusDomainIn3D(gene, startPos, endPos) {
+  dmsCenterPos = Math.round((startPos + endPos) / 2);
+  if (document.getElementById('exp-dms').classList.contains('active')) renderDmsHeatmap();
+  if (viewer3d && active3DState.gene === gene) {
+    const span = [];
+    for (let p = startPos; p <= endPos; p += 2) span.push(p);
+    viewer3d.zoomTo({model: 0, resi: span}, 380);
+  }
+}
+
+function renderGeneXrefStrip(gene) {
+  const el = document.getElementById('gene-xref-strip');
+  if (!el) return;
+  const p = ATLAS.panel.find(x => x.geneSymbol === gene);
+  if (!p) { el.innerHTML = ''; return; }
+  const loeuf = p.gnomad_LOEUF !== '' ? Number(p.gnomad_LOEUF) : null;
+  const lBg = loeuf === null ? '#f3f4f6' : (loeuf < 0.35 ? 'rgba(197,34,31,0.10)' : (loeuf < 0.60 ? 'rgba(176,96,0,0.12)' : 'rgba(0,112,155,0.09)'));
+  const lCol = loeuf === null ? '#5f6368' : (loeuf < 0.35 ? '#c5221f' : (loeuf < 0.60 ? '#b06000' : '#00709b'));
+  const lTxt = loeuf === null ? 'LOEUF —' : `LOEUF ${loeuf.toFixed(2)} · ${loeuf < 0.35 ? 'Constrained' : (loeuf < 0.60 ? 'Moderate' : 'Tolerant')}`;
+  const pdb1 = (p.pdbComplexIds || '').split(';')[0].trim();
+  const smBadge = p.opentargets_sm_tractable === '1'
+    ? `<span class="loeuf-pill" data-term="tractability" style="background:rgba(19,115,51,0.10);color:#137333;">SM Ligandable</span>` : '';
+
+  el.innerHTML = `
+    <span class="loeuf-pill" data-term="gnomad_loeuf" style="background:${lBg};color:${lCol};">${lTxt}</span>
+    ${smBadge}
+    <a class="xref-pill" href="https://www.uniprot.org/uniprotkb/${p.uniprotAccession}" target="_blank" rel="noopener">UniProt ${p.uniprotAccession} &#8599;</a>
+    <a class="xref-pill" href="https://alphafold.ebi.ac.uk/entry/${p.uniprotAccession}" target="_blank" rel="noopener">AlphaFold DB &#8599;</a>
+    <a class="xref-pill" href="https://www.ebi.ac.uk/ProtVar/query?search=${p.uniprotAccession}" target="_blank" rel="noopener">ProtVar &#8599;</a>
+    <a class="xref-pill" href="https://gnomad.broadinstitute.org/gene/${p.ensemblGeneId}?dataset=gnomad_r4" target="_blank" rel="noopener">gnomAD v4 &#8599;</a>
+    <a class="xref-pill" href="https://platform.opentargets.org/target/${p.ensemblGeneId}" target="_blank" rel="noopener">Open Targets &#8599;</a>
+    <a class="xref-pill" href="https://www.cbioportal.org/results/mutations?cancer_study_list=pancan_pcawg_2020&amp;gene_list=${gene}" target="_blank" rel="noopener">cBioPortal &#8599;</a>
+    ${pdb1 ? `<a class="xref-pill" href="https://www.rcsb.org/structure/${pdb1}" target="_blank" rel="noopener">RCSB ${pdb1} &#8599;</a>` : ''}
+  `;
+}
+
+function downloadLollipopSVG() {
+  const svgEl = document.querySelector('#lollipop-svg-wrap svg');
+  if (!svgEl) return;
+  const src = '<?xml version="1.0" encoding="UTF-8"?>\n' + svgEl.outerHTML;
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([src], {type: 'image/svg+xml;charset=utf-8'}));
+  a.download = `${active3DState.gene}_domain_lollipop_track.svg`;
+  a.click();
+}
+
 function updateLollipopActiveMarker(pos) {
   const marker = document.getElementById('lol-active-needle');
   const label = document.getElementById('lol-active-lbl');
@@ -2238,36 +2490,56 @@ function updateLollipopActiveMarker(pos) {
 
 function renderLollipopAndLoadSat() {
   const gene = document.getElementById('lol-gene').value;
+  renderGeneXrefStrip(gene);
+  const domSel = document.getElementById('dms-domain-sel');
+  if (domSel) {
+    const doms = PROTEIN_DOMAINS[gene] || [];
+    domSel.innerHTML = '<option value="">Jump to domain...</option>' +
+      doms.map(d => `<option value="${d[0]}-${d[1]}">${d[2]} (${d[0]}–${d[1]})</option>`).join('');
+  }
+
   const tr = ATLAS.tracks[gene] || [];
   if (!tr.length) return;
   const L = tr.length;
-  const W = 1420, H = 192, padL = 94, padR = 26;
+  const W = 1420, H = 206, padL = 94, padR = 26;
   const plotW = W - padL - padR;
   const xOf = pos => padL + ((pos - 1) / Math.max(1, L - 1)) * plotW;
 
   let maxCnt = 1;
   tr.forEach(c => { if (c[7] + c[8] > maxCnt) maxCnt = c[7] + c[8]; });
 
+  let domCapsules = '';
+  (PROTEIN_DOMAINS[gene] || []).forEach(([ds, de, dname, dcol]) => {
+    const x1 = xOf(ds), x2 = xOf(Math.min(L, de));
+    const dw = Math.max(6, x2 - x1);
+    const showTxt = dw >= 48;
+    const shortLbl = dw < 76 && dname.length > 9 ? dname.slice(0, 8) + '…' : dname;
+    domCapsules += `<g style="cursor:pointer" onclick="focusDomainIn3D('${gene}',${ds},${de})">
+      <rect x="${x1.toFixed(1)}" y="112" width="${dw.toFixed(1)}" height="20" rx="5" fill="${dcol}" fill-opacity="0.88">
+        <title>${gene} ${dname} domain (${ds}–${de} aa) — Click to focus domain in 3D</title>
+      </rect>
+      ${showTxt ? `<text x="${(x1 + dw/2).toFixed(1)}" y="125.5" font-size="10" font-weight="600" fill="#ffffff" text-anchor="middle" pointer-events="none">${shortLbl}</text>` : ''}
+    </g>`;
+  });
+
   let pockets = '', amPath = '', stems = '';
   tr.forEach(c => {
     const [pos, wt, plddt, pkt, am, e2, if1, tcgaN, cvN, pdb] = c;
     const x = xOf(pos);
     if (pkt === 1) {
-      pockets += `<rect x="${x-1.4}" y="114" width="2.8" height="15" fill="#c5221f" opacity="0.84" style="cursor:pointer" onclick="selectCodonFromTrack(${pos})"><title>${gene} ${wt}${pos} · 3D pocket (${pdb})</title></rect>`;
-    } else if (pdb) {
-      pockets += `<rect x="${x-0.9}" y="118" width="1.8" height="7" fill="#00709b" opacity="0.30"></rect>`;
+      pockets += `<rect x="${x-1.3}" y="107" width="2.6" height="5" fill="#c5221f" opacity="0.9" style="cursor:pointer" onclick="selectCodonFromTrack(${pos})"><title>${gene} ${wt}${pos} · 3D active pocket &le;6Å (${pdb})</title></rect>`;
     }
     if (am !== null) {
-      const yAm = 170 - am * 28;
+      const yAm = 182 - am * 28;
       amPath += (amPath ? ' L' : 'M') + x.toFixed(1) + ',' + yAm.toFixed(1);
     }
     if (tcgaN > 0 || cvN > 0) {
-      const h = 14 + (Math.log2(tcgaN + cvN + 1) / Math.log2(maxCnt + 1)) * 82;
-      const yTop = 109 - h;
+      const h = 14 + (Math.log2(tcgaN + cvN + 1) / Math.log2(maxCnt + 1)) * 78;
+      const yTop = 105 - h;
       const col = pkt === 1 ? '#c5221f' : (cvN > 0 ? '#00709b' : '#5f6368');
       const r = Math.min(6.4, 2.8 + Math.log2(tcgaN + cvN + 1));
       stems += `<g style="cursor:pointer" onclick="selectCodonFromTrack(${pos})">
-        <line x1="${x.toFixed(1)}" y1="109" x2="${x.toFixed(1)}" y2="${yTop.toFixed(1)}" stroke="${col}" stroke-width="1.25" opacity="0.72"/>
+        <line x1="${x.toFixed(1)}" y1="105" x2="${x.toFixed(1)}" y2="${yTop.toFixed(1)}" stroke="${col}" stroke-width="1.25" opacity="0.72"/>
         <circle cx="${x.toFixed(1)}" cy="${yTop.toFixed(1)}" r="${r.toFixed(1)}" fill="${col}" stroke="#fff" stroke-width="0.8">
           <title>${gene} ${wt}${pos} · TCGA: ${tcgaN} · ClinVar P/LP: ${cvN}</title>
         </circle>
@@ -2278,20 +2550,21 @@ function renderLollipopAndLoadSat() {
   let ticks = '';
   const step = L > 1200 ? 200 : (L > 500 ? 100 : 50);
   for (let p = 1; p <= L; p += step) {
-    ticks += `<text x="${xOf(p).toFixed(1)}" y="187" font-size="10.5" fill="#80868b" text-anchor="middle">${p}</text>`;
+    ticks += `<text x="${xOf(p).toFixed(1)}" y="200" font-size="10.5" fill="#80868b" text-anchor="middle">${p}</text>`;
   }
-  ticks += `<text x="${xOf(L).toFixed(1)}" y="187" font-size="10.5" fill="#80868b" text-anchor="end">${L} aa</text>`;
+  ticks += `<text x="${xOf(L).toFixed(1)}" y="200" font-size="10.5" fill="#80868b" text-anchor="end">${L} aa</text>`;
 
-  document.getElementById('lollipop-svg-wrap').innerHTML = `<svg viewBox="0 0 ${W} ${H}" width="100%" height="192">
+  document.getElementById('lollipop-svg-wrap').innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" width="100%" height="206">
     <text x="6" y="24" font-size="10" font-weight="600" fill="#80868b">VARIANTS</text>
-    <text x="6" y="125" font-size="10" font-weight="600" fill="#80868b">POCKET / PDB</text>
-    <text x="6" y="162" font-size="10" font-weight="600" fill="#80868b">CONSTRAINT</text>
-    <rect x="${padL}" y="114" width="${plotW}" height="15" rx="3.5" fill="#ebeef2"/>
-    <line id="lol-active-needle" x1="${padL}" y1="14" x2="${padL}" y2="174" stroke="#00709b" stroke-width="1.6" stroke-dasharray="3,2" opacity="0.85"/>
+    <text x="6" y="126" font-size="10" font-weight="600" fill="#80868b">DOMAINS</text>
+    <text x="6" y="174" font-size="10" font-weight="600" fill="#80868b">CONSTRAINT</text>
+    <rect x="${padL}" y="119" width="${plotW}" height="6" rx="3" fill="#dfe3e8"/>
+    ${domCapsules}${pockets}
+    <line id="lol-active-needle" x1="${padL}" y1="14" x2="${padL}" y2="186" stroke="#00709b" stroke-width="1.6" stroke-dasharray="3,2" opacity="0.85"/>
     <text id="lol-active-lbl" x="${padL + 24}" y="12" font-size="10" font-family="monospace" font-weight="600" fill="#00709b" text-anchor="middle"></text>
-    ${pockets}${stems}
+    ${stems}
     <path d="${amPath}" fill="none" stroke="#00709b" stroke-width="1.15" opacity="0.82"/>
-    <line x1="${padL}" y1="${170 - 0.564*28}" x2="${W-padR}" y2="${170 - 0.564*28}" stroke="#c5221f" stroke-dasharray="3,3" stroke-width="0.8" opacity="0.65"/>
+    <line x1="${padL}" y1="${182 - 0.564*28}" x2="${W-padR}" y2="${182 - 0.564*28}" stroke="#c5221f" stroke-dasharray="3,3" stroke-width="0.8" opacity="0.65"/>
     ${ticks}
   </svg>`;
 
@@ -2452,24 +2725,36 @@ function refresh3DScene(keepCamera) {
 
   ensureStruct3DLoaded(gene, st => {
     if (!st) return;
-    document.getElementById('mol3d-hud').textContent = `${gene} · ${st.u} (${st.s.length} aa)`;
+    const domHit = domainAtPos(gene, pos);
+    document.getElementById('mol3d-hud').textContent = `${gene} · ${st.u} (${st.s.length} aa)${domHit ? ' · ' + domHit.name : ''}`;
     const geom = computeMutant3DGeometry(st, pos, wt, mut);
     const pdbs = buildPdbModels(gene, st, pos, wt, mut, geom, colorMode);
     active3DState.lastPdbText = pdbs.wtPdb + (mode !== 'wt' ? ('\n' + pdbs.mutPdb) : '');
 
     v.removeAllModels(); v.removeAllShapes(); v.removeAllLabels();
+    if (typeof v.removeAllSurfaces === 'function') v.removeAllSurfaces();
     v.addModel(pdbs.wtPdb, 'pdb');
     v.setStyle({model: 0}, {cartoon: {colorfunc: atom => {
+      if (colorMode === 'domain') {
+        const dm = domainAtPos(gene, atom.resi);
+        return dm ? dm.color : '#475569';
+      }
       const b = atom.b;
       if (colorMode === 'plddt') return b >= 90 ? '#0053d6' : (b >= 70 ? '#65cbf3' : (b >= 50 ? '#ffdb13' : '#ff7d45'));
       if (colorMode === 'am') return b >= 56.4 ? '#c5221f' : (b >= 34.0 ? '#d97706' : '#00709b');
       return b >= 80 ? '#e11d48' : '#64748b';
     }, opacity: 0.86}});
 
-    if (showNeighbors && geom && geom.bb.CA) {
+    let nbrRes = [];
+    if (geom && geom.bb.CA) {
       const [cx, cy, cz] = geom.bb.CA;
-      const nbrRes = st._caList.filter(c => c[0] !== pos && Math.hypot(c[1]-cx, c[2]-cy, c[3]-cz) <= 8.5).map(c => c[0]);
-      if (nbrRes.length) v.addStyle({model: 0, resi: nbrRes}, {stick: {radius: 0.10, colorscheme: 'Jmol', opacity: 0.5}});
+      nbrRes = st._caList.filter(c => c[0] !== pos && Math.hypot(c[1]-cx, c[2]-cy, c[3]-cz) <= 8.5).map(c => c[0]);
+      if (showNeighbors && nbrRes.length) {
+        v.addStyle({model: 0, resi: nbrRes}, {stick: {radius: 0.10, colorscheme: 'Jmol', opacity: 0.5}});
+      }
+      if (showSurface3D && nbrRes.length && typeof $3Dmol !== 'undefined') {
+        v.addSurface($3Dmol.SurfaceType.VDW, {opacity: 0.32, color: '#cbd5e1'}, {model: 0, resi: nbrRes.concat([pos])});
+      }
     }
     if (mode === 'overlay' || mode === 'wt') {
       v.addStyle({model: 0, resi: pos}, {stick: {radius: 0.21, color: '#0095c8', opacity: mode==='overlay'?0.72:1}, sphere: {scale: 0.25, color: '#0095c8', opacity: mode==='overlay'?0.72:1}});
@@ -2491,6 +2776,7 @@ function refresh3DScene(keepCamera) {
     v.setClickable({model: 0}, true, atom => { if (atom && atom.resi) selectCodonFromTrack(atom.resi); });
     v.render();
     if (!keepCamera) zoomToMutatedResidue();
+    if (showContact2D) renderContactMap2D();
   });
 }
 
@@ -2506,6 +2792,7 @@ function renderExperimentalRCSB(gene, pos, wt, mut) {
   document.getElementById('mol3d-hud').textContent = `${gene} · RCSB PDB ${pdbRaw}`;
   const drawCif = cifTxt => {
     v.removeAllModels(); v.removeAllShapes(); v.removeAllLabels();
+    if (typeof v.removeAllSurfaces === 'function') v.removeAllSurfaces();
     v.addModel(cifTxt, 'cif');
     v.setStyle({}, {cartoon: {color: '#64748b', opacity: 0.82}});
     v.addStyle({resn: ['A','U','G','C','DA','DT','DG','DC']}, {cartoon: {color: '#d97706'}, stick: {radius: 0.13, color: '#f59e0b'}});
@@ -2524,6 +2811,84 @@ function renderExperimentalRCSB(gene, pos, wt, mut) {
 function zoomToMutatedResidue() { if (viewer3d) { const p = active3DState.pos; viewer3d.zoomTo({model:0, resi:[Math.max(1,p-4),p,p+4]}, 360); viewer3d.zoom(0.82, 160); } }
 function resetFullProtein3D() { if (viewer3d) viewer3d.zoomTo({model: 0}, 400); }
 function toggleNeighbors3D() { showNeighbors = !showNeighbors; document.getElementById('btn-nbrs').textContent = `Shell: ${showNeighbors ? 'On' : 'Off'}`; refresh3DScene(true); }
+function toggleSurface3D() {
+  showSurface3D = !showSurface3D;
+  const btn = document.getElementById('btn-surf');
+  if (btn) btn.classList.toggle('active-vp', showSurface3D);
+  refresh3DScene(true);
+}
+function toggleContactMap2D() {
+  showContact2D = !showContact2D;
+  const hud = document.getElementById('contact-hud');
+  const btn = document.getElementById('btn-2dmap');
+  if (hud) hud.classList.toggle('open', showContact2D);
+  if (btn) btn.classList.toggle('active-vp', showContact2D);
+  if (showContact2D) renderContactMap2D();
+}
+function renderContactMap2D() {
+  const cvs = document.getElementById('contact-canvas');
+  if (!cvs) return;
+  const { gene, pos } = active3DState;
+  const st = window.STRUCT3D_CACHE ? window.STRUCT3D_CACHE[gene] : null;
+  if (!st || !st._caList) return;
+  const L = st.s.length, N = 192, pad = 6, M = N - pad;
+  document.getElementById('contact-max-lbl').textContent = `${L} aa`;
+  const ctx = cvs.getContext('2d');
+  ctx.fillStyle = '#111315';
+  ctx.fillRect(0, 0, N, N);
+
+  const caByPos = {};
+  st._caList.forEach(c => { caByPos[c[0]] = c; });
+  const img = ctx.createImageData(M, M);
+  const data = img.data;
+  for (let py = 0; py < M; py++) {
+    const r1 = 1 + Math.floor((py / M) * L);
+    const c1 = caByPos[r1];
+    for (let px = 0; px < M; px++) {
+      const r2 = 1 + Math.floor((px / M) * L);
+      const c2 = caByPos[r2];
+      const off = (py * M + px) * 4;
+      if (!c1 || !c2) { data[off]=20; data[off+1]=22; data[off+2]=26; data[off+3]=255; continue; }
+      const d = Math.hypot(c1[1]-c2[1], c1[2]-c2[2], c1[3]-c2[3]);
+      const conf = Math.min(c1[4], c2[4]) / 100.0;
+      if (d <= 24.0) {
+        const t = (1.0 - d / 24.0) * (0.35 + 0.65 * conf);
+        data[off]   = Math.round(18 + t * 0);
+        data[off+1] = Math.round(26 + t * 165);
+        data[off+2] = Math.round(32 + t * 145);
+        data[off+3] = 255;
+      } else {
+        data[off]=22; data[off+1]=25; data[off+2]=30; data[off+3]=255;
+      }
+    }
+  }
+  ctx.putImageData(img, pad, pad);
+
+  (PROTEIN_DOMAINS[gene] || []).forEach(([ds, de, _, dcol]) => {
+    const a = pad + ((ds - 1) / L) * M, b = pad + (Math.min(L, de) / L) * M;
+    ctx.fillStyle = dcol;
+    ctx.fillRect(a, 0, Math.max(2, b - a), 4);
+    ctx.fillRect(0, a, 4, Math.max(2, b - a));
+  });
+
+  const cp = pad + ((Math.min(L, Math.max(1, pos)) - 1) / L) * M;
+  ctx.strokeStyle = '#ff4d6d';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(cp, pad); ctx.lineTo(cp, N);
+  ctx.moveTo(pad, cp); ctx.lineTo(N, cp);
+  ctx.stroke();
+}
+function handleContactMapClick(ev) {
+  const cvs = document.getElementById('contact-canvas');
+  const st = window.STRUCT3D_CACHE ? window.STRUCT3D_CACHE[active3DState.gene] : null;
+  if (!cvs || !st) return;
+  const rect = cvs.getBoundingClientRect();
+  const x = (ev.clientX - rect.left) * (cvs.width / rect.width);
+  const pad = 6, M = cvs.width - pad;
+  const targetPos = Math.min(st.s.length, Math.max(1, 1 + Math.round(((x - pad) / M) * (st.s.length - 1))));
+  selectCodonFromTrack(targetPos);
+}
 function toggleSpin3D() { if (viewer3d) { spinActive = !spinActive; viewer3d.spin(spinActive ? 'y' : false); document.getElementById('btn-spin').textContent = spinActive ? 'Stop' : 'Spin'; } }
 function toggleTheatre3D() {
   theatre3D = !theatre3D;
@@ -2567,6 +2932,38 @@ function downloadMutatedPDB() {
   a.download = `${gene}_${wt}${pos}${mut}.pdb`; a.click();
 }
 
+function buildProtVarRadarSVG(am, e2, if1, gDist, minPocketA, accentCol) {
+  const sAm  = am !== null ? Math.min(1, Math.max(0, am)) : 0;
+  const sSeq = e2 !== null ? Math.min(1, Math.max(0, -e2 / 10.0)) : 0;
+  const sIf1 = if1 !== null ? Math.min(1, Math.max(0, -if1 / 4.0)) : 0;
+  const sChm = Math.min(1, Math.max(0, gDist / 180.0));
+  const sPkt = minPocketA !== null ? Math.min(1, Math.max(0, 1.0 - minPocketA / 16.0)) : 0.1;
+  const vals = [sAm, sSeq, sIf1, sChm, sPkt];
+  const lbls = ['AM', 'Seq', 'Fold', 'Chem', 'Pocket'];
+  const cx = 62, cy = 60, R = 36;
+  const ptAt = (i, rFrac) => {
+    const ang = -Math.PI / 2 + (i * 2 * Math.PI) / 5;
+    return [cx + Math.cos(ang) * R * rFrac, cy + Math.sin(ang) * R * rFrac];
+  };
+  let rings = '', axes = '', lblSvg = '';
+  [0.5, 1.0].forEach(rf => {
+    const poly = [0,1,2,3,4].map(i => ptAt(i, rf).map(v=>v.toFixed(1)).join(',')).join(' ');
+    rings += `<polygon points="${poly}" fill="none" stroke="#dadce0" stroke-width="0.8"/>`;
+  });
+  lbls.forEach((lb, i) => {
+    const [ax, ay] = ptAt(i, 1.0);
+    const [lx, ly] = ptAt(i, 1.32);
+    axes += `<line x1="${cx}" y1="${cy}" x2="${ax.toFixed(1)}" y2="${ay.toFixed(1)}" stroke="#e2e6ea" stroke-width="0.8"/>`;
+    lblSvg += `<text x="${lx.toFixed(1)}" y="${(ly + 3).toFixed(1)}" font-size="8.5" font-weight="600" fill="#5f6368" text-anchor="middle">${lb}</text>`;
+  });
+  const dataPoly = vals.map((v, i) => ptAt(i, Math.max(0.08, v)).map(x=>x.toFixed(1)).join(',')).join(' ');
+  return `<svg viewBox="0 0 124 116" width="122" height="114" aria-label="5-axis biophysical impact radar">
+    ${rings}${axes}
+    <polygon points="${dataPoly}" fill="${accentCol}" fill-opacity="0.22" stroke="${accentCol}" stroke-width="1.6"/>
+    ${lblSvg}
+  </svg>`;
+}
+
 /* Clean Minimal Visual Scorecard */
 function renderPropertyDeltaCard(gene, pos, wt, mut, entry, subRow) {
   const box = document.getElementById('prop-delta-panel');
@@ -2581,6 +2978,7 @@ function renderPropertyDeltaCard(gene, pos, wt, mut, entry, subRow) {
   const regimeTag = wt === mut ? tagDot('dot-emerald', 'Wild-type')
     : (constrained ? ((if1 !== null && if1 > -1.5) ? tagDot('dot-crimson', 'Fold-preserving active site') : tagDot('dot-amber', 'Fold-destabilising'))
                    : tagDot('dot-petrol', 'Neutral'));
+  const radarCol = wt === mut ? '#137333' : (constrained ? ((if1 !== null && if1 > -1.5) ? '#c5221f' : '#b06000') : '#00709b');
 
   const clashCount = geom ? geom.clashes.length : 0;
   const aaCells = entry.s.map(r => {
@@ -2589,6 +2987,11 @@ function renderPropertyDeltaCard(gene, pos, wt, mut, entry, subRow) {
     const topCol = cns ? ((rIf1 !== null && rIf1 > -1.5) ? '#c5221f' : '#b06000') : '#00709b';
     return `<button class="aa-cell ${a===mut?'active':''}" style="border-top-color:${topCol};" onclick="selectMutAA(${pos},'${wt}','${a}')" title="${wt}${pos}${a}">${a}</button>`;
   }).join('');
+
+  const pktDists = [dna, dmet, dprt].filter(x => x !== null);
+  const minPktA = pktDists.length ? Math.min(...pktDists) : null;
+  const domHit = domainAtPos(gene, pos);
+  const domBadge = domHit ? `<span class="tag" style="background:${domHit.color}18;color:${domHit.color};font-weight:600;">${domHit.name}</span>` : '';
 
   const pocketNote = (dmet !== null && dmet <= 6.0) ? `${dmet} Å from catalytic metal`
     : ((dna !== null && dna <= 6.0) ? `${dna} Å from bound RNA/DNA` : `${geom ? geom.caNeighbors8A : '—'} Cα within 8 Å`);
@@ -2600,9 +3003,12 @@ function renderPropertyDeltaCard(gene, pos, wt, mut, entry, subRow) {
   box.innerHTML = `
     <div>
       <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;">
-        <div style="font-size:18px;font-weight:650;letter-spacing:-0.02em;">
-          ${gene} <code>${wt}${pos}${mut}</code>
-          <span style="font-size:13px;color:var(--ink-3);font-weight:400;margin-left:4px;">p.${wp.three}${pos}${mp.three}</span>
+        <div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap;">
+          <span style="font-size:18px;font-weight:650;letter-spacing:-0.02em;">
+            ${gene} <code>${wt}${pos}${mut}</code>
+          </span>
+          <span style="font-size:12.5px;color:var(--ink-3);">p.${wp.three}${pos}${mp.three}</span>
+          ${domBadge}
         </div>
         <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
           ${regimeTag}
@@ -2647,7 +3053,12 @@ function renderPropertyDeltaCard(gene, pos, wt, mut, entry, subRow) {
       </div>
     </div>
 
-    <div class="summary-pill">${oneLine}</div>
+    <div class="score-bottom">
+      <div class="summary-pill">${oneLine}</div>
+      <div class="radar-box" title="ProtVar-style 5-axis normalized fingerprint: AlphaMissense (AM), ESM-2 constraint (Seq), ESM-IF1 unfolding (Fold), Grantham radicality (Chem), and 3D Pocket proximity (Pocket)">
+        ${buildProtVarRadarSVG(am, e2, if1, gDist, minPktA, radarCol)}
+      </div>
+    </div>
   `;
 }
 
@@ -2670,7 +3081,10 @@ function inspectSaturationCodon() {
   const mut3D = activeSubRow ? activeSubRow[0] : wt;
 
   active3DState = { gene, pos, wt, mut: mut3D, lastPdbText: active3DState.lastPdbText };
+  dmsCenterPos = pos;
+  recordRecentVariant(gene, `${wt}${pos}${mut3D}`);
   updateLollipopActiveMarker(pos);
+  if (document.getElementById('exp-dms').classList.contains('active')) renderDmsHeatmap();
   if (document.getElementById('tab-variants').classList.contains('active')) {
     syncUrlHash(`#variant=${gene}:${wt}${pos}${mut3D}`);
   }
@@ -3322,10 +3736,124 @@ function applyUrlState() {
       const hit = tMap[kv.tab.toLowerCase()];
       if (hit) switchTab(hit[0], document.getElementById(hit[1]), true);
       if (kv.tab.toLowerCase() === 'batch') openBatchTriage();
+      if (kv.tab.toLowerCase() === 'dms') openDmsLandscape();
     }
   } finally {
     setTimeout(() => { suppressHashSync = false; }, 120);
   }
+}
+
+/* MaveDB / dms-viz Style 2D Deep Mutational Scanning Heatmap Synced to 3D */
+const DMS_AA_ORDER = ['G','A','V','L','I','M','F','Y','W','P','S','T','C','N','Q','H','K','R','D','E'];
+function openDmsLandscape() {
+  switchTab('tab-variants', document.getElementById('btn-tab-variants'));
+  switchSub('exp-sub', 'exp-dms', document.getElementById('seg-exp-dms'));
+  renderDmsHeatmap();
+  document.getElementById('exp-dms').scrollIntoView({behavior: 'smooth', block: 'start'});
+}
+
+function stepDmsWindow(delta) {
+  const gene = document.getElementById('lol-gene').value;
+  const gCache = window.SAT_CACHE ? window.SAT_CACHE[gene] : null;
+  if (!gCache) return;
+  const L = Object.keys(gCache).length;
+  dmsCenterPos = Math.min(L, Math.max(1, (dmsCenterPos || active3DState.pos || 1) + delta));
+  renderDmsHeatmap();
+}
+
+function jumpDmsToDomain(val) {
+  if (!val) return;
+  const [s, e] = val.split('-').map(Number);
+  if (s && e) {
+    dmsCenterPos = Math.round((s + e) / 2);
+    renderDmsHeatmap();
+  }
+}
+
+function dmsScoreColor(metric, val) {
+  if (val === null || val === undefined) return '#eef1f4';
+  if (metric === 'am') {
+    if (val <= 0.45) {
+      const t = Math.max(0, val / 0.45);
+      return `rgb(${Math.round(35 + t*215)},${Math.round(118 + t*132)},${Math.round(178 + t*72)})`;
+    }
+    const t = Math.min(1, (val - 0.45) / 0.55);
+    return `rgb(${Math.round(250 - t*53)},${Math.round(245 - t*211)},${Math.round(245 - t*214)})`;
+  }
+  if (metric === 'if1') {
+    const t = Math.min(1, Math.max(0, -val / 4.2));
+    return `rgb(${Math.round(244 - t*68)},${Math.round(247 - t*151)},${Math.round(250 - t*240)})`;
+  }
+  const t = Math.min(1, Math.max(0, -val / 11.0));
+  return `rgb(${Math.round(244 - t*47)},${Math.round(247 - t*213)},${Math.round(250 - t*219)})`;
+}
+
+function renderDmsHeatmap() {
+  const wrap = document.getElementById('dms-svg-wrap');
+  if (!wrap) return;
+  const gene = document.getElementById('lol-gene').value;
+  const gCache = window.SAT_CACHE ? window.SAT_CACHE[gene] : null;
+  if (!gCache) { ensureSatLoaded(gene, renderDmsHeatmap); return; }
+
+  const L = Object.keys(gCache).length;
+  const half = parseInt(document.getElementById('dms-span').value || '25', 10);
+  const metric = document.getElementById('dms-metric').value || 'am';
+  const center = Math.min(L, Math.max(1, dmsCenterPos || active3DState.pos || 1));
+  let startP = Math.max(1, center - half);
+  let endP = Math.min(L, startP + half * 2);
+  startP = Math.max(1, endP - half * 2);
+  const nCols = endP - startP + 1;
+
+  const cw = half > 30 ? 16 : 24, ch = 18, padL = 42, padT = 32, padB = 26, padR = 16;
+  const W = padL + nCols * cw + padR, H = padT + 20 * ch + padB;
+
+  let cells = '', colHdrs = '';
+  for (let p = startP; p <= endP; p++) {
+    const entry = gCache[String(p)];
+    if (!entry) continue;
+    const x = padL + (p - startP) * cw;
+    const wt = entry.m[0];
+    const dm = domainAtPos(gene, p);
+    colHdrs += `<rect x="${x}" y="8" width="${cw - 1}" height="5" fill="${dm ? dm.color : '#dfe3e8'}"><title>${dm ? dm.name : 'Inter-domain'} · aa ${p}</title></rect>`;
+    if (p === active3DState.pos) {
+      colHdrs += `<rect x="${x - 0.5}" y="${padT - 1}" width="${cw}" height="${20 * ch + 2}" fill="none" stroke="#202124" stroke-width="1.5"/>`;
+    }
+    if (p === startP || p === endP || p % 5 === 0) {
+      colHdrs += `<text x="${(x + cw/2).toFixed(1)}" y="25" font-size="9.5" font-family="monospace" fill="${p===active3DState.pos?'#c5221f':'#5f6368'}" font-weight="${p===active3DState.pos?'700':'400'}" text-anchor="middle">${p}</text>`;
+    }
+    const subMap = {};
+    entry.s.forEach(r => { subMap[r[0]] = r; });
+    DMS_AA_ORDER.forEach((aa, ri) => {
+      const y = padT + ri * ch;
+      if (aa === wt) {
+        cells += `<g style="cursor:pointer" onclick="selectMutAA(${p},'${wt}','${wt}')">
+          <rect x="${x}" y="${y}" width="${cw - 1}" height="${ch - 1}" fill="#f8f9fa"/>
+          <circle cx="${(x + (cw-1)/2).toFixed(1)}" cy="${(y + (ch-1)/2).toFixed(1)}" r="2.1" fill="#5f6368"/>
+          <title>${gene} ${wt}${p} (Wild-type)</title>
+        </g>`;
+        return;
+      }
+      const sr = subMap[aa];
+      const val = sr ? (metric === 'am' ? sr[1] : (metric === 'if1' ? sr[4] : sr[2])) : null;
+      const bg = dmsScoreColor(metric, val);
+      const hasObs = sr && (sr[5] > 0 || (sr[6] && sr[6].toLowerCase().includes('pathogenic')));
+      const strokeAttr = (p === active3DState.pos && aa === active3DState.mut)
+        ? 'stroke="#111315" stroke-width="1.8"'
+        : (hasObs ? 'stroke="#202124" stroke-width="1.1"' : '');
+      cells += `<rect x="${x}" y="${y}" width="${cw - 1}" height="${ch - 1}" rx="1.5" fill="${bg}" ${strokeAttr} style="cursor:pointer" onclick="selectMutAA(${p},'${wt}','${aa}')">
+        <title>${gene} ${wt}${p}${aa} · AM=${sr&&sr[1]!==null?sr[1].toFixed(3):'—'} · IF1=${sr&&sr[4]!==null?sr[4].toFixed(2):'—'} · ESM2=${sr&&sr[2]!==null?sr[2].toFixed(2):'—'}${sr&&sr[5]>0?' · TCGA n='+sr[5]:''}${sr&&sr[6]?' · ClinVar: '+sr[6]:''}</title>
+      </rect>`;
+    });
+  }
+
+  const rowLbls = DMS_AA_ORDER.map((aa, ri) =>
+    `<text x="${padL - 8}" y="${padT + ri * ch + 13}" font-size="10.5" font-family="monospace" font-weight="600" fill="#202124" text-anchor="end">${aa}</text>`
+  ).join('');
+
+  wrap.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" width="100%" height="${H}">
+    ${rowLbls}${cells}${colHdrs}
+    <text x="${padL}" y="${H - 7}" font-size="10.5" fill="#80868b">${gene} codons ${startP}–${endP} of ${L} aa</text>
+  </svg>`;
 }
 
 function downloadCSV(filename, rows) {

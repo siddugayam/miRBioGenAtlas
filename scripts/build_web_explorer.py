@@ -1069,6 +1069,77 @@ def build_web_explorer():
     color: var(--ink-3);
     font-size: 12px;
   }}
+
+  /* Clean Home-Page About, Authors & Citation Section */
+  .about-section {{
+    background: #ffffff;
+    border-top: 1px solid var(--line-soft);
+    padding: 40px 0 36px;
+  }}
+  .about-grid {{
+    display: grid;
+    grid-template-columns: 1.25fr 1fr;
+    gap: 24px;
+    margin-bottom: 24px;
+  }}
+  @media (max-width: 960px) {{
+    .about-grid {{ grid-template-columns: 1fr; }}
+  }}
+  .pillars-row {{
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-top: 14px;
+  }}
+  @media (max-width: 680px) {{
+    .pillars-row {{ grid-template-columns: 1fr; }}
+  }}
+  .pillar-tile {{
+    background: var(--canvas);
+    border: 1px solid var(--line-soft);
+    border-radius: 10px;
+    padding: 11px 13px;
+  }}
+  .authors-grid {{
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-bottom: 20px;
+  }}
+  @media (max-width: 1024px) {{
+    .authors-grid {{ grid-template-columns: repeat(2, 1fr); }}
+  }}
+  @media (max-width: 560px) {{
+    .authors-grid {{ grid-template-columns: 1fr; }}
+  }}
+  .author-card {{
+    border: 1px solid var(--line-soft);
+    border-radius: 11px;
+    padding: 13px 15px;
+    background: var(--canvas);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 8px;
+  }}
+  .orcid-link {{
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--emerald);
+    text-decoration: none;
+  }}
+  .orcid-link:hover {{ text-decoration: underline; }}
+  .cite-box {{
+    background: var(--canvas);
+    border: 1px solid var(--line-soft);
+    border-radius: 11px;
+    padding: 14px 16px;
+    font-size: 12.5px;
+    color: var(--ink-2);
+  }}
 </style>
 </head>
 <body>
@@ -1088,6 +1159,7 @@ def build_web_explorer():
       <button class="nav-tab" id="btn-tab-mirna" onclick="switchTab('tab-mirna', this)">Small-RNA</button>
       <button class="nav-tab" id="btn-tab-clinical" onclick="switchTab('tab-clinical', this)">Clinical &amp; Biology</button>
       <button class="nav-tab" id="btn-tab-docs" onclick="switchTab('tab-docs', this)">Formulas &amp; Data</button>
+      <button class="nav-tab" onclick="document.getElementById('about-atlas').scrollIntoView({{behavior:'smooth'}})">About &amp; Cite</button>
     </nav>
 
     <div class="top-links">
@@ -1716,10 +1788,110 @@ def build_web_explorer():
   <button class="btn-action" style="width:100%;" onclick="closeGuideDrawer();openFormulaTab();">Browse All 16 LaTeX Equations &rarr;</button>
 </aside>
 
+<!-- Clean Home-Page About, Authors, Citation & Access Section -->
+<section id="about-atlas" class="about-section">
+  <div class="wrap">
+    <div class="about-grid">
+      <div>
+        <div style="font-family:var(--mono);font-size:11px;color:var(--accent);font-weight:600;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:4px;">About the Resource</div>
+        <h2 style="margin:0 0 8px;font-size:18px;font-weight:650;letter-spacing:-0.02em;">miRBioGenAtlas (v2.0.2)</h2>
+        <p style="margin:0;color:var(--ink-2);font-size:13px;line-height:1.58;">
+          <strong>miRBioGenAtlas</strong> is an open-access, multi-consortium reference of the human microRNA biogenesis machinery integrating somatic coding mutations, chromosome-arm-deconfounded copy-number alterations, 213,940-variant 3D structural and language-model saturation scores, and endogenous mature <code>5p:3p</code> small-RNA readouts across 21,140 sequenced human tumours. All 3D side-chain modelling and queries execute locally in your browser with zero tracking or data upload.
+        </p>
+
+        <div class="pillars-row">
+          <div class="pillar-tile">
+            <div style="font-weight:600;font-size:12.5px;margin-bottom:2px;">Reproducible by Design</div>
+            <div style="font-size:11.5px;color:var(--ink-2);">Built deterministically from 46 SHA-256-verified raw snapshots with 7 automated integrity tests.</div>
+          </div>
+          <div class="pillar-tile">
+            <div style="font-weight:600;font-size:12.5px;margin-bottom:2px;">Open Dual Licensing</div>
+            <div style="font-size:11.5px;color:var(--ink-2);">Derived tables &amp; figures: <strong>CC BY 4.0</strong> · Pipeline, CLI &amp; 3D web explorer: <strong>MIT License</strong>.</div>
+          </div>
+          <div class="pillar-tile">
+            <div style="font-weight:600;font-size:12.5px;margin-bottom:2px;">Instant CLI &amp; Bulk Data</div>
+            <div style="font-size:11.5px;color:var(--ink-2);">41 CSV/CSV.GZ tables on Zenodo plus offline Python CLI: <code>query_variant.py DICER1 E1705K</code>.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="cite-box" style="display:flex;flex-direction:column;justify-content:space-between;gap:12px;">
+        <div>
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:6px;">
+            <strong style="color:var(--ink);font-size:13px;">How to Cite &amp; Data Access</strong>
+            <div style="display:flex;gap:6px;">
+              <button class="btn-subtle" id="btn-copy-cite" onclick="copyCitationText('text')">Copy Citation</button>
+              <button class="btn-subtle" id="btn-copy-bib" onclick="copyCitationText('bibtex')">Copy BibTeX</button>
+            </div>
+          </div>
+          <div style="background:#ffffff;border:1px solid var(--line-soft);border-radius:8px;padding:10px 12px;font-size:12px;line-height:1.5;color:var(--ink);">
+            Gayam, P. K. R., Earny, V. A., Aranjani, J. M. &amp; Mahammad, F. S. <em>miRBioGenAtlas: Pan-cancer alteration landscape of the miRNA biogenesis machinery across 32 TCGA cancer studies</em> (v2.0.2). <strong>Zenodo</strong> <a href="https://doi.org/10.5281/zenodo.24455067" target="_blank" rel="noopener" style="color:var(--accent);text-decoration:none;">https://doi.org/10.5281/zenodo.24455067</a> (2026).
+          </div>
+        </div>
+
+        <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between;">
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <a href="https://doi.org/10.5281/zenodo.24455067" target="_blank" rel="noopener" class="btn-action" style="text-decoration:none;display:inline-flex;align-items:center;height:31px;font-size:12px;">Download Zenodo Deposit (44 MB)</a>
+            <a href="https://github.com/siddugayam/miRBioGenAtlas" target="_blank" rel="noopener" class="btn-subtle" style="text-decoration:none;display:inline-flex;align-items:center;height:31px;">GitHub &amp; CLI</a>
+          </div>
+          <span style="font-family:var(--mono);font-size:11px;color:var(--ink-3);">Concept DOI: 10.5281/zenodo.24337286</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Authors & Affiliations -->
+    <div style="margin-bottom:8px;display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:8px;">
+      <div style="font-size:13px;font-weight:600;color:var(--ink);">Authors &amp; Institutional Affiliations — Manipal Academy of Higher Education (MAHE), Manipal, India</div>
+      <a href="mailto:fayaz.shaik@manipal.edu" style="font-size:12px;color:var(--accent);text-decoration:none;">Correspondence: fayaz.shaik@manipal.edu</a>
+    </div>
+
+    <div class="authors-grid">
+      <div class="author-card">
+        <div>
+          <div style="font-weight:600;font-size:13px;color:var(--ink);">Gayam Prasanna Kumar Reddy</div>
+          <div style="font-size:11.5px;color:var(--ink-2);margin-top:3px;">Dept. of Pharmaceutical Biotechnology, Manipal College of Pharmaceutical Sciences (MCOPS), MAHE</div>
+        </div>
+        <a class="orcid-link" href="https://orcid.org/0000-0001-5032-364X" target="_blank" rel="noopener">ORCID &middot; 0000-0001-5032-364X</a>
+      </div>
+
+      <div class="author-card">
+        <div>
+          <div style="font-weight:600;font-size:13px;color:var(--ink);">Venkat Abhiram Earny</div>
+          <div style="font-size:11.5px;color:var(--ink-2);margin-top:3px;">Dept. of Microbiology, Kasturba Medical College (KMC), MAHE</div>
+        </div>
+        <a class="orcid-link" href="https://orcid.org/0009-0008-6926-553X" target="_blank" rel="noopener">ORCID &middot; 0009-0008-6926-553X</a>
+      </div>
+
+      <div class="author-card">
+        <div>
+          <div style="font-weight:600;font-size:13px;color:var(--ink);">Jesil Mathew Aranjani</div>
+          <div style="font-size:11.5px;color:var(--ink-2);margin-top:3px;">Dept. of Pharmaceutical Biotechnology, Manipal College of Pharmaceutical Sciences (MCOPS), MAHE</div>
+        </div>
+        <a class="orcid-link" href="https://orcid.org/0000-0002-7666-3252" target="_blank" rel="noopener">ORCID &middot; 0000-0002-7666-3252</a>
+      </div>
+
+      <div class="author-card">
+        <div>
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:6px;">
+            <span style="font-weight:600;font-size:13px;color:var(--ink);">Fayaz Shaik Mahammad*</span>
+            <span class="ver-pill" style="color:var(--accent);background:var(--accent-soft);">Corresponding</span>
+          </div>
+          <div style="font-size:11.5px;color:var(--ink-2);margin-top:3px;">Manipal Institute of Technology (MIT), MAHE, Manipal 576104, Karnataka, India</div>
+        </div>
+        <a class="orcid-link" href="https://orcid.org/0000-0002-1212-7952" target="_blank" rel="noopener">ORCID &middot; 0000-0002-1212-7952</a>
+      </div>
+    </div>
+
+    <div style="font-size:11.5px;color:var(--ink-3);line-height:1.5;">
+      <strong>Consortium Attribution &amp; Research Disclaimer:</strong> Harmonises public open-access data from TCGA PanCancer Atlas / NCI GDC, cBioPortal, MSK-IMPACT, RCSB PDB, AlphaFold DB, AlphaMissense, Meta ESM, NCBI ClinVar, gnomAD v4, GTEx v10, Human Protein Atlas, CPTAC, Broad DepMap, and Open Targets. Provided strictly for scientific research and educational use; not intended for direct clinical diagnostic decision-making without validated laboratory confirmation.
+    </div>
+  </div>
+</section>
+
 <footer>
   <div class="wrap" style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;">
-    <span>miRBioGenAtlas v2.0.2 &middot; Manipal Academy of Higher Education (MAHE)</span>
-    <span><a href="https://doi.org/10.5281/zenodo.24455067" target="_blank" rel="noopener" style="color:var(--accent);text-decoration:none;">Zenodo 10.5281/zenodo.24455067</a> &middot; CC BY 4.0 / MIT</span>
+    <span>&copy; 2026 miRBioGenAtlas Authors &middot; Manipal Academy of Higher Education (MAHE), Manipal, India</span>
+    <span><a href="https://doi.org/10.5281/zenodo.24455067" target="_blank" rel="noopener" style="color:var(--accent);text-decoration:none;">DOI: 10.5281/zenodo.24455067</a> &middot; <a href="https://github.com/siddugayam/miRBioGenAtlas" target="_blank" rel="noopener" style="color:var(--accent);text-decoration:none;">GitHub</a> &middot; CC BY 4.0 / MIT</span>
   </div>
 </footer>
 
@@ -2821,6 +2993,18 @@ function downloadCSV(filename, rows) {{
 function exportLongCSV() {{ downloadCSV('miRBioGenAtlas_480_gene_study_summary.csv', ATLAS.long); }}
 function exportFilteredVariantsCSV() {{ downloadCSV('miRBioGenAtlas_filtered_3D_variants.csv', currentFilteredVars); }}
 function exportDicerMirnaCSV() {{ downloadCSV('miRBioGenAtlas_DICER1_mirnaseq_5p3p.csv', ATLAS.dicer_pts); }}
+
+function copyCitationText(fmt) {{
+  const plain = 'Gayam, P. K. R., Earny, V. A., Aranjani, J. M. & Mahammad, F. S. miRBioGenAtlas: Pan-cancer alteration landscape of the miRNA biogenesis machinery across 32 TCGA cancer studies (v2.0.2). Zenodo https://doi.org/10.5281/zenodo.24455067 (2026).';
+  const bib = `@dataset{{gayam_2026_mirbiogenatlas,\\n  author    = {{Gayam, Prasanna Kumar Reddy and Earny, Venkat Abhiram and Aranjani, Jesil Mathew and Mahammad, Fayaz Shaik}},\\n  title     = {{{{miRBioGenAtlas: Pan-cancer alteration landscape of the miRNA biogenesis machinery across 32 TCGA cancer studies}}}},\\n  year      = {{2026}},\\n  publisher = {{Zenodo}},\\n  version   = {{2.0.2}},\\n  doi       = {{10.5281/zenodo.24455067}},\\n  url       = {{https://doi.org/10.5281/zenodo.24455067}}\\n}}`;
+  const txt = fmt === 'bibtex' ? bib : plain;
+  const btn = document.getElementById(fmt === 'bibtex' ? 'btn-copy-bib' : 'btn-copy-cite');
+  const orig = btn.textContent;
+  navigator.clipboard.writeText(txt).then(() => {{
+    btn.textContent = 'Copied ✓';
+    setTimeout(() => {{ btn.textContent = orig; }}, 1600);
+  }});
+}}
 
 window.addEventListener('DOMContentLoaded', () => {{
   const selVar = document.getElementById('var-gene');

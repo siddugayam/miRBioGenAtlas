@@ -412,6 +412,12 @@ FORMULA_CARDS = [
         "title": "Matched Cohort Denominator & Inclusion–Exclusion Identity",
         "latex": r"N_s = \lvert \mathcal{S}_{\text{seq},s} \cap \mathcal{S}_{\text{CNA},s} \rvert, \qquad N_{\text{any}} = N_{\text{mut-only}} + N_{\text{CNA-only}} + N_{\text{mut}\cap\text{CNA}}",
         "summary": "Ensures exact matched denominators (N = 10,195 across 32 TCGA studies) and zero union-identity discrepancy across 20/20 cBioPortal API spot-checks.",
+        "citation": "Hoadley et al., Cell 173, 291–304 (2018); Ellrott et al., Cell Syst. 6, 271–281 (2018)",
+        "doi_url": "https://doi.org/10.1016/j.cell.2018.03.022",
+        "refs": [
+            {"cite": "Hoadley et al., Cell (2018)", "url": "https://doi.org/10.1016/j.cell.2018.03.022"},
+            {"cite": "Ellrott et al., Cell Syst. (2018)", "url": "https://doi.org/10.1016/j.cels.2018.03.002"},
+        ],
     },
     {
         "id": "F2",
@@ -419,6 +425,12 @@ FORMULA_CARDS = [
         "title": "Strict Alteration Filter & Synteny-Aware Pathway Union",
         "latex": r"\mathbb{I}_{\text{strict}}(s,g) = \mathbb{I}\!\bigl[\text{nonsyn}(s,g) > 0 \;\lor\; |\text{GISTIC2}(s,g)| = 2\bigr], \qquad B_{\mathcal{T}}(s) = \max_{g\in\mathcal{T}}\mathbb{I}_{\text{strict}}(s,g)",
         "summary": "Strips the 81% of raw GISTIC calls caused by whole-arm ±1 aneuploidy and collapses tandem 1p34.3 (AGO1/3/4) and 18q21.1 (SMAD2/4) clusters.",
+        "citation": "Mermel et al., Genome Biol. 12, R41 (2011) [GISTIC2.0]; Taylor et al., Cancer Cell 33, 676–689 (2018)",
+        "doi_url": "https://doi.org/10.1186/gb-2011-12-4-r41",
+        "refs": [
+            {"cite": "Mermel et al., Genome Biol. (2011)", "url": "https://doi.org/10.1186/gb-2011-12-4-r41"},
+            {"cite": "Taylor et al., Cancer Cell (2018)", "url": "https://doi.org/10.1016/j.ccell.2018.03.007"},
+        ],
     },
     {
         "id": "F3",
@@ -426,6 +438,12 @@ FORMULA_CARDS = [
         "title": "3D Active-Pocket & Cofactor Euclidean Heavy-Atom Distance",
         "latex": r"d_{\min}(r,\mathcal{L}) = \min_{a\in\mathcal{A}_r,\;b\in\mathcal{A}_{\mathcal{L}}}\|\mathbf{x}_a - \mathbf{x}_b\|_2, \qquad \mathbb{I}_{\text{pocket}}(r) = \mathbb{I}\!\bigl[\min(d_{\text{NA}},\,d_{\text{metal}},\,d_{\text{partner}}) \le 6.0\,\text{\AA}\bigr]",
         "summary": "Identifies catalytic and substrate-binding residues across 16 human Cryo-EM and X-ray protein–RNA–metal structures.",
+        "citation": "Zapletal et al., Mol. Cell 82, 4064–4079 (2022); Jumper et al., Nature 596, 583–589 (2021)",
+        "doi_url": "https://doi.org/10.1016/j.molcel.2022.10.010",
+        "refs": [
+            {"cite": "Zapletal et al., Mol. Cell (2022)", "url": "https://doi.org/10.1016/j.molcel.2022.10.010"},
+            {"cite": "Jumper et al., Nature (2021)", "url": "https://doi.org/10.1038/s41586-021-03819-2"},
+        ],
     },
     {
         "id": "F4",
@@ -433,6 +451,12 @@ FORMULA_CARDS = [
         "title": "Zero-Shot Protein Language Model Masked-Marginal LLR (ESM-2 & ESM-1v)",
         "latex": r"\Delta\ell_{\text{PLM}}(i,\, w \to m) = \log P_{\theta}(x_i = m \mid \mathbf{x}_{-i}) - \log P_{\theta}(x_i = w \mid \mathbf{x}_{-i})",
         "summary": "Scores evolutionary fitness across all 213,940 single-amino-acid substitutions without clinical training supervision (Δℓ ≤ −5 marks strong constraint).",
+        "citation": "Lin et al., Science 379, 1123–1130 (2023) [ESM-2]; Meier et al., NeurIPS 34, 29287–29303 (2021) [ESM-1v]",
+        "doi_url": "https://doi.org/10.1126/science.ade2574",
+        "refs": [
+            {"cite": "Lin et al., Science (2023) [ESM-2]", "url": "https://doi.org/10.1126/science.ade2574"},
+            {"cite": "Meier et al., NeurIPS (2021) [ESM-1v]", "url": "https://doi.org/10.1101/2021.07.09.450648"},
+        ],
     },
     {
         "id": "F5",
@@ -440,6 +464,12 @@ FORMULA_CARDS = [
         "title": "3D Inverse-Folding Thermodynamic Stability (ESM-IF1)",
         "latex": r"\Delta\log P_{\text{IF1}} = \sum_{t=1}^{L}\Bigl[\log P\bigl(x_t^{\text{mut}} \mid \mathbf{X}_{\text{N,C}\alpha\text{,C}},\,\mathbf{x}_{<t}^{\text{mut}}\bigr) - \log P\bigl(x_t^{\text{wt}} \mid \mathbf{X}_{\text{N,C}\alpha\text{,C}},\,\mathbf{x}_{<t}^{\text{wt}}\bigr)\Bigr]",
         "summary": "Separates fold-preserving catalytic hotspots (ΔlogP > −1.5, e.g. DICER1 E1705K) from fold-destabilising core mutations (ΔlogP ≤ −1.5).",
+        "citation": "Hsu et al., Proc. ICML 162, 8946–8970 (2022) [ESM-IF1]; Cheng et al., Science 381, eadg7492 (2023) [AlphaMissense]",
+        "doi_url": "https://doi.org/10.1126/science.adg7492",
+        "refs": [
+            {"cite": "Hsu et al., ICML (2022) [ESM-IF1]", "url": "https://doi.org/10.1101/2022.04.10.487779"},
+            {"cite": "Cheng et al., Science (2023) [AlphaMissense]", "url": "https://doi.org/10.1126/science.adg7492"},
+        ],
     },
     {
         "id": "F6",
@@ -447,6 +477,12 @@ FORMULA_CARDS = [
         "title": "N–Cα–C Side-Chain Rotamer Projection & Steric Clash Penalty",
         "latex": r"\mathbf{u}=\widehat{\mathbf{r}_{\text{N}}-\mathbf{r}_{\text{C}\alpha}},\;\mathbf{w}=\widehat{\mathbf{u}\times(\mathbf{r}_{\text{C}}-\mathbf{r}_{\text{C}\alpha})},\quad E_{\text{clash}}=\sum_{d<2.4\,\text{\AA}}25(2.40-d)^2 + \sum_{2.4\le d<3.0\,\text{\AA}}0.4(3.0-d)",
         "summary": "Projects mutant heavy atoms onto the local backbone frame and selects the χ1 rotamer minimising van der Waals clashes (< 2.40 Å).",
+        "citation": "Shapovalov & Dunbrack, Structure 19, 844–858 (2011); Lovell et al., Proteins 40, 389–408 (2000)",
+        "doi_url": "https://doi.org/10.1016/j.str.2011.03.019",
+        "refs": [
+            {"cite": "Shapovalov & Dunbrack, Structure (2011)", "url": "https://doi.org/10.1016/j.str.2011.03.019"},
+            {"cite": "Lovell et al., Proteins (2000)", "url": "https://doi.org/10.1002/1097-0134(20000815)40:3%3C389::AID-PROT50%3E3.0.CO;2-2"},
+        ],
     },
     {
         "id": "F7",
@@ -454,6 +490,12 @@ FORMULA_CARDS = [
         "title": "Grantham Chemical Distance & Side-Chain Property Shifts",
         "latex": r"D(a,b) = 50.723\,\sqrt{1.833(c_a-c_b)^2 + 0.1018(p_a-p_b)^2 + 0.000399(v_a-v_b)^2}",
         "summary": "Quantifies chemical severity (Conservative ≤ 50, Moderate 51–100, Radical > 150) alongside Δq (pH 7.4), ΔVolume (Å³), and ΔHydropathy.",
+        "citation": "Grantham, Science 185, 862–864 (1974); Kyte & Doolittle, J. Mol. Biol. 157, 105–132 (1982)",
+        "doi_url": "https://doi.org/10.1126/science.185.4154.862",
+        "refs": [
+            {"cite": "Grantham, Science (1974)", "url": "https://doi.org/10.1126/science.185.4154.862"},
+            {"cite": "Kyte & Doolittle, J. Mol. Biol. (1982)", "url": "https://doi.org/10.1016/0022-2836(82)90515-0"},
+        ],
     },
     {
         "id": "F8",
@@ -461,6 +503,12 @@ FORMULA_CARDS = [
         "title": "Paired Canonical 5p:3p Mature miRNA Duplex Ratio",
         "latex": r"\text{Duplex}_{5p:3p}(s) = \frac{1}{\lvert\mathcal{D}_s\rvert}\sum_{d\in\mathcal{D}_s}\log_2\!\left(\frac{\text{RPM}_{s,d,5p}+1}{\text{RPM}_{s,d,3p}+1}\right), \qquad F_{5p}(s) = \frac{\sum_d \text{RPM}_{s,d,5p}}{\sum_d(\text{RPM}_{s,d,5p}+\text{RPM}_{s,d,3p})}",
         "summary": "Cancels transcriptional variance across 192 co-transcribed hairpins (N = 9,578 tumours) to isolate DICER1 RNase IIIb 5p cleavage failure.",
+        "citation": "Anglesio et al., N. Engl. J. Med. 366, 409–420 (2012); Gurtan et al., Genes Dev. 26, 1369–1374 (2012)",
+        "doi_url": "https://doi.org/10.1056/NEJMoa1109399",
+        "refs": [
+            {"cite": "Anglesio et al., NEJM (2012)", "url": "https://doi.org/10.1056/NEJMoa1109399"},
+            {"cite": "Gurtan et al., Genes Dev. (2012)", "url": "https://doi.org/10.1101/gad.191528.112"},
+        ],
     },
     {
         "id": "F9",
@@ -468,6 +516,12 @@ FORMULA_CARDS = [
         "title": "Endogenous DICER1-Independent / AGO2-Slicer Ratiometric Control",
         "latex": r"\Delta_{\text{Slicer}}(s) = \log_2\!\bigl(\text{RPM}_{s,\text{miR-451a}} + 1\bigr) - \log_2\!\bigl(\text{RPM}_{s,\text{miR-144-5p}} + 1\bigr)",
         "summary": "Short-stem pre-miR-451a bypasses DICER1 and is sliced directly by AGO2, remaining invariant in DICER1 pocket mutants (p = 0.967).",
+        "citation": "Cheloufi et al., Nature 465, 584–589 (2010); Cifuentes et al., Science 328, 1694–1698 (2010)",
+        "doi_url": "https://doi.org/10.1038/nature09092",
+        "refs": [
+            {"cite": "Cheloufi et al., Nature (2010)", "url": "https://doi.org/10.1038/nature09092"},
+            {"cite": "Cifuentes et al., Science (2010)", "url": "https://doi.org/10.1126/science.1190809"},
+        ],
     },
     {
         "id": "F10",
@@ -475,6 +529,12 @@ FORMULA_CARDS = [
         "title": "miRNAome Shannon Entropy & Standardised SVD Principal Axis",
         "latex": r"H'(s) = -\sum_{m:\,\text{RPM}_{s,m}>0} p_{s,m}\log_2 p_{s,m}\;\;(\text{bits}), \qquad \mathbf{Z}_{\text{miR}} = \mathbf{U}\boldsymbol{\Sigma}\mathbf{V}^{\top}",
         "summary": "Measures global small-RNA diversity in bits and extracts the primary orthogonal component (PC1) across 662 mature miRNAs.",
+        "citation": "Shannon, Bell Syst. Tech. J. 27, 379–423 (1948); Chu et al., Nucleic Acids Res. 44, e3 (2016)",
+        "doi_url": "https://doi.org/10.1093/nar/gkv808",
+        "refs": [
+            {"cite": "Shannon, Bell Syst. Tech. J. (1948)", "url": "https://doi.org/10.1002/j.1538-7305.1948.tb01338.x"},
+            {"cite": "Chu et al., Nucleic Acids Res. (2016)", "url": "https://doi.org/10.1093/nar/gkv808"},
+        ],
     },
     {
         "id": "F11",
@@ -482,6 +542,12 @@ FORMULA_CARDS = [
         "title": "Transcriptome-Wide miRNA × mRNA Couplings (13.37M Pairs)",
         "latex": r"\mathbf{R} = \frac{1}{N_{\text{dual}}-1}\,\mathbf{Z}_{\text{miR}}^{\top}\mathbf{Z}_{\text{mRNA}}, \qquad t_{m,g} = r_{m,g}\sqrt{\frac{N_{\text{dual}}-2}{1 - r_{m,g}^2}}",
         "summary": "Evaluates 662 miRNAs × 20,196 mRNAs across N = 9,353 dual-profiled tumours and computes let-7 and miR-200 target derepression Z-scores.",
+        "citation": "Viswanathan et al., Science 320, 97–100 (2008); Bartel, Cell 173, 20–51 (2018)",
+        "doi_url": "https://doi.org/10.1016/j.cell.2018.03.006",
+        "refs": [
+            {"cite": "Viswanathan et al., Science (2008)", "url": "https://doi.org/10.1126/science.1154040"},
+            {"cite": "Bartel, Cell (2018)", "url": "https://doi.org/10.1016/j.cell.2018.03.006"},
+        ],
     },
     {
         "id": "F12",
@@ -489,6 +555,13 @@ FORMULA_CARDS = [
         "title": "Yanai Healthy Tissue-Specificity Index (τ) Across 54 GTEx Tissues",
         "latex": r"\tau_g = \frac{1}{K-1}\sum_{i=1}^{K}\left(1 - \frac{\tilde{x}_{g,i}}{\max_{1\le j\le K}\tilde{x}_{g,j}}\right), \qquad \tilde{x}_{g,i} = \log_2(\text{TPM}_{g,i}+1)",
         "summary": "Contrasts ubiquitous housekeeping Core-10 enzymes (τ = 0.22–0.38) against testis-restricted oncofetal LIN28A (0.997) and LIN28B (0.978).",
+        "citation": "Yanai et al., Bioinformatics 21, 650–659 (2005); GTEx Consortium, Science 369, 1318–1330 (2020); Karczewski et al., Nature 581, 434–443 (2020)",
+        "doi_url": "https://doi.org/10.1093/bioinformatics/bti042",
+        "refs": [
+            {"cite": "Yanai et al., Bioinformatics (2005)", "url": "https://doi.org/10.1093/bioinformatics/bti042"},
+            {"cite": "GTEx Consortium, Science (2020)", "url": "https://doi.org/10.1126/science.aaz1776"},
+            {"cite": "Karczewski et al., Nature (2020) [gnomAD]", "url": "https://doi.org/10.1038/s41586-020-2308-7"},
+        ],
     },
     {
         "id": "F13",
@@ -496,6 +569,13 @@ FORMULA_CARDS = [
         "title": "CPTAC Mass-Spectrometry Dosage Propagation & Complex Attenuation",
         "latex": r"\Delta\rho_g = \rho_{\text{Spearman}}(\text{CNA}_g,\,\text{mRNA}_g) - \rho_{\text{Spearman}}(\text{CNA}_g,\,\text{Protein}_g)",
         "summary": "Quantifies post-transcriptional degradation of excess unbound heterodimer subunits (DROSHA–DGCR8, DICER1–TARBP2) across 1,002 primary tumours.",
+        "citation": "Gonçalves et al., Mol. Syst. Biol. 13, 957 (2017); Li et al., Cell 186, 3921–3940 (2023); Dempster et al., Genome Biol. 22, 343 (2021)",
+        "doi_url": "https://doi.org/10.15252/msb.20177829",
+        "refs": [
+            {"cite": "Gonçalves et al., Mol. Syst. Biol. (2017)", "url": "https://doi.org/10.15252/msb.20177829"},
+            {"cite": "Li et al., Cell (2023) [CPTAC]", "url": "https://doi.org/10.1016/j.cell.2023.07.014"},
+            {"cite": "Dempster et al., Genome Biol. (2021) [Chronos]", "url": "https://doi.org/10.1186/s13059-021-02558-x"},
+        ],
     },
     {
         "id": "F14",
@@ -503,6 +583,12 @@ FORMULA_CARDS = [
         "title": "Tie-Corrected Mann–Whitney U & Hanley–McNeil ROC-AUC Variance",
         "latex": r"r_{\text{rb}} = \frac{2U}{n_1 n_0} - 1,\quad \text{AUC} = \frac{r_{\text{rb}}+1}{2},\quad \mathrm{Var}(\text{AUC}) = \frac{\text{AUC}(1-\text{AUC}) + (n_1-1)(Q_1-\text{AUC}^2) + (n_0-1)(Q_2-\text{AUC}^2)}{n_1 n_0}",
         "summary": "Delivers exact rank-biserial effect sizes, tie-corrected two-sided p-values, and 95% confidence intervals for clinical and multi-omic benchmarks.",
+        "citation": "Hanley & McNeil, Radiology 143, 29–36 (1982); Landrum et al., Nucleic Acids Res. 46, D1062–D1067 (2018)",
+        "doi_url": "https://doi.org/10.1148/radiology.143.1.7063747",
+        "refs": [
+            {"cite": "Hanley & McNeil, Radiology (1982)", "url": "https://doi.org/10.1148/radiology.143.1.7063747"},
+            {"cite": "Landrum et al., NAR (2018) [ClinVar]", "url": "https://doi.org/10.1093/nar/gkx1153"},
+        ],
     },
     {
         "id": "F15",
@@ -510,6 +596,12 @@ FORMULA_CARDS = [
         "title": "Cancer-Type-Stratified Mantel–Haenszel Log-Rank Hazard Ratio",
         "latex": r"O - E = \sum_s\sum_t\left(d_{1,s,t} - n_{1,s,t}\frac{d_{s,t}}{n_{s,t}}\right), \qquad \widehat{\text{HR}}_{\text{strat}} = \exp\!\left(\frac{O - E}{V}\right)",
         "summary": "Compares survival strictly within each histological cancer study before pooling across 32 TCGA or 43 MSK-IMPACT strata.",
+        "citation": "Mantel, Cancer Chemother. Rep. 50, 163–170 (1966); Liu et al., Cell 173, 400–416 (2018) [TCGA-CDR]",
+        "doi_url": "https://doi.org/10.1016/j.cell.2018.02.052",
+        "refs": [
+            {"cite": "Mantel, Cancer Chemother. Rep. (1966)", "url": "https://pubmed.ncbi.nlm.nih.gov/5910392/"},
+            {"cite": "Liu et al., Cell (2018) [TCGA-CDR]", "url": "https://doi.org/10.1016/j.cell.2018.02.052"},
+        ],
     },
     {
         "id": "F16",
@@ -517,6 +609,13 @@ FORMULA_CARDS = [
         "title": "Stratified Multivariable Breslow Cox Proportional Hazards",
         "latex": r"\ell(\boldsymbol{\beta}) = \sum_s\sum_{t:\,d_{s,t}>0}\left[\boldsymbol{\beta}^{\top}\!\sum_{i\in\mathcal{D}_{s,t}}\mathbf{x}_i - d_{s,t}\ln\!\left(\sum_{j\in\mathcal{R}_{s,t}}\exp(\boldsymbol{\beta}^{\top}\mathbf{x}_j)\right)\right]",
         "summary": "Adjusts survival hazard ratios simultaneously for age, biological sex, AJCC pathologic stage, and hypermutator/TMB status.",
+        "citation": "Cox, J. R. Stat. Soc. B 34, 187–220 (1972); Breslow, Biometrics 30, 89–99 (1974); Thorsson et al., Immunity 48, 812–830 (2018)",
+        "doi_url": "https://doi.org/10.1016/j.immuni.2018.03.023",
+        "refs": [
+            {"cite": "Cox, J. R. Stat. Soc. B (1972)", "url": "https://doi.org/10.1111/j.2517-6161.1972.tb00899.x"},
+            {"cite": "Breslow, Biometrics (1974)", "url": "https://doi.org/10.2307/2529620"},
+            {"cite": "Thorsson et al., Immunity (2018)", "url": "https://doi.org/10.1016/j.immuni.2018.03.023"},
+        ],
     },
 ]
 

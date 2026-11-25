@@ -1218,6 +1218,24 @@ def build_web_explorer():
     font-size: 13px;
   }}
   .pop-thresh {{ font-size: 11.5px; color: var(--ink-3); }}
+  .pop-cite {{
+    margin-top: 7px;
+    padding-top: 7px;
+    border-top: 1px solid var(--line-soft);
+    font-size: 11px;
+    color: var(--ink-3);
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 6px;
+  }}
+  .pop-cite a {{
+    color: var(--accent);
+    text-decoration: none;
+    font-weight: 500;
+  }}
+  .pop-cite a:hover {{ text-decoration: underline; }}
 
   /* Slide-Over Contextual Guide Drawer */
   .drawer-backdrop {{
@@ -1276,6 +1294,24 @@ def build_web_explorer():
     align-items: center;
     justify-content: center;
   }}
+  .eq-cite {{
+    margin-top: 4px;
+    padding-top: 9px;
+    border-top: 1px solid var(--line-soft);
+    font-size: 11.5px;
+    color: var(--ink-3);
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 5px 8px;
+    line-height: 1.45;
+  }}
+  .eq-cite a {{
+    color: var(--accent);
+    text-decoration: none;
+    font-weight: 500;
+  }}
+  .eq-cite a:hover {{ text-decoration: underline; }}
   .pathway-steps {{
     display: grid;
     grid-template-columns: repeat(5, 1fr);
@@ -1371,14 +1407,44 @@ def build_web_explorer():
     color: var(--ink-2);
   }}
 
-  /* SOTA Cross-Portal Reference Strip, AFDB Contact HUD & ProtVar Radar */
-  .xref-strip {{
+  /* Dedicated Sub-Header Public Datasets Row, Visual Legends & Table Guides */
+  .public-bar {{
+    background: #f8fafc;
+    border-bottom: 1px solid var(--line-soft);
+    padding: 7px 0;
+    font-size: 11.5px;
+  }}
+  .public-bar-inner {{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 7px 12px;
+  }}
+  .pub-left {{
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    color: var(--ink-2);
+    font-weight: 600;
+    white-space: nowrap;
+  }}
+  .pub-gene-sel {{
+    height: 25px !important;
+    padding: 0 8px !important;
+    font-size: 11.5px !important;
+    font-weight: 600;
+    border-radius: 999px !important;
+    background: #ffffff;
+    color: var(--accent) !important;
+    border: 1px solid rgba(0, 112, 155, 0.30) !important;
+    cursor: pointer;
+  }}
+  .pub-links {{
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: 6px;
-    margin: -4px 0 14px;
-    font-size: 11.5px;
+    gap: 5px;
   }}
   .xref-pill {{
     display: inline-flex;
@@ -1387,16 +1453,17 @@ def build_web_explorer():
     padding: 2px 9px;
     border-radius: 999px;
     border: 1px solid var(--line-soft);
-    background: var(--canvas);
+    background: #ffffff;
     color: var(--ink-2);
     text-decoration: none;
-    font-size: 11.5px;
+    font-size: 11px;
     transition: all 0.12s ease;
+    white-space: nowrap;
   }}
   .xref-pill:hover {{
     border-color: var(--accent);
     color: var(--accent);
-    background: #ffffff;
+    background: var(--accent-soft);
   }}
   .loeuf-pill {{
     display: inline-flex;
@@ -1407,6 +1474,53 @@ def build_web_explorer():
     font-family: var(--mono);
     font-size: 11px;
     font-weight: 600;
+  }}
+  .plot-legend {{
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 15px;
+    padding: 7px 11px;
+    margin-top: 4px;
+    background: #f4f6f9;
+    border-top: 1px solid var(--line-soft);
+    border-radius: 7px;
+    font-size: 11.5px;
+    color: var(--ink-2);
+  }}
+  .table-guide {{
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px 14px;
+    padding: 8px 12px;
+    margin-bottom: 11px;
+    background: var(--canvas);
+    border: 1px solid var(--line-soft);
+    border-left: 3px solid var(--accent);
+    border-radius: 8px;
+    font-size: 12px;
+    color: var(--ink-2);
+    line-height: 1.45;
+  }}
+  .leg-item {{
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    white-space: nowrap;
+  }}
+  .leg-line {{
+    display: inline-block;
+    width: 14px;
+    height: 2.5px;
+    border-radius: 1px;
+  }}
+  .leg-box {{
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 2.5px;
   }}
   .contact-hud {{
     position: absolute;
@@ -1432,12 +1546,14 @@ def build_web_explorer():
     .score-bottom {{ grid-template-columns: 1fr; }}
   }}
   .radar-box {{
-    width: 124px;
-    height: 116px;
+    width: 132px;
+    min-height: 128px;
+    padding: 4px 4px 5px;
     border: 1px solid var(--line-soft);
     border-radius: 10px;
     background: var(--canvas);
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
@@ -1447,7 +1563,7 @@ def build_web_explorer():
   #print-report-banner, #print-3d-img {{ display: none; }}
   @media print {{
     body {{ background: #ffffff; font-size: 11.5px; }}
-    .topbar, .search-hero, .view-bar, #exp-dms, #exp-tcga, #exp-batch, .xref-strip, .contact-hud, .about-section, footer, .vp-bar, .guide-btn, .no-print, #lollipop-svg-wrap, .popover, .drawer, .drawer-backdrop {{
+    .topbar, .public-bar, .search-hero, .view-bar, #exp-dms, #exp-tcga, #exp-batch, .table-guide, .plot-legend, .contact-hud, .about-section, footer, .vp-bar, .guide-btn, .no-print, #lollipop-svg-wrap, .popover, .drawer, .drawer-backdrop {{
       display: none !important;
     }}
     main.workspace {{ background: #ffffff; padding: 0; min-height: auto; }}
@@ -1504,6 +1620,17 @@ def build_web_explorer():
   </div>
 </header>
 
+<!-- Dedicated Sub-Header Row: Access from Public Datasets -->
+<div class="public-bar no-print" role="region" aria-label="Access from Public Datasets">
+  <div class="wrap public-bar-inner">
+    <div class="pub-left">
+      <span>Access from Public Datasets:</span>
+      <select id="pubbar-gene" class="pub-gene-sel" aria-label="Select gene for external public datasets" onchange="syncGeneFromPublicBar(this.value)"></select>
+    </div>
+    <div class="pub-links" id="public-datasets-links"></div>
+  </div>
+</div>
+
 <!-- Google-Simple Omni-Search Hero -->
 <section class="search-hero">
   <div class="wrap">
@@ -1525,7 +1652,7 @@ def build_web_explorer():
       <button class="chip" onclick="loadPresetMutation('DROSHA','E1147K')">DROSHA E1147K</button>
       <button class="chip" onclick="loadPresetMutation('TP53','R175H')">TP53 R175H</button>
       <button class="chip" onclick="openDmsLandscape()">2D DMS Heatmap</button>
-      <button class="chip" onclick="openBatchTriage()">VCF / Batch Triage</button>
+      <button class="chip" onclick="openBatchTriage()">.VCF Triage</button>
       <button class="chip" onclick="openApiDocs()">REST API &amp; CLI</button>
       <button class="chip" onclick="openFormulaTab()">LaTeX Equations &rarr;</button>
     </div>
@@ -1564,14 +1691,13 @@ def build_web_explorer():
               <button class="step-btn" onclick="stepCodon(1)" aria-label="Next residue">&rsaquo;</button>
             </div>
             <span class="meta-note" id="sat-status"></span>
+            <span id="gene-bio-badges" style="display:inline-flex;gap:6px;align-items:center;flex-wrap:wrap;"></span>
           </div>
           <div style="display:flex;gap:7px;align-items:center;">
             <button class="btn-subtle" onclick="downloadLollipopSVG()" title="Export publication-ready vector SVG of domain &amp; lollipop track">Track SVG</button>
             <button class="guide-btn" onclick="openGuideDrawer('explorer')">&#9432; How this works</button>
           </div>
         </div>
-
-        <div id="gene-xref-strip" class="xref-strip"></div>
 
         <div id="lollipop-svg-wrap" class="svg-track"></div>
 
@@ -1614,12 +1740,17 @@ def build_web_explorer():
                     <button onclick="toggleContactMap2D()" style="border:none;background:none;color:#9aa0a6;cursor:pointer;font-size:14px;line-height:1;">&times;</button>
                   </div>
                   <canvas id="contact-canvas" width="192" height="192" style="width:192px;height:192px;border-radius:6px;cursor:crosshair;display:block;background:#111315;" onclick="handleContactMapClick(event)" title="Click anywhere on 2D matrix to jump to that residue in 3D"></canvas>
-                  <div style="display:flex;justify-content:space-between;margin-top:4px;font-size:10px;color:#9aa0a6;font-family:var(--mono);">
-                    <span>1 aa</span><span>Click to focus 3D</span><span id="contact-max-lbl">L aa</span>
+                  <div style="display:flex;align-items:center;justify-content:space-between;gap:5px;margin-top:5px;font-size:9.5px;color:#cbd5e1;font-family:var(--mono);">
+                    <span>0&Aring;</span>
+                    <span style="flex:1;height:5px;border-radius:999px;background:linear-gradient(90deg,#12bfa9 0%,#135664 55%,#16191e 100%);border:1px solid #3c4043;"></span>
+                    <span>24&Aring;</span>
+                  </div>
+                  <div style="display:flex;justify-content:space-between;margin-top:3px;font-size:9.5px;color:#9aa0a6;font-family:var(--mono);">
+                    <span>1 aa</span><span style="color:#ff4d6d;">&#10010; Active aa</span><span id="contact-max-lbl">L aa</span>
                   </div>
                 </div>
                 <div id="mol3d-canvas" style="width:100%;height:100%;position:relative;"></div>
-                <div class="mol3d-legend">
+                <div class="mol3d-legend" id="mol3d-legend">
                   <span><i class="swatch" style="background:#0095c8;"></i>WT</span>
                   <span data-term="rotamer_clash"><i class="swatch" style="background:#e11d48;"></i>Mutant rotamer</span>
                   <span data-term="burial_8a"><i class="swatch" style="background:#94a3b8;"></i>8&Aring; shell</span>
@@ -1640,7 +1771,7 @@ def build_web_explorer():
           <button class="seg-btn active" id="seg-exp-codon" onclick="switchSub('exp-sub', 'exp-codon', this)">Codon 19-AA Scan</button>
           <button class="seg-btn" id="seg-exp-dms" onclick="switchSub('exp-sub', 'exp-dms', this); renderDmsHeatmap();">2D DMS Landscape</button>
           <button class="seg-btn" id="seg-exp-tcga" onclick="switchSub('exp-sub', 'exp-tcga', this)">Observed Tumour Variants (6,292)</button>
-          <button class="seg-btn" id="seg-exp-batch" onclick="switchSub('exp-sub', 'exp-batch', this)">Batch Variant Triage</button>
+          <button class="seg-btn" id="seg-exp-batch" onclick="switchSub('exp-sub', 'exp-batch', this)">.VCF Variant Triage</button>
         </div>
       </div>
 
@@ -1653,7 +1784,7 @@ def build_web_explorer():
           <div class="card-head">
             <div>
               <h2>2D Deep Mutational Scanning (DMS) Saturation Heatmap</h2>
-              <div class="meta-note" style="margin-top:2px;">Click any (codon &times; amino acid) cell to model its 3D side-chain rotamer above &middot; <code>&bull;</code> = wild-type &middot; dark ring = observed in TCGA / ClinVar P</div>
+              <div class="meta-note" style="margin-top:2px;">20 amino acids &times; sliding sequence window &middot; Click any cell to model its 3D side-chain rotamer above</div>
             </div>
             <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
               <select id="dms-metric" onchange="renderDmsHeatmap()">
@@ -1674,6 +1805,7 @@ def build_web_explorer():
               </div>
             </div>
           </div>
+          <div id="dms-legend-bar" class="table-guide"></div>
           <div id="dms-svg-wrap" class="svg-track" style="margin-bottom:0;"></div>
         </div>
       </div>
@@ -1702,6 +1834,10 @@ def build_web_explorer():
             </select>
             <input type="text" class="ctrl-input" id="var-q" placeholder="Filter variant, study, ClinVar..." oninput="renderVariants()">
             <button class="btn-action" onclick="exportFilteredVariantsCSV()">Export CSV</button>
+          </div>
+          <div class="table-guide">
+            <span><strong>Reading Guide:</strong> <code>RNA / Metal (&Aring;)</code> = heavy-atom distance in Cryo-EM/X-ray PDB (<strong>&le;6.0 &Aring;</strong> = active pocket) &middot; <code>AlphaMissense &ge; 0.564</code> pathogenic &middot; <code>ESM-IF1 &gt; &minus;1.5</code> fold intact vs <code>&le; &minus;1.5</code> unfolding.</span>
+            <span class="meta-note">Click <strong>View</strong> to load in 3D &middot; Click <code>&#8597;</code> headers to sort &middot; Hover dotted headers for LaTeX</span>
           </div>
           <div class="table-wrap">
             <table id="var-table">
@@ -1732,21 +1868,25 @@ def build_web_explorer():
         <div class="card" ondragover="event.preventDefault()" ondrop="handleBatchFileDrop(event)">
           <div class="card-head">
             <div>
-              <h2>VCF &amp; Batch Variant Triage (GRCh38 / GRCh37 / HGVS / Protein)</h2>
-              <div class="meta-note" style="margin-top:2px;">Paste protein changes (<code>DICER1 E1705K</code>), genomic VCF coordinates (<code>chr14:95094139:C&gt;T</code>, <code>14-95094139-C-T</code>), cDNA (<code>DICER1 c.5113G&gt;A</code>), <code>rsID</code>, or drop a <code>.vcf</code> file (100% local in browser)</div>
+              <h2>.VCF Clinical &amp; Somatic Variant Triage (GRCh38 / GRCh37)</h2>
+              <div class="meta-note" style="margin-top:2px;">Upload or drop a standard uncompressed <code>.vcf</code> file, or paste VCF/HGVS variant calls below (100% client-side in browser; zero server upload)</div>
             </div>
             <span class="meta-note" id="batch-summary"></span>
           </div>
-          <textarea id="batch-input" class="batch-area" placeholder="chr14:95094139:C>T&#10;DICER1 p.Asp1810Tyr&#10;DROSHA c.3439G>A&#10;AGO2 M364T&#10;17-7675088-C-T&#10;rs2073092496"></textarea>
+          <textarea id="batch-input" class="batch-area" placeholder="#CHROM	POS	ID	REF	ALT&#10;chr14	95094139	.	C	T&#10;chr5	31409348	.	C	T&#10;chr17	7675088	.	C	T"></textarea>
           <div class="controls" style="margin-top:10px;">
-            <button class="btn-action" onclick="runBatchTriage()">Score Variants</button>
-            <button class="btn-subtle" style="height:34px;" onclick="loadBatchExample()">Load Mixed VCF/HGVS Example</button>
-            <label class="btn-subtle" style="height:34px;display:inline-flex;align-items:center;cursor:pointer;">
-              Upload .VCF / .TXT
-              <input type="file" id="vcf-file-input" accept=".vcf,.txt,.tsv,.csv,.maf" style="display:none;" onchange="handleBatchFileSelect(this.files)">
+            <button class="btn-action" onclick="runBatchTriage()">Score .VCF Variants</button>
+            <label class="btn-subtle" style="height:34px;display:inline-flex;align-items:center;cursor:pointer;font-weight:600;color:var(--accent);border-color:rgba(0,112,155,0.35);">
+              Upload .VCF
+              <input type="file" id="vcf-file-input" accept=".vcf" style="display:none;" onchange="handleBatchFileSelect(this.files)">
             </label>
+            <button class="btn-subtle" style="height:34px;" onclick="loadBatchExample()">Load Sample .VCF</button>
             <button class="btn-subtle" style="height:34px;" onclick="clearBatchTriage()">Clear</button>
             <button class="btn-subtle" style="height:34px;" onclick="exportBatchTriageCSV()">Export Triage CSV</button>
+          </div>
+          <div class="table-guide">
+            <span><strong>.VCF Triage Key:</strong> Auto-detects <strong>GRCh38</strong> &amp; <strong>GRCh37/hg19</strong> canonical MANE Select CDS exons across all 15 genes (non-panel chromosomes are skipped automatically) &middot; Classifies <span class="leg-item"><i class="dot dot-crimson"></i>Active site</span> vs <span class="leg-item"><i class="dot dot-amber"></i>Unfolding</span> vs <span class="leg-item"><i class="dot dot-petrol"></i>Neutral</span>.</span>
+            <span class="meta-note">File upload accepts <code>.vcf</code> strictly</span>
           </div>
           <div class="table-wrap">
             <table id="batch-table">
@@ -1784,8 +1924,8 @@ def build_web_explorer():
         <div class="card">
           <div class="card-head">
             <div>
-              <h2>Pan-Cancer Alteration Matrix</h2>
-              <div class="meta-note" style="margin-top:2px;">Click any cell to inspect observed variants for that gene &amp; cancer cohort</div>
+              <h2>Pan-Cancer Alteration Matrix (15 Genes &times; 32 TCGA Studies)</h2>
+              <div class="meta-note" style="margin-top:2px;">Matched exome + CNA cohorts (N = 10,195 tumours) &middot; Hover any cell for exact counts or click to inspect variants</div>
             </div>
             <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
               <div id="hm-legend" style="display:flex;align-items:center;gap:7px;font-size:11.5px;color:var(--ink-2);font-family:var(--mono);"></div>
@@ -1799,6 +1939,7 @@ def build_web_explorer():
               <button class="btn-action" onclick="exportLongCSV()">Export CSV</button>
             </div>
           </div>
+          <div id="hm-explainer" class="table-guide"></div>
           <div id="hm-container" class="table-wrap" style="max-height:none;"></div>
         </div>
       </div>
@@ -1808,6 +1949,10 @@ def build_web_explorer():
           <div class="card-head">
             <h2>Synteny-Aware Patient Pathway Burden (Excluding TP53)</h2>
             <span class="meta-note">Collapses tandem 1p34.3 (AGO1/3/4) &amp; 18q21.1 (SMAD2/4) clusters</span>
+          </div>
+          <div class="table-guide">
+            <span><strong>Reading Guide:</strong> <strong>Core-10</strong> = dedicated maturation/RISC enzymes &middot; <strong>Extended-12</strong> = +<code>LIN28A/B</code> &middot; <strong>Panel-14</strong> = +<code>SMAD2/4</code> (<code>TP53</code> excluded so ubiquitous p53 loss does not mask miRNA-pathway specificity). Co-deleted <code>1p34.3</code> or <code>18q21.1</code> genes count once per patient.</span>
+            <span class="meta-note"><code>*</code> = Low-N study (N &lt; 100) &middot; Click <code>&#8597;</code> to sort</span>
           </div>
           <div class="table-wrap">
             <table id="cohort-burden-table">
@@ -1832,6 +1977,10 @@ def build_web_explorer():
           <div class="card-head">
             <h2>TCGA 32-Study Acronym Decoder &amp; Sample Counts</h2>
             <span class="meta-note">Exact S_seq &cap; S_CNA denominators</span>
+          </div>
+          <div class="table-guide">
+            <span><strong>Reading Guide:</strong> <strong>Matched N</strong> = exact intersection of exome-sequenced (<code>Exome</code>) and SNP6 copy-number profiled (<code>CNA</code>) primary tumours audited against Hoadley et al. (<em>Cell</em> 2018) &middot; <strong>Hypermut</strong> = POLE/MSI tumours (&gt;10 mut/Mb or &ge;500 coding mutations).</span>
+            <span class="meta-note"><code>*</code> = Study N &lt; 100 &middot; Click <code>&#8597;</code> to sort</span>
           </div>
           <div class="table-wrap">
             <table id="study-decoder-table">
@@ -1865,6 +2014,10 @@ def build_web_explorer():
             <h2>Mature miRNA-seq &amp; RISC Target Benchmarks</h2>
             <span class="meta-note">9,578 miRNA-seq &middot; 192 canonical duplexes</span>
           </div>
+          <div class="table-guide">
+            <span><strong>Reading Guide:</strong> <strong>Shift</strong> = <code>Median(Group A) &minus; Median(Group B)</code> evaluated by tie-corrected two-sided Wilcoxon&ndash;Mann&ndash;Whitney test &middot; Negative <code>Duplex 5p:3p</code> shift = selective 5p cleavage loss; positive <code>Target Z</code> shift = target mRNA derepression; <code>hsa-miR-451a</code> = DICER1-independent AGO2-Slicer control.</span>
+            <span class="meta-note">Hover dotted headers for LaTeX equations &amp; citations</span>
+          </div>
           <div class="table-wrap">
             <table id="mir-bench-table">
               <thead>
@@ -1884,14 +2037,18 @@ def build_web_explorer():
           <div class="card-head">
             <div>
               <h2>DICER1-Altered Tumours: Endogenous 5p:3p Strand Collapse &amp; let-7 Derepression</h2>
-              <div class="meta-note" style="margin-top:2px;">Click any tumour dot in the plot below to locate that sample in the table</div>
+              <div class="meta-note" style="margin-top:2px;">RNase IIIb cleaves 5p strands while RNase IIIa cleaves 3p strands &middot; Within-hairpin 5p:3p ratios cancel transcriptional noise</div>
             </div>
             <div style="display:flex;gap:8px;align-items:center;">
               <button class="btn-subtle" id="dicer-reset-btn" style="display:none;" onclick="resetDicerSelection()">Show All Tumours</button>
               <button class="btn-action" onclick="exportDicerMirnaCSV()">Export CSV</button>
             </div>
           </div>
-          <div id="dicer-svg-plot" class="svg-track" style="margin-bottom:16px;"></div>
+          <div id="dicer-svg-plot" class="svg-track" style="margin-bottom:14px;"></div>
+          <div class="table-guide">
+            <span><strong>Table Key:</strong> <code>Duplex log2 &lt; 0</code> = inversion from normal 5p dominance (+0.475 WT median) to 3p dominance &middot; <code>5p Fraction</code> = global proportion of 5p reads (0&ndash;1) &middot; <code>let-7 Target Z &gt; 0</code> = loss of <em>let-7</em> mRNA silencing in that tumour.</span>
+            <span class="meta-note">Click any circle or class label above to filter/jump</span>
+          </div>
           <div class="table-wrap">
             <table id="dicer-mir-table">
               <thead>
@@ -1913,6 +2070,10 @@ def build_web_explorer():
           <div class="card-head">
             <h2>Top Repressive miRNA &times; mRNA Couplings</h2>
             <span class="meta-note">13,369,752 pairs across N = 9,353 dual tumours</span>
+          </div>
+          <div class="table-guide">
+            <span><strong>Reading Guide:</strong> Ranked by strongest inverse expression coupling (<code>Pearson r &lt; 0</code> on <code>log2(RPM+1)</code> vs <code>log2(RSEM+1)</code>) across 9,353 dual-profiled TCGA tumours, capturing canonical RISC-mediated target mRNA destabilisation and lineage switches.</span>
+            <span class="meta-note">Click <code>&#8597;</code> headers to sort</span>
           </div>
           <div class="table-wrap">
             <table id="top-axes-table">
@@ -1948,6 +2109,10 @@ def build_web_explorer():
             <h2>ClinVar Pathogenic vs Benign Missense Discrimination</h2>
             <span class="meta-note">Non-circular clinical benchmark</span>
           </div>
+          <div class="table-guide">
+            <span><strong>Reading Guide:</strong> Evaluates zero-shot predictors on independent NCBI ClinVar Pathogenic/LP vs Benign/LB missense variants &middot; <strong>ROC-AUC</strong>: <code>0.50</code> = random, <code>1.00</code> = ideal separation [Hanley&ndash;McNeil 95% CI] &middot; <strong>PR-AUC (Base)</strong>: precision-recall area vs pathogenic prevalence baseline.</span>
+            <span class="meta-note"><code>1star+</code> restricts to multi-submitter / expert-reviewed stars &ge;1</span>
+          </div>
           <div class="table-wrap">
             <table id="clinvar-roc-table">
               <thead>
@@ -1969,6 +2134,10 @@ def build_web_explorer():
           <div class="card-head">
             <h2>MSK-IMPACT (N = 10,945) vs TCGA (N = 10,195) Replication</h2>
           </div>
+          <div class="table-guide">
+            <span><strong>Reading Guide:</strong> Compares somatic coding mutation prevalence in prospective clinical sequencing (<strong>MSK-IMPACT</strong>, primary + metastatic) against <strong>TCGA</strong> primary tumours &middot; <strong>3D Pocket %</strong> = mutations hitting active-site residues (&le;6 &Aring;).</span>
+            <span class="meta-note">Genes absent from earlier MSK-IMPACT bait sets show lower profiled N</span>
+          </div>
           <div class="table-wrap">
             <table id="msk-rep-table">
               <thead>
@@ -1983,7 +2152,10 @@ def build_web_explorer():
           </div>
         </div>
         <div class="card">
-          <div class="card-head"><h2>MSK-IMPACT DICER1 Cancer-Type Breakdown</h2></div>
+          <div class="card-head">
+            <h2>MSK-IMPACT DICER1 Cancer-Type Breakdown</h2>
+            <span class="meta-note">RNase IIIb metal-binding hotspots: E1705, D1709, G1809, D1810, E1813</span>
+          </div>
           <div class="table-wrap" style="max-height:300px;">
             <table id="msk-dicer-table">
               <thead>
@@ -1999,6 +2171,10 @@ def build_web_explorer():
         <div class="card" style="margin-bottom:16px;">
           <div class="card-head">
             <h2>Germline Constraint (gnomAD v4), Localisation (HPA) &amp; Tractability</h2>
+          </div>
+          <div class="table-guide">
+            <span><strong>Reading Guide:</strong> <code>LOEUF &lt; 0.35</code> &amp; <code>pLI &ge; 0.90</code> = severe human germline LoF intolerance (&gt;800k exomes/genomes) &middot; <code>Missense Z &ge; 3.09</code> = missense-depleted &middot; <strong>Specificity (&tau;)</strong>: <code>0</code> = ubiquitous housekeeping, <code>1</code> = tissue-restricted (e.g. testis <code>LIN28A/B &gt; 0.97</code>).</span>
+            <span class="meta-note">Open Targets <code>Ligandable</code> = small-molecule binding pocket</span>
           </div>
           <div class="table-wrap">
             <table id="gene-ref-table">
@@ -2016,7 +2192,10 @@ def build_web_explorer():
         </div>
         <div class="card">
           <div class="card-head">
-            <h2>GTEx v10 Healthy Adult Expression (54 Tissues)</h2>
+            <div>
+              <h2>GTEx v10 Healthy Adult Expression (54 Tissues)</h2>
+              <div class="meta-note" style="margin-top:2px;">Switch between ubiquitous Core-10 enzymes (&tau; &lt; 0.38) and oncofetal LIN28A/B (&tau; &gt; 0.97)</div>
+            </div>
             <select id="gtex-gene" onchange="renderGtexBars()"></select>
           </div>
           <div id="gtex-bars" class="table-wrap" style="max-height:360px;"></div>
@@ -2027,6 +2206,10 @@ def build_web_explorer():
         <div class="card" style="margin-bottom:16px;">
           <div class="card-head">
             <h2>CPTAC Proteogenomics (N = 1,002) &amp; DepMap CRISPR Essentiality (N = 1,208)</h2>
+          </div>
+          <div class="table-guide">
+            <span><strong>Reading Guide:</strong> <strong>Buffering &Delta;&rho;</strong> = <code>&rho;(CNA,mRNA) &minus; &rho;(CNA,Protein)</code> (&gt;+0.15 indicates post-transcriptional degradation of unbound complex partners) &middot; <strong>Chronos</strong>: <code>0</code> = neutral, <code>&le;&minus;0.5</code> = cell-line dependency, <code>&le;&minus;1.0</code> = pan-essential.</span>
+            <span class="meta-note"><span class="leg-item"><i class="dot dot-crimson"></i>Essential</span> vs <span class="leg-item"><i class="dot dot-petrol"></i>Buffered paralog</span></span>
           </div>
           <div class="table-wrap">
             <table id="consortia-table">
@@ -2044,6 +2227,9 @@ def build_web_explorer():
         </div>
         <div class="card">
           <div class="card-head"><h2>CRISPR Collateral Synthetic Lethality &amp; Oncofetal Addiction</h2></div>
+          <div class="table-guide">
+            <span><strong>Reading Guide:</strong> Negative <strong>&Delta;Chronos</strong> (<code>Median_Altered &minus; Median_Control &lt; 0</code>) indicates stronger CRISPR knockout lethality in the altered cell-line group (e.g. <code>1p34.3 AGO1/3/4</code> loss sensitises cells to <code>AGO2</code> knockout).</span>
+          </div>
           <div class="table-wrap">
             <table id="collat-table">
               <thead>
@@ -2063,6 +2249,9 @@ def build_web_explorer():
           <div class="card-head">
             <h2>Stratified Log-Rank &amp; Multivariable Breslow Cox Survival</h2>
           </div>
+          <div class="table-guide">
+            <span><strong>Reading Guide:</strong> <strong>HR &gt; 1.0</strong> = higher hazard (shorter survival) compared strictly within histological cancer-type strata (<code>OS</code> Overall, <code>DSS</code> Disease-Specific, <code>PFI</code> Progression-Free) &middot; <strong>Multivariable Cox HR</strong> adjusts simultaneously for Age, Sex, AJCC Stage &amp; TMB.</span>
+          </div>
           <div class="table-wrap">
             <table id="surv-table">
               <thead>
@@ -2079,6 +2268,9 @@ def build_web_explorer():
         </div>
         <div class="card">
           <div class="card-head"><h2>Homologous Recombination Deficiency (HRD) &amp; Immune Benchmarks</h2></div>
+          <div class="table-guide">
+            <span><strong>Reading Guide:</strong> <strong>HRD Score</strong> = <code>LOH + LST + TAI</code> genomic scar sum across 9,899 tumours (<code>&ge;42</code> clinical HRD threshold; focal <code>8q24.3 AGO2 +2</code> co-amplifies with chromosomal instability, median 33 vs 7).</span>
+          </div>
           <div class="table-wrap">
             <table id="imm-table">
               <thead>
@@ -2107,6 +2299,10 @@ def build_web_explorer():
       </div>
 
       <div id="doc-formulas" class="subpanel doc-sub active">
+        <div class="table-guide" style="margin-bottom:14px;">
+          <span><strong>Mathematical Methods &amp; Primary Literature Citations:</strong> All 16 equations powering cohort denominators, GISTIC2 filtering, 3D rotamers, AI language models, 5p:3p enzymology, proteomics, and survival models, rendered in KaTeX with clickable peer-reviewed DOIs.</span>
+          <span class="meta-note">Direct links: <code>#eq=F1</code> &ndash; <code>#eq=F16</code></span>
+        </div>
         <div class="controls" style="margin-bottom:16px;">
           <select id="formula-cat" onchange="renderFormulas()">
             <option value="ALL">All 16 Equations</option>
@@ -2117,7 +2313,7 @@ def build_web_explorer():
             <option value="Proteomics & Tissue">Tissue Specificity &amp; Proteomics</option>
             <option value="Biostatistics">Biostatistics, ROC &amp; Survival</option>
           </select>
-          <input type="text" class="ctrl-input" id="formula-q" placeholder="Filter equations (e.g. Cox, 5p:3p, Grantham, IF1)..." oninput="renderFormulas()" style="width:280px;">
+          <input type="text" class="ctrl-input" id="formula-q" placeholder="Filter by equation, author, or journal (e.g. Cox, Grantham, Cheng, GISTIC)..." oninput="renderFormulas()" style="width:320px;">
         </div>
         <div id="formula-cards-wrap" class="eq-grid"></div>
       </div>
@@ -2236,6 +2432,9 @@ def build_web_explorer():
       </div>
 
       <div id="doc-glossary" class="subpanel doc-sub">
+        <div class="table-guide" style="margin-bottom:14px;">
+          <span><strong>Interactive Term Glossary:</strong> Every dotted metric header across the portal links to these 50 definitions, biological thresholds, LaTeX equations, and primary literature citations.</span>
+        </div>
         <div class="controls" style="margin-bottom:16px;">
           <input type="text" class="ctrl-input" id="gloss-q" placeholder="Filter glossary terms (e.g. LOEUF, GISTIC2, ESM-IF1, Chronos, HRD)..." oninput="renderGlossaryCards()" style="width:360px;">
           <span class="meta-note" id="gloss-count"></span>
@@ -2257,6 +2456,7 @@ def build_web_explorer():
   <div class="pop-desc" id="tp-meaning"></div>
   <div class="pop-math" id="tp-math"></div>
   <div class="pop-thresh" id="tp-thresh"></div>
+  <div class="pop-cite" id="tp-cite"></div>
 </div>
 
 <!-- Contextual Right Slide-Over Guide Drawer -->
@@ -2928,7 +3128,8 @@ function runGlobalSearch(raw) {{
   renderVariants();
 }}
 
-/* Light KaTeX Popover Logic */
+/* Light KaTeX Popover Logic with Primary Citations */
+const FORMULA_BY_ID = Object.fromEntries((ATLAS.formulas || []).map(f => [f.id, f]));
 let tpPinned = false;
 let tpTimer = null;
 function showTermPopover(targetEl, pin) {{
@@ -2945,10 +3146,22 @@ function showTermPopover(targetEl, pin) {{
   renderLatex(item.latex || '', document.getElementById('tp-math'), false);
   document.getElementById('tp-thresh').textContent = item.thresholds || '';
 
+  const citeEl = document.getElementById('tp-cite');
+  const fRef = item.anchor ? FORMULA_BY_ID[item.anchor] : null;
+  if (citeEl) {{
+    if (fRef && fRef.refs && fRef.refs.length) {{
+      const links = fRef.refs.slice(0, 2).map(r => `<a href="${{r.url}}" target="_blank" rel="noopener">${{r.cite}} &#8599;</a>`).join(' &middot; ');
+      citeEl.innerHTML = `<span>Ref: ${{links}}</span><a href="#eq=${{fRef.id}}" onclick="event.preventDefault();hideTermPopover(true);openFormulaTab('${{fRef.id}}');">${{fRef.id}} &rarr;</a>`;
+      citeEl.style.display = 'flex';
+    }} else {{
+      citeEl.style.display = 'none';
+    }}
+  }}
+
   pop.classList.add('visible');
   const rect = targetEl.getBoundingClientRect();
-  const pw = pop.offsetWidth || 360;
-  const ph = pop.offsetHeight || 180;
+  const pw = pop.offsetWidth || 380;
+  const ph = pop.offsetHeight || 200;
   let left = Math.min(Math.max(12, rect.left), window.innerWidth - pw - 14);
   let top = rect.bottom + 8;
   if (top + ph > window.innerHeight - 12 && rect.top - ph - 8 > 8) top = rect.top - ph - 8;
@@ -2963,12 +3176,19 @@ function hideTermPopover(force) {{
 }}
 
 document.addEventListener('mouseover', e => {{
+  const pop = document.getElementById('term-popover');
+  if (pop && pop.contains(e.target)) {{ clearTimeout(tpTimer); return; }}
   const t = e.target.closest('[data-term]');
   if (t && !tpPinned) showTermPopover(t, false);
 }});
 document.addEventListener('mouseout', e => {{
+  const pop = document.getElementById('term-popover');
+  if (pop && pop.contains(e.target) && !pop.contains(e.relatedTarget)) {{
+    if (!tpPinned) tpTimer = setTimeout(() => hideTermPopover(false), 220);
+    return;
+  }}
   const t = e.target.closest('[data-term]');
-  if (t && !tpPinned) tpTimer = setTimeout(() => hideTermPopover(false), 200);
+  if (t && !tpPinned) tpTimer = setTimeout(() => hideTermPopover(false), 240);
 }});
 document.addEventListener('click', e => {{
   const pop = document.getElementById('term-popover');
@@ -3070,7 +3290,18 @@ function renderHeatmap() {{
   const maxScale = (metric === 'mut' || metric === 'nhm') ? 0.12 : (metric === 'any' ? 0.85 : 0.40);
   const legEl = document.getElementById('hm-legend');
   if (legEl) {{
-    legEl.innerHTML = `<span>0%</span><i class="hm-ramp"></i><span>${{Math.round(maxScale * 100)}}%+</span>`;
+    legEl.innerHTML = `<span>0.00 (0%)</span><i class="hm-ramp"></i><span>${{maxScale.toFixed(2)}} (${{Math.round(maxScale * 100)}}%+)</span>`;
+  }}
+  const hmNotes = {{
+    hc: '<strong>Strict High-Confidence (Default):</strong> Proportion (<code>0.00&ndash;1.00</code>) with nonsynonymous somatic mutation OR focal high-level <code>GISTIC2 &plusmn;2</code> CNA (strips shallow <code>&plusmn;1</code> whole-arm aneuploidy, which inflates raw calls 5.3-fold).',
+    fcna: '<strong>Focal High-Level CNA Only (<code>GISTIC2 &plusmn;2</code>):</strong> Proportion of tumours with deep homozygous deletion (<code>&minus;2</code>) or high-level focal amplification (<code>+2</code>), excluding point mutations and arm-level <code>&plusmn;1</code> shifts.',
+    mut: '<strong>Somatic Coding Mutation (All Matched):</strong> Proportion of tumours carrying &ge;1 nonsynonymous SNV, indel, or splice-site mutation across <code>N = 10,195</code> matched samples.',
+    nhm: '<strong>Deconfounded Somatic Mutation (Non-Hypermutated):</strong> Restricts each study to non-POLE/MSI tumours (<code>TMB &le; 10 mut/Mb</code> &amp; <code>&lt;500</code> coding mutations) to isolate driver selection from hypermutator passenger noise.',
+    any: '<strong>Broad Any Alteration:</strong> Nonsynonymous mutation OR any <code>GISTIC2 &ne; 0</code> call (includes shallow <code>&plusmn;1</code> chromosome-arm gains/losses &mdash; shown to illustrate aneuploidy inflation).'
+  }};
+  const expEl = document.getElementById('hm-explainer');
+  if (expEl) {{
+    expEl.innerHTML = `<span>${{hmNotes[metric] || hmNotes.hc}}</span><span class="meta-note"><code>0.10</code> = 10% of cohort &middot; <code>*</code> = Low-N cohort (N &lt; 100) &middot; Click any cell &rarr; inspect variants</span>`;
   }}
   const studies = [...new Set(ATLAS.long.map(r => r.t))].sort();
   const genes = ATLAS.panel.map(p => p.geneSymbol);
@@ -3168,11 +3399,23 @@ function focusDomainIn3D(gene, startPos, endPos) {{
   }}
 }}
 
+function syncGeneFromPublicBar(gene) {{
+  if (!gene) return;
+  renderGeneXrefStrip(gene);
+  const lolSel = document.getElementById('lol-gene');
+  if (lolSel && lolSel.value !== gene) {{
+    lolSel.value = gene;
+    document.getElementById('sat-query').value = '';
+    renderLollipopAndLoadSat();
+  }}
+}}
+
 function renderGeneXrefStrip(gene) {{
-  const el = document.getElementById('gene-xref-strip');
-  if (!el) return;
   const p = ATLAS.panel.find(x => x.geneSymbol === gene);
-  if (!p) {{ el.innerHTML = ''; return; }}
+  if (!p) return;
+  const pubSel = document.getElementById('pubbar-gene');
+  if (pubSel && pubSel.value !== gene) pubSel.value = gene;
+
   const loeuf = p.gnomad_LOEUF !== '' ? Number(p.gnomad_LOEUF) : null;
   const lBg = loeuf === null ? '#f3f4f6' : (loeuf < 0.35 ? 'rgba(197,34,31,0.10)' : (loeuf < 0.60 ? 'rgba(176,96,0,0.12)' : 'rgba(0,112,155,0.09)'));
   const lCol = loeuf === null ? '#5f6368' : (loeuf < 0.35 ? '#c5221f' : (loeuf < 0.60 ? '#b06000' : '#00709b'));
@@ -3181,17 +3424,26 @@ function renderGeneXrefStrip(gene) {{
   const smBadge = p.opentargets_sm_tractable === '1'
     ? `<span class="loeuf-pill" data-term="tractability" style="background:rgba(19,115,51,0.10);color:#137333;">SM Ligandable</span>` : '';
 
-  el.innerHTML = `
-    <span class="loeuf-pill" data-term="gnomad_loeuf" style="background:${{lBg}};color:${{lCol}};">${{lTxt}}</span>
-    ${{smBadge}}
-    <a class="xref-pill" href="https://www.uniprot.org/uniprotkb/${{p.uniprotAccession}}" target="_blank" rel="noopener">UniProt ${{p.uniprotAccession}} &#8599;</a>
-    <a class="xref-pill" href="https://alphafold.ebi.ac.uk/entry/${{p.uniprotAccession}}" target="_blank" rel="noopener">AlphaFold DB &#8599;</a>
-    <a class="xref-pill" href="https://www.ebi.ac.uk/ProtVar/query?search=${{p.uniprotAccession}}" target="_blank" rel="noopener">ProtVar &#8599;</a>
-    <a class="xref-pill" href="https://gnomad.broadinstitute.org/gene/${{p.ensemblGeneId}}?dataset=gnomad_r4" target="_blank" rel="noopener">gnomAD v4 &#8599;</a>
-    <a class="xref-pill" href="https://platform.opentargets.org/target/${{p.ensemblGeneId}}" target="_blank" rel="noopener">Open Targets &#8599;</a>
-    <a class="xref-pill" href="https://www.cbioportal.org/results/mutations?cancer_study_list=pancan_pcawg_2020&amp;gene_list=${{gene}}" target="_blank" rel="noopener">cBioPortal &#8599;</a>
-    ${{pdb1 ? `<a class="xref-pill" href="https://www.rcsb.org/structure/${{pdb1}}" target="_blank" rel="noopener">RCSB ${{pdb1}} &#8599;</a>` : ''}}
-  `;
+  const bioEl = document.getElementById('gene-bio-badges');
+  if (bioEl) {{
+    bioEl.innerHTML = `<span class="loeuf-pill" data-term="gnomad_loeuf" style="background:${{lBg}};color:${{lCol}};">${{lTxt}}</span>${{smBadge}}`;
+  }}
+
+  const pubLinks = document.getElementById('public-datasets-links');
+  if (pubLinks) {{
+    pubLinks.innerHTML = `
+      <a class="xref-pill" href="https://www.uniprot.org/uniprotkb/${{p.uniprotAccession}}" target="_blank" rel="noopener">UniProt ${{p.uniprotAccession}} &#8599;</a>
+      <a class="xref-pill" href="https://alphafold.ebi.ac.uk/entry/${{p.uniprotAccession}}" target="_blank" rel="noopener">AlphaFold DB &#8599;</a>
+      <a class="xref-pill" href="https://www.ebi.ac.uk/ProtVar/query?search=${{p.uniprotAccession}}" target="_blank" rel="noopener">ProtVar &#8599;</a>
+      <a class="xref-pill" href="https://gnomad.broadinstitute.org/gene/${{p.ensemblGeneId}}?dataset=gnomad_r4" target="_blank" rel="noopener">gnomAD v4 &#8599;</a>
+      <a class="xref-pill" href="https://platform.opentargets.org/target/${{p.ensemblGeneId}}" target="_blank" rel="noopener">Open Targets &#8599;</a>
+      <a class="xref-pill" href="https://www.cbioportal.org/results/mutations?cancer_study_list=pancan_pcawg_2020&amp;gene_list=${{gene}}" target="_blank" rel="noopener">cBioPortal &#8599;</a>
+      ${{pdb1 ? `<a class="xref-pill" href="https://www.rcsb.org/structure/${{pdb1}}" target="_blank" rel="noopener">RCSB ${{pdb1}} &#8599;</a>` : ''}}
+      <a class="xref-pill" href="https://www.ncbi.nlm.nih.gov/clinvar/?term=${{gene}}%5Bgene%5D" target="_blank" rel="noopener">NCBI ClinVar &#8599;</a>
+      <a class="xref-pill" href="https://gtexportal.org/home/gene/${{gene}}" target="_blank" rel="noopener">GTEx v10 &#8599;</a>
+      <a class="xref-pill" href="https://doi.org/10.5281/zenodo.24455067" target="_blank" rel="noopener">Zenodo Deposit &#8599;</a>
+    `;
+  }}
 }}
 
 function downloadLollipopSVG() {{
@@ -3298,7 +3550,15 @@ function renderLollipopAndLoadSat() {{
     <path d="${{amPath}}" fill="none" stroke="#00709b" stroke-width="1.15" opacity="0.82"/>
     <line x1="${{padL}}" y1="${{182 - 0.564*28}}" x2="${{W-padR}}" y2="${{182 - 0.564*28}}" stroke="#c5221f" stroke-dasharray="3,3" stroke-width="0.8" opacity="0.65"/>
     ${{ticks}}
-  </svg>`;
+  </svg>
+  <div class="plot-legend">
+    <span class="leg-item"><i class="swatch" style="background:#c5221f;margin:0;"></i>3D Active Pocket (&le;6 &Aring; RNA/Metal)</span>
+    <span class="leg-item"><i class="swatch" style="background:#00709b;margin:0;"></i>ClinVar Pathogenic / LP</span>
+    <span class="leg-item"><i class="swatch" style="background:#5f6368;margin:0;"></i>TCGA Somatic (stem height = log&#8322; count)</span>
+    <span class="leg-item"><i class="leg-box" style="background:#4f46e5;"></i>UniProt Domains (click capsule to zoom 3D)</span>
+    <span class="leg-item"><i class="leg-line" style="background:#00709b;"></i>Mean AlphaMissense (<i class="leg-line" style="border-top:2px dashed #c5221f;height:0;width:12px;"></i> 0.564 pathogenic cutoff)</span>
+    <span class="leg-item"><span style="color:#00709b;font-weight:700;">&#9478;</span>Active 3D residue</span>
+  </div>`;
 
   ensureSatLoaded(gene, () => {{
     const rawQ = document.getElementById('sat-query').value.trim().toUpperCase();
@@ -3446,12 +3706,47 @@ function ensureViewerInitialized() {{
   return viewer3d;
 }}
 
+function update3DLegend(mode, colorMode) {{
+  const leg = document.getElementById('mol3d-legend');
+  if (!leg) return;
+  if (mode === 'rcsb') {{
+    leg.innerHTML = `
+      <span><strong style="color:#fff;">Experimental PDB:</strong></span>
+      <span><i class="swatch" style="background:#64748b;"></i>Protein</span>
+      <span><i class="swatch" style="background:#f59e0b;"></i>Bound RNA/DNA</span>
+      <span><i class="swatch" style="background:#10b981;"></i>Catalytic Mg&sup2;&#8314;/Zn&sup2;&#8314;</span>
+      <span><i class="swatch" style="background:#e11d48;"></i>Selected codon</span>
+    `;
+    return;
+  }}
+  let bbKey = '';
+  if (colorMode === 'plddt') {{
+    bbKey = `<span><strong style="color:#fff;">pLDDT:</strong> <i class="swatch" style="background:#0053d6;"></i>&ge;90 <i class="swatch" style="background:#65cbf3;margin-left:5px;"></i>70–90 <i class="swatch" style="background:#ffdb13;margin-left:5px;"></i>50–70 <i class="swatch" style="background:#ff7d45;margin-left:5px;"></i>&lt;50</span>`;
+  }} else if (colorMode === 'domain') {{
+    bbKey = `<span><strong style="color:#fff;">Backbone:</strong> UniProt Domains (<i class="swatch" style="background:#475569;margin-left:3px;"></i>Inter-domain)</span>`;
+  }} else if (colorMode === 'am') {{
+    bbKey = `<span data-term="alphamissense"><strong style="color:#fff;">AM:</strong> <i class="swatch" style="background:#c5221f;"></i>&ge;0.564 Pathogenic <i class="swatch" style="background:#d97706;margin-left:5px;"></i>0.34–0.564 <i class="swatch" style="background:#00709b;margin-left:5px;"></i>&le;0.34 Benign</span>`;
+  }} else {{
+    bbKey = `<span data-term="dist_na"><strong style="color:#fff;">Pocket:</strong> <i class="swatch" style="background:#e11d48;"></i>&le;6&Aring; Active site <i class="swatch" style="background:#64748b;margin-left:5px;"></i>&gt;6&Aring; Scaffold</span>`;
+  }}
+  leg.innerHTML = `
+    ${{bbKey}}
+    <span style="opacity:0.4;">|</span>
+    <span><i class="swatch" style="background:#0095c8;"></i>WT</span>
+    <span data-term="rotamer_clash"><i class="swatch" style="background:#e11d48;"></i>Mutant rotamer</span>
+    <span data-term="burial_8a"><i class="swatch" style="background:#94a3b8;"></i>8&Aring; shell</span>
+    <span data-term="dist_na"><i class="swatch" style="background:#f59e0b;"></i>Contact (2.4–3.8&Aring;)</span>
+    <span data-term="rotamer_clash"><i class="swatch" style="background:#ff3b30;"></i>Clash (&lt;2.4&Aring;)</span>
+  `;
+}}
+
 function refresh3DScene(keepCamera) {{
   const v = ensureViewerInitialized();
   if (!v) return;
   const {{ gene, pos, wt, mut }} = active3DState;
   const mode = document.getElementById('mol3d-mode').value;
   const colorMode = document.getElementById('mol3d-color').value;
+  update3DLegend(mode, colorMode);
 
   if (mode === 'rcsb') {{ renderExperimentalRCSB(gene, pos, wt, mut); return; }}
 
@@ -3757,6 +4052,14 @@ function renderPropertyDeltaCard(gene, pos, wt, mut, entry, subRow) {{
       </div>
       ${{genomicBar}}
 
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px;margin-top:10px;margin-bottom:-6px;font-size:11px;color:var(--ink-3);">
+        <span>19-AA Substitution Strip (click any residue to mutate in 3D):</span>
+        <span style="display:inline-flex;gap:9px;">
+          <span class="leg-item"><i class="leg-line" style="background:#c5221f;"></i>Active-site</span>
+          <span class="leg-item"><i class="leg-line" style="background:#b06000;"></i>Unfolding</span>
+          <span class="leg-item"><i class="leg-line" style="background:#00709b;"></i>Neutral</span>
+        </span>
+      </div>
       <div class="aa-strip">${{aaCells}}</div>
 
       <div class="metric-tiles">
@@ -3797,6 +4100,7 @@ function renderPropertyDeltaCard(gene, pos, wt, mut, entry, subRow) {{
       <div class="summary-pill">${{oneLine}}</div>
       <div class="radar-box" title="ProtVar-style 5-axis normalized fingerprint: AlphaMissense (AM), ESM-2 constraint (Seq), ESM-IF1 unfolding (Fold), Grantham radicality (Chem), and 3D Pocket proximity (Pocket)">
         ${{buildProtVarRadarSVG(am, e2, if1, gDist, minPktA, radarCol)}}
+        <span style="font-size:9.5px;color:var(--ink-3);font-family:var(--mono);margin-top:-2px;">0&rarr;1 Impact Radar</span>
       </div>
     </div>
   `;
@@ -3836,6 +4140,10 @@ function inspectSaturationCodon() {{
   let html = `<div class="card-head">
       <h2>All 19 Substitutions at ${{gene}} ${{wt}}${{pos}}</h2>
       <span class="meta-note">PDB ${{pdb || 'AlphaFold v6'}} · RNA ${{dna ?? '—'}} Å · Metal ${{dmet ?? '—'}} Å</span>
+    </div>
+    <div class="table-guide no-print">
+      <span><strong>Thresholds:</strong> <code>AlphaMissense &ge; 0.564</code> Pathogenic &middot; <code>ESM-2 &le; &minus;5.0</code> Constrained &middot; <code>ESM-IF1 &gt; &minus;1.5</code> Fold-preserving (<span class="leg-item"><i class="dot dot-crimson"></i>Active site</span>) vs <code>&le; &minus;1.5</code> (<span class="leg-item"><i class="dot dot-amber"></i>Unfolding</span>) &middot; <code>Grantham &gt; 100</code> Radical.</span>
+      <span class="meta-note">Click <strong>View</strong> to model side chain in 3D &middot; Click <code>&#8597;</code> headers to sort</span>
     </div>
     <div class="table-wrap" style="max-height:420px;">
       <table>
@@ -3915,17 +4223,21 @@ function renderGtexBars() {{
   markSortableHeaders(gBox);
 }}
 
-/* Render Authentic KaTeX Formula Cards */
+/* Render Authentic KaTeX Formula Cards with Primary Literature Citations */
 function renderFormulas() {{
   const cat = document.getElementById('formula-cat').value;
   const q = (document.getElementById('formula-q').value || '').trim().toLowerCase();
   const list = (ATLAS.formulas || []).filter(f => {{
     if (cat !== 'ALL' && f.cat !== cat) return false;
-    if (q && !(`${{f.id}} ${{f.title}} ${{f.summary}} ${{f.cat}}`.toLowerCase().includes(q))) return false;
+    if (q && !(`${{f.id}} ${{f.title}} ${{f.summary}} ${{f.cat}} ${{f.citation || ''}}`.toLowerCase().includes(q))) return false;
     return true;
   }});
   const wrap = document.getElementById('formula-cards-wrap');
-  wrap.innerHTML = list.map((f, idx) => `
+  wrap.innerHTML = list.map((f, idx) => {{
+    const refHtml = (f.refs && f.refs.length)
+      ? `<div class="eq-cite"><strong>References:</strong> ${{f.refs.map(r => `<a href="${{r.url}}" target="_blank" rel="noopener">${{r.cite}} &#8599;</a>`).join(' &middot; ')}}</div>`
+      : (f.citation ? `<div class="eq-cite"><strong>Reference:</strong> <a href="${{f.doi_url || '#'}}" target="_blank" rel="noopener">${{f.citation}} &#8599;</a></div>` : '');
+    return `
     <div class="eq-card" id="${{f.id}}">
       <div>
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
@@ -3935,9 +4247,13 @@ function renderFormulas() {{
         <div style="font-size:14px;font-weight:600;margin-bottom:10px;">${{f.title}}</div>
         <div class="eq-math-box" id="katex-eq-${{idx}}"></div>
       </div>
-      <div style="font-size:12.5px;color:var(--ink-2);">${{f.summary}}</div>
+      <div>
+        <div style="font-size:12.5px;color:var(--ink-2);">${{f.summary}}</div>
+        ${{refHtml}}
+      </div>
     </div>
-  `).join('');
+    `;
+  }}).join('');
   list.forEach((f, idx) => renderLatex(f.latex, document.getElementById(`katex-eq-${{idx}}`), true));
 }}
 
@@ -3962,7 +4278,12 @@ function renderGlossaryCards() {{
     .filter(g => !q || (`${{g.title}} ${{g.cat}} ${{g.meaning}} ${{g.thresholds}}`.toLowerCase().includes(q)));
   document.getElementById('gloss-count').textContent = `${{entries.length}} terms`;
   const wrap = document.getElementById('glossary-cards-wrap');
-  wrap.innerHTML = entries.map((g, i) => `
+  wrap.innerHTML = entries.map((g, i) => {{
+    const fRef = g.anchor ? FORMULA_BY_ID[g.anchor] : null;
+    const citeRow = (fRef && fRef.refs && fRef.refs.length)
+      ? `<div class="eq-cite"><span>Ref: ${{fRef.refs.slice(0, 2).map(r => `<a href="${{r.url}}" target="_blank" rel="noopener">${{r.cite}} &#8599;</a>`).join(' &middot; ')}}</span><a href="#eq=${{fRef.id}}" onclick="event.preventDefault();openFormulaTab('${{fRef.id}}');" style="margin-left:auto;">Eq. ${{fRef.id}} &rarr;</a></div>`
+      : '';
+    return `
     <div class="eq-card">
       <div>
         <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px;">
@@ -3972,9 +4293,13 @@ function renderGlossaryCards() {{
         <div style="font-size:12.5px;color:var(--ink-2);margin-bottom:10px;">${{g.meaning}}</div>
         <div class="eq-math-box" style="min-height:44px;padding:8px 10px;" id="katex-gl-${{i}}"></div>
       </div>
-      <div class="meta-note">${{g.thresholds}}</div>
+      <div>
+        <div class="meta-note">${{g.thresholds}}</div>
+        ${{citeRow}}
+      </div>
     </div>
-  `).join('');
+    `;
+  }}).join('');
   entries.forEach((g, i) => renderLatex(g.latex, document.getElementById(`katex-gl-${{i}}`), false));
 }}
 
@@ -4175,7 +4500,7 @@ function renderDicerStripPlot() {{
   extraKeys.forEach(k => groups.push({{ key: k, label: k.replace(/^DICER1_/, '').replace(/_/g, ' '), color: '#00709b' }}));
   const activeGroups = groups.filter(g => ATLAS.dicer_pts.some(d => d.c === g.key));
 
-  const W = 1360, rowH = 44, topPad = 32, botPad = 34, padL = 220, padR = 40;
+  const W = 1360, rowH = 44, topPad = 32, botPad = 48, padL = 220, padR = 40;
   const H = topPad + activeGroups.length * rowH + botPad;
   const minX = -2.4, maxX = 1.6;
   const xOf = v => padL + ((Math.min(maxX, Math.max(minX, v)) - minX) / (maxX - minX)) * (W - padL - padR);
@@ -4184,9 +4509,12 @@ function renderDicerStripPlot() {{
   let svg = `<svg viewBox="0 0 ${{W}} ${{H}}" width="100%" height="${{H}}">`;
   [-2.0, -1.5, -1.0, -0.5, 0.0, 0.5, 1.0, 1.5].forEach(tk => {{
     const x = xOf(tk).toFixed(1);
-    svg += `<line x1="${{x}}" y1="${{topPad - 8}}" x2="${{x}}" y2="${{H - botPad}}" stroke="#ebeef2" stroke-width="1"/>`;
-    svg += `<text x="${{x}}" y="${{H - 12}}" font-size="10.5" fill="#80868b" text-anchor="middle">${{tk >= 0 ? '+' + tk.toFixed(1) : tk.toFixed(1)}}</text>`;
+    svg += `<line x1="${{x}}" y1="${{topPad - 8}}" x2="${{x}}" y2="${{H - botPad}}" stroke="${{tk === 0.0 ? '#cbd5e1' : '#ebeef2'}}" stroke-width="${{tk === 0.0 ? '1.3' : '1'}}"/>`;
+    svg += `<text x="${{x}}" y="${{H - 26}}" font-size="10.5" fill="#80868b" text-anchor="middle">${{tk >= 0 ? '+' + tk.toFixed(1) : tk.toFixed(1)}}</text>`;
   }});
+  svg += `<text x="${{xOf(-1.6).toFixed(1)}}" y="${{H - 8}}" font-size="10.5" font-weight="600" fill="#c5221f" text-anchor="middle">&larr; Selective 5p Cleavage Collapse (&lt; 0)</text>`;
+  svg += `<text x="${{xOf(0.0).toFixed(1)}}" y="${{H - 8}}" font-size="10.5" fill="#5f6368" text-anchor="middle">Mean Duplex log&#8322;((RPM&#8325;&#8346;+1)/(RPM&#8323;&#8346;+1))</text>`;
+  svg += `<text x="${{xOf(1.05).toFixed(1)}}" y="${{H - 8}}" font-size="10.5" font-weight="600" fill="#137333" text-anchor="middle">Canonical 5p Strand Dominance (&gt; 0) &rarr;</text>`;
 
   const xWt = xOf(wtMed).toFixed(1);
   svg += `<line x1="${{xWt}}" y1="${{topPad - 12}}" x2="${{xWt}}" y2="${{H - botPad}}" stroke="#137333" stroke-width="1.5" stroke-dasharray="4,3"/>`;
@@ -4209,7 +4537,13 @@ function renderDicerStripPlot() {{
       </circle>`;
     }});
   }});
-  svg += `</svg>`;
+  svg += `</svg>
+  <div class="plot-legend">
+    <span class="leg-item"><i class="swatch" style="background:#c5221f;margin:0;"></i>Circle = 1 TCGA tumour (click dot to jump to sample row)</span>
+    <span class="leg-item"><span style="font-weight:800;color:#202124;">&#9475;</span>Thick vertical bar = Class median</span>
+    <span class="leg-item"><i class="leg-line" style="border-top:2px dashed #137333;height:0;width:14px;"></i>Pan-cancer wild-type median (+0.475, n = 9,129)</span>
+    <span class="leg-item">Click any left-hand class label to filter table</span>
+  </div>`;
   wrap.innerHTML = svg;
 }}
 
@@ -4224,19 +4558,25 @@ function openBatchTriage() {{
 
 function loadBatchExample() {{
   document.getElementById('batch-input').value = [
-    'chr14:95094139:C>T',
-    'DICER1 p.Asp1810Tyr',
-    'DROSHA c.3439G>A',
-    '17-7675088-C-T',
-    'AGO2 M364T',
-    'rs2073092496',
-    'DICER1 K868R'
+    '##fileformat=VCFv4.2',
+    '##reference=GRCh38',
+    '#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO',
+    'chr14\t95094139\t.\tC\tT\t.\tPASS\tGENE=DICER1;HGVSp=p.Glu1705Lys',
+    'chr14\t95090846\t.\tC\tA\t.\tPASS\tGENE=DICER1;HGVSp=p.Asp1810Tyr',
+    'chr5\t31409348\t.\tC\tT\t.\tPASS\tGENE=DROSHA;HGVSp=p.Glu1147Lys',
+    'chr17\t7675088\t.\tC\tT\t.\tPASS\tGENE=TP53;HGVSp=p.Arg175His',
+    'chr14\t95108998\t.\tT\tC\t.\tPASS\tGENE=DICER1;HGVSp=p.Lys868Arg'
   ].join('\\n');
   runBatchTriage();
 }}
 
 function handleBatchFileSelect(files) {{
   if (!files || !files.length) return;
+  const f = files[0];
+  if (!/\\.vcf$/i.test(f.name || '')) {{
+    document.getElementById('batch-summary').textContent = 'Rejected: Only uncompressed .vcf files are accepted for file upload.';
+    return;
+  }}
   const reader = new FileReader();
   reader.onload = ev => {{
     const txt = String(ev.target.result || '');
@@ -4247,9 +4587,13 @@ function handleBatchFileSelect(files) {{
       if (u && !u.skipVcfNonPanel) kept.push(lines[i]);
     }}
     document.getElementById('batch-input').value = kept.join('\\n');
+    if (!kept.length) {{
+      document.getElementById('batch-summary').textContent = `Parsed ${{f.name}}: 0 coding SNVs overlapped the 15-gene panel.`;
+      return;
+    }}
     runBatchTriage();
   }};
-  reader.readAsText(files[0]);
+  reader.readAsText(f);
 }}
 
 function handleBatchFileDrop(ev) {{
@@ -4611,6 +4955,18 @@ function renderDmsHeatmap() {{
   const L = Object.keys(gCache).length;
   const half = parseInt(document.getElementById('dms-span').value || '25', 10);
   const metric = document.getElementById('dms-metric').value || 'am';
+  const dmsLeg = document.getElementById('dms-legend-bar');
+  if (dmsLeg) {{
+    let scaleHtml = '';
+    if (metric === 'am') {{
+      scaleHtml = `<span class="leg-item"><strong>AlphaMissense:</strong> <code>0.0</code> Benign <span style="display:inline-block;width:96px;height:8px;border-radius:999px;border:1px solid var(--line);background:linear-gradient(90deg,rgb(35,118,178) 0%,rgb(250,250,250) 45%,rgb(197,34,31) 100%);"></span> <code>1.0</code> Pathogenic (&ge;0.564 cutoff)</span>`;
+    }} else if (metric === 'if1') {{
+      scaleHtml = `<span class="leg-item"><strong>ESM-IF1 3D &Delta;logP:</strong> <code>0.0</code> Fold Intact <span style="display:inline-block;width:96px;height:8px;border-radius:999px;border:1px solid var(--line);background:linear-gradient(90deg,rgb(244,247,250) 0%,rgb(176,96,10) 100%);"></span> <code>&le;&minus;4.2</code> Unfolding (&le;&minus;1.5 cutoff)</span>`;
+    }} else {{
+      scaleHtml = `<span class="leg-item"><strong>ESM-2 &Delta;&ell;:</strong> <code>0.0</code> Tolerated <span style="display:inline-block;width:96px;height:8px;border-radius:999px;border:1px solid var(--line);background:linear-gradient(90deg,rgb(244,247,250) 0%,rgb(197,34,31) 100%);"></span> <code>&le;&minus;11.0</code> Constrained (&le;&minus;5.0 cutoff)</span>`;
+    }}
+    dmsLeg.innerHTML = `${{scaleHtml}}<span class="meta-note"><code>&bull;</code> Wild-type AA &middot; <span style="display:inline-block;width:9px;height:9px;border:1.3px solid #202124;border-radius:2px;vertical-align:-1px;"></span> Observed in TCGA / ClinVar P/LP &middot; Column box = Active 3D codon &middot; Top bar = UniProt domain</span>`;
+  }}
   const center = Math.min(L, Math.max(1, dmsCenterPos || active3DState.pos || 1));
   let startP = Math.max(1, center - half);
   let endP = Math.min(L, startP + half * 2);
@@ -4696,12 +5052,14 @@ function copyCitationText(fmt) {{
 window.addEventListener('DOMContentLoaded', () => {{
   const selVar = document.getElementById('var-gene');
   const selLol = document.getElementById('lol-gene');
+  const selPub = document.getElementById('pubbar-gene');
   const selGtex = document.getElementById('gtex-gene');
   const selApi = document.getElementById('api-gene-sel');
   ATLAS.panel.forEach(p => {{
     const g = p.geneSymbol;
     selVar.insertAdjacentHTML('beforeend', `<option value="${{g}}">${{g}} (${{p.uniprotAccession}})</option>`);
     selLol.insertAdjacentHTML('beforeend', `<option value="${{g}}" ${{g==='DICER1'?'selected':''}}>${{g}} · ${{p.uniprotAccession}} (${{p.proteinLengthAa}} aa)</option>`);
+    if (selPub) selPub.insertAdjacentHTML('beforeend', `<option value="${{g}}" ${{g==='DICER1'?'selected':''}}>${{g}} (${{p.uniprotAccession}})</option>`);
     selGtex.insertAdjacentHTML('beforeend', `<option value="${{g}}" ${{g==='LIN28B'?'selected':''}}>${{g}} (&tau; = ${{p.gtex_tau_tissue_specificity}})</option>`);
     if (selApi) selApi.insertAdjacentHTML('beforeend', `<option value="${{g}}" ${{g==='DICER1'?'selected':''}}>${{g}}.json</option>`);
   }});

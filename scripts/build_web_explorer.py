@@ -6,7 +6,16 @@ import gzip
 import json
 import math
 import pathlib
+import sys
 from collections import Counter, defaultdict
+
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
+from explainer_content import (
+    DATASET_DESCRIPTIONS,
+    FORMULA_CARDS,
+    SOURCE_CONSORTIA,
+    TERM_GLOSSARY,
+)
 
 REPO_ROOT = pathlib.Path(__file__).resolve().parent.parent
 DATA_DIR = REPO_ROOT / "data"
@@ -216,6 +225,30 @@ def build_web_explorer():
     msk_dicer = read_csv_rows(DATA_DIR / "msk_impact_dicer1_cancer_type_enrichment.csv")[:20]
     surv_bench = read_csv_rows(DATA_DIR / "validation_clinical_survival_benchmarks.csv")
     imm_bench = read_csv_rows(DATA_DIR / "validation_panimmune_and_hrd_benchmarks.csv")
+    study_summary = read_csv_rows(DATA_DIR / "tcga_pancan_atlas_sample_set_summary.csv")
+    excluded_cands = read_csv_rows(DATA_DIR / "miRNA_biogenesis_excluded_candidates_rationale.csv")
+    top_tumours = read_csv_rows(DATA_DIR / "miRNA_biogenesis_top_tumours_excluding_TP53.csv")
+
+    derived_catalogue = []
+    for fpath in sorted(DATA_DIR.iterdir(), key=lambda p: p.name):
+        if not fpath.is_file() or not (fpath.name.endswith(".csv") or fpath.name.endswith(".csv.gz")):
+            continue
+        opener = gzip.open if fpath.name.endswith(".gz") else open
+        with opener(fpath, "rt", encoding="utf-8") as fh:
+            rdr = csv.reader(fh)
+            hdr = next(rdr, [])
+            n_rows = sum(1 for _ in rdr)
+        sz_bytes = fpath.stat().st_size
+        sz_str = f"{sz_bytes / (1024 * 1024):.2f} MB" if sz_bytes >= 512 * 1024 else f"{max(1.0, sz_bytes / 1024.0):.1f} KB"
+        pk, desc = DATASET_DESCRIPTIONS.get(fpath.name, ("Key columns", "Derived analytical table in data/."))
+        derived_catalogue.append({
+            "file": fpath.name,
+            "rows": n_rows,
+            "cols": len(hdr),
+            "size": sz_str,
+            "pk": pk,
+            "desc": desc,
+        })
 
     residue_tracks = build_saturation_js_chunks(clinvar_rows)
     rotamer_lib = build_struct3d_chunks_and_rotamers()
@@ -322,6 +355,13 @@ def build_web_explorer():
         "gtex_tpm": gtex_by_gene,
         "surv_bench": surv_bench,
         "imm_bench": imm_bench,
+        "study_summary": study_summary,
+        "excluded_cands": excluded_cands,
+        "top_tumours": top_tumours,
+        "datasets": derived_catalogue,
+        "consortia": SOURCE_CONSORTIA,
+        "formulas": FORMULA_CARDS,
+        "glossary": TERM_GLOSSARY,
     }
 
     data_json = json.dumps(bundle, separators=(",", ":"))
@@ -925,6 +965,349 @@ def build_web_explorer():
   }}
   .footer-inner a {{ color: var(--embl-petrol); text-decoration: none; }}
   .footer-inner a:hover {{ text-decoration: underline; }}
+
+  /* Interactive Term Tooltips, Section Explainers & Reference Hub */
+  [data-term] {{
+    border-bottom: 1px dotted rgba(0, 112, 155, 0.58);
+    cursor: help;
+    transition: color 0.12s ease, border-color 0.12s ease;
+  }}
+  [data-term]:hover {{
+    color: var(--embl-petrol);
+    border-bottom-color: var(--embl-petrol);
+  }}
+  th [data-term], th[data-term] {{
+    border-bottom: 1px dotted rgba(0, 112, 155, 0.65);
+  }}
+  .spec-item[data-term] {{
+    border-bottom: none;
+    border-radius: 6px;
+    padding: 4px 10px 4px 14px;
+    transition: background 0.12s ease;
+  }}
+  .spec-item[data-term]:first-child {{ padding-left: 6px; }}
+  .spec-item[data-term]:hover {{ background: var(--surface-subtle); }}
+  .info-badge {{
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    font-family: var(--sans);
+    font-size: 10px;
+    font-weight: 650;
+    color: var(--embl-petrol);
+    background: rgba(0, 112, 155, 0.10);
+    margin-left: 4px;
+    vertical-align: middle;
+    text-transform: none;
+  }}
+  .explainer-banner {{
+    background: var(--surface);
+    border: 1px solid var(--line-light);
+    border-left: 3px solid var(--embl-petrol);
+    border-radius: 8px;
+    margin-bottom: 16px;
+    overflow: hidden;
+  }}
+  .explainer-banner summary {{
+    list-style: none;
+    cursor: pointer;
+    padding: 11px 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    font-size: 13px;
+    color: var(--ink);
+    user-select: none;
+  }}
+  .explainer-banner summary::-webkit-details-marker {{ display: none; }}
+  .explainer-banner summary:hover {{ background: var(--surface-subtle); }}
+  .exp-sum-left {{
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    flex-wrap: wrap;
+  }}
+  .exp-kicker {{
+    font-family: var(--mono);
+    font-size: 10.5px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--embl-petrol);
+    background: rgba(0, 112, 155, 0.08);
+    padding: 2px 7px;
+    border-radius: 4px;
+  }}
+  .exp-toggle-lbl {{
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--embl-petrol);
+    white-space: nowrap;
+  }}
+  .explainer-banner[open] .exp-toggle-lbl::after {{ content: " ▴"; }}
+  .explainer-banner:not([open]) .exp-toggle-lbl::after {{ content: " ▾"; }}
+  .exp-body {{
+    padding: 14px 18px 16px;
+    border-top: 1px solid var(--line-light);
+    background: var(--surface-subtle);
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    font-size: 12.5px;
+    color: var(--ink-secondary);
+    line-height: 1.52;
+  }}
+  @media (max-width: 960px) {{
+    .exp-body {{ grid-template-columns: 1fr; }}
+  }}
+  .exp-col h4 {{
+    margin: 0 0 5px;
+    font-size: 11.5px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.035em;
+    color: var(--ink);
+  }}
+  .exp-col p {{ margin: 0; }}
+  .exp-chips {{
+    grid-column: 1 / -1;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+    padding-top: 8px;
+    border-top: 1px solid var(--line-light);
+    font-size: 11.5px;
+    color: var(--ink-tertiary);
+  }}
+  .term-chip {{
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 5px;
+    padding: 2px 8px;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--ink);
+    cursor: help;
+  }}
+  .term-chip:hover {{
+    border-color: var(--embl-petrol);
+    color: var(--embl-petrol);
+  }}
+
+  /* Floating Term Specification Popover */
+  .term-popover {{
+    position: fixed;
+    z-index: 9999;
+    width: 390px;
+    max-width: calc(100vw - 24px);
+    background: #1d1d1f;
+    color: #f5f5f7;
+    border: 1px solid #3a3a3c;
+    border-radius: 10px;
+    padding: 13px 15px;
+    box-shadow: 0 14px 36px rgba(0, 0, 0, 0.28);
+    font-size: 12.5px;
+    line-height: 1.48;
+    display: none;
+  }}
+  .term-popover.visible {{ display: block; }}
+  .tp-head {{
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 8px;
+    margin-bottom: 6px;
+  }}
+  .tp-cat {{
+    font-family: var(--mono);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #5ac8fa;
+    display: block;
+    margin-bottom: 2px;
+  }}
+  .tp-title {{
+    font-size: 13.5px;
+    font-weight: 600;
+    color: #ffffff;
+  }}
+  .tp-close {{
+    background: transparent;
+    border: none;
+    color: #98989d;
+    font-size: 15px;
+    cursor: pointer;
+    padding: 0 2px;
+    line-height: 1;
+  }}
+  .tp-close:hover {{ color: #ffffff; }}
+  .tp-meaning {{ color: #e5e5ea; margin-bottom: 8px; }}
+  .tp-formula {{
+    font-family: var(--mono);
+    font-size: 11.2px;
+    background: rgba(255, 255, 255, 0.07);
+    border: 1px solid rgba(255, 255, 255, 0.11);
+    border-radius: 6px;
+    padding: 6px 9px;
+    color: #f5f5f7;
+    margin-bottom: 8px;
+    overflow-x: auto;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }}
+  .tp-thresh {{
+    font-size: 11.5px;
+    color: #AEAEB2;
+    margin-bottom: 8px;
+  }}
+  .tp-link {{
+    background: transparent;
+    border: none;
+    padding: 0;
+    color: #5ac8fa;
+    font-size: 11.5px;
+    font-weight: 500;
+    cursor: pointer;
+    font-family: var(--sans);
+  }}
+  .tp-link:hover {{ text-decoration: underline; }}
+
+  /* Reference Hub (Tab 7: Pathway, Formulas, Datasets & Glossary) */
+  .doc-jumpbar {{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 16px;
+  }}
+  .pathway-flow {{
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 10px;
+    margin-bottom: 16px;
+  }}
+  @media (max-width: 1060px) {{
+    .pathway-flow {{ grid-template-columns: repeat(2, 1fr); }}
+  }}
+  @media (max-width: 600px) {{
+    .pathway-flow {{ grid-template-columns: 1fr; }}
+  }}
+  .pf-step {{
+    border: 1px solid var(--line-light);
+    border-top: 3px solid var(--embl-petrol);
+    border-radius: 8px;
+    padding: 12px 13px;
+    background: var(--surface-subtle);
+  }}
+  .pf-num {{
+    font-family: var(--mono);
+    font-size: 10.5px;
+    color: var(--embl-petrol);
+    font-weight: 600;
+    text-transform: uppercase;
+  }}
+  .pf-title {{
+    font-size: 13px;
+    font-weight: 600;
+    margin: 3px 0 5px;
+    color: var(--ink);
+  }}
+  .pf-desc {{
+    font-size: 12px;
+    color: var(--ink-secondary);
+    line-height: 1.45;
+  }}
+  .formula-grid {{
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+  }}
+  @media (max-width: 1024px) {{
+    .formula-grid {{ grid-template-columns: 1fr; }}
+  }}
+  .formula-card {{
+    border: 1px solid var(--line-light);
+    border-radius: 8px;
+    padding: 14px 16px;
+    background: var(--surface);
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+  }}
+  .formula-card:target {{
+    border-color: var(--embl-petrol);
+    box-shadow: 0 0 0 3px rgba(0, 112, 155, 0.14);
+  }}
+  .fc-top {{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+  }}
+  .fc-id {{
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--embl-petrol);
+    background: rgba(0, 112, 155, 0.08);
+    padding: 2px 7px;
+    border-radius: 4px;
+  }}
+  .fc-cat {{
+    font-size: 11px;
+    color: var(--ink-tertiary);
+    font-family: var(--mono);
+  }}
+  .fc-title {{
+    font-size: 13.5px;
+    font-weight: 600;
+    color: var(--ink);
+  }}
+  .fc-eq {{
+    font-family: var(--mono);
+    font-size: 11.8px;
+    background: var(--surface-subtle);
+    border: 1px solid var(--line-light);
+    border-radius: 6px;
+    padding: 8px 10px;
+    color: var(--ink);
+    overflow-x: auto;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }}
+  .fc-vars {{
+    font-size: 11.8px;
+    color: var(--ink-tertiary);
+  }}
+  .fc-meaning {{
+    font-size: 12.3px;
+    color: var(--ink-secondary);
+    line-height: 1.48;
+  }}
+  .fc-script {{
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--embl-teal);
+  }}
+  .glossary-grid {{
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }}
+  @media (max-width: 960px) {{
+    .glossary-grid {{ grid-template-columns: 1fr; }}
+  }}
+  .gloss-card {{
+    border: 1px solid var(--line-light);
+    border-radius: 8px;
+    padding: 12px 14px;
+    background: var(--surface-subtle);
+  }}
 </style>
 </head>
 <body>
@@ -936,6 +1319,7 @@ def build_web_explorer():
       <span>miRBioGenAtlas &middot; Multi-Consortium Cancer Genomics &amp; Structural Reference</span>
     </div>
     <div class="global-links">
+      <a href="#tab-docs" onclick="event.preventDefault();openDocsSection('sec-pathway')" style="color:#5ac8fa;font-weight:600;">Guide, Formulas &amp; Glossary</a>
       <a href="https://doi.org/10.5281/zenodo.24455067" target="_blank" rel="noopener">DOI:10.5281/zenodo.24455067</a>
       <a href="https://github.com/siddugayam/miRBioGenAtlas" target="_blank" rel="noopener">GitHub</a>
       <span>CC BY 4.0 / MIT</span>
@@ -948,37 +1332,37 @@ def build_web_explorer():
     <div class="masthead-top">
       <div class="title-block">
         <h1>miRBioGenAtlas <span class="version-tag">v2.0.2</span></h1>
-        <p>Sample-, variant-, and atomic-level reference of the human microRNA biogenesis machinery across TCGA, MSK-IMPACT, GDC, PDB, AlphaFold, ClinVar, gnomAD, GTEx, CPTAC, and DepMap.</p>
+        <p>Sample-, variant-, and atomic-level reference of the human microRNA biogenesis machinery across TCGA, MSK-IMPACT, GDC, PDB, AlphaFold, ClinVar, gnomAD, GTEx, CPTAC, and DepMap. <span style="color:var(--embl-petrol);cursor:pointer;font-weight:500;" onclick="openDocsSection('sec-pathway')">Hover or click any underlined metric for definitions &amp; formulas &rarr;</span></p>
       </div>
       <div class="omni-search">
-        <input type="text" id="global-search" placeholder="Jump to gene, mutation, or study (e.g. DICER1 E1705K, TP53 R175H)..." onkeydown="if(event.key==='Enter') runGlobalSearch(this.value)">
+        <input type="text" id="global-search" placeholder="Search gene, variant, term or formula (e.g. DICER1 E1705K, LOEUF, 5p:3p)..." onkeydown="if(event.key==='Enter') runGlobalSearch(this.value)">
         <span class="omni-kbd">/</span>
       </div>
     </div>
 
     <div class="spec-strip">
-      <div class="spec-item">
-        <div class="spec-val">21,140</div>
+      <div class="spec-item" data-term="kpi_tumours">
+        <div class="spec-val">21,140 <span class="info-badge">?</span></div>
         <div class="spec-lbl">Sequenced Tumours (TCGA &amp; MSK)</div>
       </div>
-      <div class="spec-item">
-        <div class="spec-val">15 Proteins</div>
+      <div class="spec-item" data-term="kpi_proteins">
+        <div class="spec-val">15 Proteins <span class="info-badge">?</span></div>
         <div class="spec-lbl">11,260 Codons &middot; 89,132 Heavy Atoms</div>
       </div>
-      <div class="spec-item">
-        <div class="spec-val">213,940</div>
+      <div class="spec-item" data-term="kpi_sat">
+        <div class="spec-val">213,940 <span class="info-badge">?</span></div>
         <div class="spec-lbl">Missense Substitutions &amp; 3D Rotamers</div>
       </div>
-      <div class="spec-item">
-        <div class="spec-val">16 Complexes</div>
+      <div class="spec-item" data-term="kpi_pdb">
+        <div class="spec-val">16 Complexes <span class="info-badge">?</span></div>
         <div class="spec-lbl">Experimental Cryo-EM &amp; X-ray PDBs</div>
       </div>
-      <div class="spec-item">
-        <div class="spec-val">9,578</div>
+      <div class="spec-item" data-term="kpi_mirna">
+        <div class="spec-val">9,578 <span class="info-badge">?</span></div>
         <div class="spec-lbl">Mature miRNA-seq &amp; 13.37M Pairs</div>
       </div>
-      <div class="spec-item">
-        <div class="spec-val">0.978 AUC</div>
+      <div class="spec-item" data-term="kpi_auc">
+        <div class="spec-val">0.978 AUC <span class="info-badge">?</span></div>
         <div class="spec-lbl">ClinVar Benchmark (16,569 Records)</div>
       </div>
     </div>
@@ -994,6 +1378,7 @@ def build_web_explorer():
       <button class="tab-btn" id="btn-tab-clinvar" onclick="switchTab('tab-clinvar', this)">Clinical &amp; Germline</button>
       <button class="tab-btn" id="btn-tab-gtex" onclick="switchTab('tab-gtex', this)">Tissue &amp; Tractability</button>
       <button class="tab-btn" id="btn-tab-consortia" onclick="switchTab('tab-consortia', this)">Proteomics, CRISPR &amp; Survival</button>
+      <button class="tab-btn" id="btn-tab-docs" onclick="switchTab('tab-docs', this)">Methods, Formulas &amp; Datasets</button>
     </div>
   </div>
 </nav>
@@ -1002,6 +1387,41 @@ def build_web_explorer():
 
   <!-- SECTION 1: STRUCTURE, LOLLIPOP & 213,940 SATURATION WORKBENCH -->
   <section id="tab-variants" class="panel active">
+    <details class="explainer-banner">
+      <summary>
+        <div class="exp-sum-left">
+          <span class="exp-kicker">Section Guide</span>
+          <span><strong>How to interpret 3D mutant side-chain rotamers, active-pocket distances &amp; saturation scores</strong> across all 213,940 substitutions</span>
+        </div>
+        <span class="exp-toggle-lbl">Expand explainer</span>
+      </summary>
+      <div class="exp-body">
+        <div class="exp-col">
+          <h4>1. Biological &amp; Structural Question</h4>
+          <p>Large biogenesis ribonucleases (<em>DICER1</em> 1,922 aa; <em>DROSHA</em> 1,374 aa) accumulate both true driver mutations and neutral hypermutator passengers. This workbench maps every codon onto 16 human Cryo-EM/X-ray complexes and AlphaFold v6 coordinates to resolve atomic mechanism.</p>
+        </div>
+        <div class="exp-col">
+          <h4>2. Three Biophysical Regimes</h4>
+          <p>By crossing sequence constraint (<strong>AlphaMissense &ge; 0.564</strong> or <strong>ESM-2 &le; &minus;5.0</strong>) with 3D inverse folding (<strong>ESM-IF1 &Delta;logP</strong>), variants separate into <strong>Fold-preserving active/interface (&Delta;logP &gt; &minus;1.5)</strong>, <strong>Fold-destabilising (&le; &minus;1.5)</strong>, and <strong>Tolerated neutral</strong>.</p>
+        </div>
+        <div class="exp-col">
+          <h4>3. Reading the Lollipop &amp; 3D Stage</h4>
+          <p>Click any lollipop stem, 19-amino-acid button, or 3D residue. Cyan sticks show the wild-type side chain; crimson sticks show the lowest-clash mutant rotamer; amber dashed lines mark contacts (&le;3.8 &Aring;) and red cylinders flag van der Waals clashes (&lt;2.4 &Aring;).</p>
+        </div>
+        <div class="exp-chips">
+          <span>Click or hover any term:</span>
+          <span class="term-chip" data-term="alphamissense">AlphaMissense</span>
+          <span class="term-chip" data-term="esm2_llr">ESM-2 3B &Delta;&ell;</span>
+          <span class="term-chip" data-term="esm1v_llr">ESM-1v &Delta;&ell;</span>
+          <span class="term-chip" data-term="esm_if1">ESM-IF1 3D &Delta;logP</span>
+          <span class="term-chip" data-term="mech_regime">3D Mechanism Regimes</span>
+          <span class="term-chip" data-term="rotamer_clash">Rotamer &amp; Steric Clash (&lt;2.4&Aring;)</span>
+          <span class="term-chip" data-term="grantham">Grantham Distance</span>
+          <span class="term-chip" data-term="plddt">AlphaFold pLDDT</span>
+        </div>
+      </div>
+    </details>
+
     <div class="surface" id="struct3d-card">
       <div class="section-head">
         <h2>3D Structural, Side-Chain Rotamer &amp; Saturation Mutagenesis Workbench</h2>
@@ -1063,10 +1483,10 @@ def build_web_explorer():
               <div id="mol3d-canvas" style="width:100%;height:100%;position:relative;"></div>
               <div class="mol3d-legend">
                 <span><i class="mol3d-swatch" style="background:#0095c8;"></i>Wild-type side chain</span>
-                <span><i class="mol3d-swatch" style="background:#e11d48;"></i>Mutant 3D rotamer</span>
-                <span><i class="mol3d-swatch" style="background:#94a3b8;"></i>8&Aring; shell</span>
-                <span><i class="mol3d-swatch" style="background:#f59e0b;"></i>Contact (&le;3.8&Aring;)</span>
-                <span><i class="mol3d-swatch" style="background:#ff3b30;"></i>Steric clash (&lt;2.4&Aring;)</span>
+                <span data-term="rotamer_clash"><i class="mol3d-swatch" style="background:#e11d48;"></i>Mutant 3D rotamer</span>
+                <span data-term="burial_8a"><i class="mol3d-swatch" style="background:#94a3b8;"></i>8&Aring; shell</span>
+                <span data-term="dist_na"><i class="mol3d-swatch" style="background:#f59e0b;"></i>Contact (&le;3.8&Aring;)</span>
+                <span data-term="rotamer_clash"><i class="mol3d-swatch" style="background:#ff3b30;"></i>Steric clash (&lt;2.4&Aring;)</span>
               </div>
             </div>
           </div>
@@ -1126,17 +1546,17 @@ def build_web_explorer():
               <th>3D</th>
               <th>Gene</th>
               <th>Variant</th>
-              <th>TCGA</th>
-              <th>ClinVar</th>
-              <th>Structural Tier</th>
-              <th>3D Mechanism</th>
-              <th>PDB</th>
-              <th>RNA/DNA (&Aring;)</th>
-              <th>Metal (&Aring;)</th>
-              <th>AlphaMissense</th>
-              <th>ESM-2 3B</th>
-              <th>ESM-1v</th>
-              <th>ESM-IF1 &Delta;logP</th>
+              <th data-term="kpi_tumours">TCGA</th>
+              <th data-term="kpi_auc">ClinVar</th>
+              <th data-term="struct_tier">Structural Tier</th>
+              <th data-term="mech_regime">3D Mechanism</th>
+              <th data-term="kpi_pdb">PDB</th>
+              <th data-term="dist_na">RNA/DNA (&Aring;)</th>
+              <th data-term="dist_metal">Metal (&Aring;)</th>
+              <th data-term="alphamissense">AlphaMissense</th>
+              <th data-term="esm2_llr">ESM-2 3B</th>
+              <th data-term="esm1v_llr">ESM-1v</th>
+              <th data-term="esm_if1">ESM-IF1 &Delta;logP</th>
               <th>Studies</th>
             </tr>
           </thead>
@@ -1148,6 +1568,42 @@ def build_web_explorer():
 
   <!-- SECTION 2: PAN-CANCER MATRIX -->
   <section id="tab-heatmap" class="panel">
+    <details class="explainer-banner">
+      <summary>
+        <div class="exp-sum-left">
+          <span class="exp-kicker">Section Guide</span>
+          <span><strong>Why strict vs broad alteration rates differ dramatically</strong>: whole-arm aneuploidy (&plusmn;1), hypermutators &amp; syntenic gene clusters</span>
+        </div>
+        <span class="exp-toggle-lbl">Expand explainer</span>
+      </summary>
+      <div class="exp-body">
+        <div class="exp-col">
+          <h4>1. Removing Whole-Arm Aneuploidy Noise</h4>
+          <p>Standard portal queries include shallow <strong>GISTIC2 &plusmn;1</strong> gains/losses, which account for <strong>81%</strong> of raw calls due to broad chromosome <code>8q</code>, <code>1p</code>, <code>18q</code>, and <code>17p</code> aneuploidy. Our primary <strong>High-Confidence (Strict)</strong> metric restricts CNAs to focal <strong>GISTIC2 &plusmn;2</strong> plus coding mutations.</p>
+        </div>
+        <div class="exp-col">
+          <h4>2. Exact Denominators &amp; Union Identity</h4>
+          <p>Every study uses the exact matched intersection <code>S_seq &cap; S_CNA</code> (<em>N</em> = 10,195) and satisfies <code>N_any = N_mut-only + N_CNA-only + N_both</code> (verified with 0.0000 discrepancy across 20 cBioPortal API spot-checks).</p>
+        </div>
+        <div class="exp-col">
+          <h4>3. Synteny-Aware Patient Pathway Tiers</h4>
+          <p>Because <em>AGO1/3/4</em> form a tandem cluster at <code>1p34.3</code> and <em>SMAD2/4</em> colocalise at <code>18q21.1</code>, patient-level burden collapses co-deleted clusters and stratifies genes into <strong>Core-10</strong>, <strong>Extended-12</strong>, and <strong>Panel-14</strong> (excluding <em>TP53</em>).</p>
+        </div>
+        <div class="exp-chips">
+          <span>Key definitions:</span>
+          <span class="term-chip" data-term="strict_hc">High-Confidence (Strict)</span>
+          <span class="term-chip" data-term="focal_cna">Focal CNA (&plusmn;2)</span>
+          <span class="term-chip" data-term="gistic2">GISTIC2 (&minus;2..+2)</span>
+          <span class="term-chip" data-term="hypermutator">Non-Hypermutated</span>
+          <span class="term-chip" data-term="broad_any">Broad Alteration</span>
+          <span class="term-chip" data-term="synteny">1p34.3 / 18q21.1 Synteny</span>
+          <span class="term-chip" data-term="tier_core10">Core-10</span>
+          <span class="term-chip" data-term="tier_ext12">Extended-12</span>
+          <span class="term-chip" data-term="tier_panel14">Panel-14</span>
+        </div>
+      </div>
+    </details>
+
     <div class="surface">
       <div class="section-head">
         <h2>Pan-Cancer Alteration Frequency Matrix (15 Genes &times; 32 TCGA Studies)</h2>
@@ -1160,19 +1616,77 @@ def build_web_explorer():
             <option value="hc">High-confidence alteration (nonsynonymous mutation or GISTIC2 &plusmn;2)</option>
             <option value="fcna">Focal high-level CNA only (GISTIC2 &plusmn;2)</option>
             <option value="mut">Somatic nonsynonymous mutation (all samples)</option>
-            <option value="nhm">Somatic nonsynonymous mutation (non-hypermutated, n = 9,360)</option>
+            <option value="nhm">Somatic nonsynonymous mutation (non-hypermutated, n = 8,810)</option>
             <option value="any">Broad alteration (mutation or any GISTIC2 &ne; 0)</option>
           </select>
         </div>
         <button class="btn-primary" onclick="exportLongCSV()">Download 480-Row CSV</button>
+        <button class="btn-quiet" onclick="openDocsSection('sec-tcga-codes')">Decode 32 TCGA Study Acronyms &rarr;</button>
       </div>
       <div id="hm-container" class="heatmap-grid"></div>
       <p class="vp-footnote">Cells report exact study proportions in [0.00, 1.00]. Hover any cell for denominator N, somatic mutation count, +2 amplification count, and &minus;2 deep-deletion count. Studies marked with * have N &lt; 100.</p>
+    </div>
+
+    <div class="surface">
+      <div class="section-head">
+        <h2>Synteny-Aware Patient Pathway Burden Ranking Across 32 TCGA Studies (Excluding TP53)</h2>
+        <span class="section-meta">Boolean patient union across nested gene-set tiers</span>
+      </div>
+      <div class="table-wrap" style="max-height:360px;">
+        <table id="cohort-burden-table">
+          <thead>
+            <tr>
+              <th>Rank</th>
+              <th>Study</th>
+              <th>Matched N</th>
+              <th data-term="tier_core10">Core-10 Strict % (n)</th>
+              <th data-term="tier_ext12">Extended-12 Strict %</th>
+              <th data-term="tier_panel14">Panel-14 Strict %</th>
+              <th data-term="broad_any">Core-10 Broad % (incl. &plusmn;1)</th>
+              <th data-term="synteny">1p34.3 AGO1/3/4 Co-CNA %</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
     </div>
   </section>
 
   <!-- SECTION 3: MIRNA-SEQ & TARGET COUPLINGS -->
   <section id="tab-mirna" class="panel">
+    <details class="explainer-banner">
+      <summary>
+        <div class="exp-sum-left">
+          <span class="exp-kicker">Section Guide</span>
+          <span><strong>How endogenous mature miRNA-seq proves enzymatic cleavage asymmetry</strong>: 5p:3p duplex ratios, AGO2-Slicer control &amp; target mRNA derepression</span>
+        </div>
+        <span class="exp-toggle-lbl">Expand explainer</span>
+      </summary>
+      <div class="exp-body">
+        <div class="exp-col">
+          <h4>1. Paired 5p:3p Hairpin Enzymology</h4>
+          <p>Inside cytoplasmic <em>DICER1</em>, the <strong>RNase IIIb</strong> domain cleaves the <code>-5p</code> hairpin strand while <strong>RNase IIIa</strong> cleaves the <code>-3p</code> strand. Pairing <code>log2((RPM_5p+1)/(RPM_3p+1))</code> within 192 co-transcribed duplexes cancels transcriptional noise and isolates catalytic RNase IIIb failure (<em>p</em> = 1.46 &times; 10<sup>&minus;15</sup>).</p>
+        </div>
+        <div class="exp-col">
+          <h4>2. Endogenous AGO2-Slicer Control</h4>
+          <p>Bicistronic <code>hsa-miR-451a</code> has a short 17-bp stem that completely bypasses <em>DICER1</em> and is cleaved directly by <em>AGO2</em> PIWI (&lsquo;Slicer&rsquo;), whereas co-transcribed <code>hsa-miR-144-5p</code> requires <em>DICER1</em>—providing an internal orthogonal control (<em>p</em> = 0.967).</p>
+        </div>
+        <div class="exp-col">
+          <h4>3. Downstream 13.37M mRNA Couplings</h4>
+          <p>Across 9,353 dual-profiled tumours (662 miRNAs &times; 20,196 mRNAs), selective collapse of <code>5p</code> <em>let-7</em> strands in <em>DICER1</em> pocket mutants derepresses oncofetal <em>let-7</em> target mRNAs (<em>p</em> = 6.53 &times; 10<sup>&minus;5</sup>) while sparing <code>3p</code>-dominant <em>miR-200</em> EMT targets.</p>
+        </div>
+        <div class="exp-chips">
+          <span>Key definitions:</span>
+          <span class="term-chip" data-term="duplex_5p3p">Paired 5p:3p Duplex Ratio</span>
+          <span class="term-chip" data-term="frac_5p">Linear 5p Fraction</span>
+          <span class="term-chip" data-term="mir451_slicer">miR-451a / miR-144 Slicer Control</span>
+          <span class="term-chip" data-term="let7_target_z">let-7 Target mRNA Z</span>
+          <span class="term-chip" data-term="pearson_couplings">13.37M Pearson Couplings</span>
+          <span class="term-chip" data-term="rank_shift_p">Mann&ndash;Whitney U Shift</span>
+        </div>
+      </div>
+    </details>
+
     <div class="surface">
       <div class="section-head">
         <h2>Mature miRNA-seq Enzymatic &amp; Target mRNA Benchmarks</h2>
@@ -1183,13 +1697,13 @@ def build_web_explorer():
           <thead>
             <tr>
               <th>Benchmark</th>
-              <th>Readout Metric</th>
+              <th data-term="duplex_5p3p">Readout Metric</th>
               <th>Group A (n)</th>
               <th>Median A</th>
               <th>Group B (n)</th>
               <th>Median B</th>
-              <th>Median Shift</th>
-              <th>Two-Sided p</th>
+              <th data-term="rank_shift_p">Median Shift</th>
+              <th data-term="rank_shift_p">Two-Sided p</th>
             </tr>
           </thead>
           <tbody></tbody>
@@ -1207,10 +1721,10 @@ def build_web_explorer():
             <tr>
               <th>Sample ID</th>
               <th>Study</th>
-              <th>DICER1 Class</th>
-              <th>Paired Duplex log2((5p+1)/(3p+1))</th>
-              <th>Linear 5p Fraction</th>
-              <th>let-7 Target mRNA Z</th>
+              <th data-term="struct_tier">DICER1 Class</th>
+              <th data-term="duplex_5p3p">Paired Duplex log2((5p+1)/(3p+1))</th>
+              <th data-term="frac_5p">Linear 5p Fraction</th>
+              <th data-term="let7_target_z">let-7 Target mRNA Z</th>
             </tr>
           </thead>
           <tbody></tbody>
@@ -1230,8 +1744,8 @@ def build_web_explorer():
               <th>Mature miRNA</th>
               <th>Target mRNA</th>
               <th>Dual Tumours (n)</th>
-              <th>Pearson r (log2)</th>
-              <th>t-Statistic</th>
+              <th data-term="pearson_couplings">Pearson r (log2)</th>
+              <th data-term="pearson_couplings">t-Statistic</th>
             </tr>
           </thead>
           <tbody></tbody>
@@ -1242,6 +1756,38 @@ def build_web_explorer():
 
   <!-- SECTION 4: CLINVAR, GNOMAD & MSK-IMPACT -->
   <section id="tab-clinvar" class="panel">
+    <details class="explainer-banner">
+      <summary>
+        <div class="exp-sum-left">
+          <span class="exp-kicker">Section Guide</span>
+          <span><strong>Non-circular clinical calibration &amp; independent clinical cohort replication</strong>: NCBI ClinVar (16,569 records) &amp; MSK-IMPACT (N = 10,945)</span>
+        </div>
+        <span class="exp-toggle-lbl">Expand explainer</span>
+      </summary>
+      <div class="exp-body">
+        <div class="exp-col">
+          <h4>1. Non-Circular ClinVar Benchmarking</h4>
+          <p>None of our four sequence/3D predictors (<code>AlphaMissense</code>, <code>ESM-2 3B</code>, <code>ESM-1v</code>, <code>ESM-IF1</code>) were trained on ClinVar clinical labels. Evaluating them against 612 expert-curated Pathogenic/LP vs Benign/LB missense variants yields an unbiased clinical calibration (<code>ROC-AUC = 0.9784</code>).</p>
+        </div>
+        <div class="exp-col">
+          <h4>2. Reading ROC-AUC vs PR-AUC</h4>
+          <p><strong>ROC-AUC</strong> (0.5 random &rarr; 1.0 perfect; Hanley&ndash;McNeil 95% CI) measures rank separation; <strong>PR-AUC</strong> measures precision-recall performance and must be compared against the positive-class prevalence baseline shown in parentheses.</p>
+        </div>
+        <div class="exp-col">
+          <h4>3. MSK-IMPACT Replication (N = 10,945)</h4>
+          <p>Replicates somatic mutation, non-hypermutated, truncating LoF, and 3D RNase IIIb hotspot frequencies in an independent prospective clinical sequencing cohort spanning primary and metastatic tumours.</p>
+        </div>
+        <div class="exp-chips">
+          <span>Key definitions:</span>
+          <span class="term-chip" data-term="roc_pr_auc">ROC-AUC &amp; PR-AUC</span>
+          <span class="term-chip" data-term="alphamissense">AlphaMissense</span>
+          <span class="term-chip" data-term="esm2_llr">ESM-2 3B</span>
+          <span class="term-chip" data-term="esm_if1">ESM-IF1 3D</span>
+          <span class="term-chip" data-term="hypermutator">Non-Hypermutated %</span>
+        </div>
+      </div>
+    </details>
+
     <div class="surface">
       <div class="section-head">
         <h2>NCBI ClinVar Pathogenic vs Benign Missense Discrimination</h2>
@@ -1255,9 +1801,9 @@ def build_web_explorer():
               <th>Predictor</th>
               <th>Pathogenic (n)</th>
               <th>Benign (n)</th>
-              <th>ROC-AUC (95% CI)</th>
-              <th>PR-AUC (Baseline)</th>
-              <th>Mann&ndash;Whitney p</th>
+              <th data-term="roc_pr_auc">ROC-AUC (95% CI)</th>
+              <th data-term="roc_pr_auc">PR-AUC (Baseline)</th>
+              <th data-term="rank_shift_p">Mann&ndash;Whitney p</th>
             </tr>
           </thead>
           <tbody></tbody>
@@ -1277,9 +1823,9 @@ def build_web_explorer():
               <th>MSK Profiled N</th>
               <th>MSK Mut % (n)</th>
               <th>TCGA Mut %</th>
-              <th>MSK Non-Hypermut %</th>
+              <th data-term="hypermutator">MSK Non-Hypermut %</th>
               <th>MSK Truncating % (n)</th>
-              <th>MSK 3D Pocket / Hotspot % (n)</th>
+              <th data-term="struct_tier">MSK 3D Pocket / Hotspot % (n)</th>
               <th>Primary vs Metastasis %</th>
             </tr>
           </thead>
@@ -1299,7 +1845,7 @@ def build_web_explorer():
               <th>Clinical Cancer Type</th>
               <th>Samples (N)</th>
               <th>DICER1 Mutated (n, %)</th>
-              <th>RNase IIIb Hotspot (n, %)</th>
+              <th data-term="struct_tier">RNase IIIb Hotspot (n, %)</th>
               <th>Truncating LoF (n, %)</th>
             </tr>
           </thead>
@@ -1311,6 +1857,39 @@ def build_web_explorer():
 
   <!-- SECTION 5: GTEX, HPA & TRACTABILITY -->
   <section id="tab-gtex" class="panel">
+    <details class="explainer-banner">
+      <summary>
+        <div class="exp-sum-left">
+          <span class="exp-kicker">Section Guide</span>
+          <span><strong>Healthy human germline constraint, adult tissue specificity (&tau;) &amp; therapeutic tractability</strong> across gnomAD v4, GTEx v10, HPA &amp; Open Targets</span>
+        </div>
+        <span class="exp-toggle-lbl">Expand explainer</span>
+      </summary>
+      <div class="exp-body">
+        <div class="exp-col">
+          <h4>1. Human Germline Purifying Selection</h4>
+          <p><strong>gnomAD v4</strong> (&gt;800,000 individuals) shows extreme intolerance to germline truncation (<code>pLI &approx; 1.0</code>, <code>LOEUF &lt; 0.35</code>) and missense variation across core biogenesis enzymes—peaking in <em>AGO2</em> (<code>Missense Z = +7.97</code>, <code>LOEUF = 0.103</code>).</p>
+        </div>
+        <div class="exp-col">
+          <h4>2. Housekeeping vs Oncofetal Specificity (&tau;)</h4>
+          <p>Yanai&rsquo;s specificity index <strong>&tau; &isin; [0, 1]</strong> across 54 adult GTEx tissues separates ubiquitous housekeeping Core-10 enzymes (<code>&tau; = 0.22&ndash;0.38</code>) from testis-restricted <em>LIN28A</em> (<code>&tau; = 0.997</code>) and <em>LIN28B</em> (<code>&tau; = 0.978</code>), whose expression in somatic tumours represents true oncofetal reactivation.</p>
+        </div>
+        <div class="exp-col">
+          <h4>3. Drug Discovery Whitespace</h4>
+          <p><strong>Open Targets</strong> reveals that <strong>0 of 14</strong> biogenesis genes (excluding <em>TP53</em>) have clinical-stage drugs, despite structural small-molecule ligandability in <em>AGO2</em>, <em>XPO5</em>, and <em>SMAD2/4</em>.</p>
+        </div>
+        <div class="exp-chips">
+          <span>Key definitions:</span>
+          <span class="term-chip" data-term="gnomad_pli">gnomAD pLI</span>
+          <span class="term-chip" data-term="gnomad_loeuf">LOEUF</span>
+          <span class="term-chip" data-term="gnomad_misz">Missense Z</span>
+          <span class="term-chip" data-term="gtex_tpm">GTEx Median TPM</span>
+          <span class="term-chip" data-term="tau_spec">Specificity (&tau;)</span>
+          <span class="term-chip" data-term="tractability">Open Targets Tractability</span>
+        </div>
+      </div>
+    </details>
+
     <div class="surface">
       <div class="section-head">
         <h2>Germline Constraint (gnomAD v4), Subcellular Localisation (HPA) &amp; Tractability (Open Targets)</h2>
@@ -1321,15 +1900,15 @@ def build_web_explorer():
           <thead>
             <tr>
               <th>Gene</th>
-              <th>gnomAD pLI</th>
-              <th>LOEUF</th>
-              <th>Missense Z</th>
+              <th data-term="gnomad_pli">gnomAD pLI</th>
+              <th data-term="gnomad_loeuf">LOEUF</th>
+              <th data-term="gnomad_misz">Missense Z</th>
               <th>HPA Subcellular Compartment</th>
-              <th>GTEx Pan-54 Median TPM</th>
-              <th>GTEx Peak Tissue (TPM)</th>
-              <th>Specificity (&tau;)</th>
-              <th>Tractability</th>
-              <th>ClinVar Pathogenic / Total</th>
+              <th data-term="gtex_tpm">GTEx Pan-54 Median TPM</th>
+              <th data-term="gtex_tpm">GTEx Peak Tissue (TPM)</th>
+              <th data-term="tau_spec">Specificity (&tau;)</th>
+              <th data-term="tractability">Tractability</th>
+              <th data-term="kpi_auc">ClinVar Pathogenic / Total</th>
             </tr>
           </thead>
           <tbody></tbody>
@@ -1350,6 +1929,39 @@ def build_web_explorer():
 
   <!-- SECTION 6: CPTAC, DEPMAP, SURVIVAL & PANIMMUNE -->
   <section id="tab-consortia" class="panel">
+    <details class="explainer-banner">
+      <summary>
+        <div class="exp-sum-left">
+          <span class="exp-kicker">Section Guide</span>
+          <span><strong>Proteogenomic buffering, CRISPR collateral synthetic lethality, multivariable survival &amp; HRD</strong> across CPTAC, DepMap &amp; TCGA-CDR</span>
+        </div>
+        <span class="exp-toggle-lbl">Expand explainer</span>
+      </summary>
+      <div class="exp-body">
+        <div class="exp-col">
+          <h4>1. CPTAC Protein Buffering (&Delta;&rho;)</h4>
+          <p>Comparing <code>&rho;(CNA, mRNA)</code> vs mass-spectrometry <code>&rho;(CNA, Protein)</code> across 1,002 tumours shows strong <em>AGO2</em> amplification-to-protein transmission alongside stoichiometry buffering (<code>&Delta;&rho; &gt; 0</code>) in heterodimers (<em>DROSHA&ndash;DGCR8</em>, <em>DICER1&ndash;TARBP2</em>).</p>
+        </div>
+        <div class="exp-col">
+          <h4>2. DepMap Chronos &amp; 1p34.3 Synthetic Lethality</h4>
+          <p><strong>Chronos &le; &minus;0.5</strong> marks cell essentiality (<em>DROSHA</em>, <em>DGCR8</em>, <em>XPO5</em>, <em>DICER1</em>). Argonaute paralogues buffer single knockouts (~0.0) until coordinate <code>1p34.3</code> <em>AGO1/3/4</em> depletion exposes collateral dependency on <em>AGO2</em> (<em>p</em> = 5.40 &times; 10<sup>&minus;4</sup>).</p>
+        </div>
+        <div class="exp-col">
+          <h4>3. Stratified Survival &amp; Extreme HRD</h4>
+          <p>Survival models stratify by cancer type (Mantel&ndash;Haenszel) and adjust for age, sex, AJCC stage, and hypermutation (Breslow multivariable Cox). Focal <code>8q24.3</code> <em>AGO2</em> <code>+2</code> marks severe homologous recombination deficiency (median HRD 33 vs 7, <em>p</em> = 1.43 &times; 10<sup>&minus;183</sup>).</p>
+        </div>
+        <div class="exp-chips">
+          <span>Key definitions:</span>
+          <span class="term-chip" data-term="cptac_rho">CPTAC CNA&rarr;Protein &rho;</span>
+          <span class="term-chip" data-term="cptac_atten">Attenuation (&Delta;&rho;)</span>
+          <span class="term-chip" data-term="depmap_chronos">DepMap Chronos</span>
+          <span class="term-chip" data-term="strat_hr">Stratified Log-Rank HR</span>
+          <span class="term-chip" data-term="multivar_cox">Multivariable Breslow Cox HR</span>
+          <span class="term-chip" data-term="hrd_score">HRD Genomic-Scar Score</span>
+        </div>
+      </div>
+    </details>
+
     <div class="surface">
       <div class="section-head">
         <h2>CPTAC Mass-Spectrometry Proteogenomics (N = 1,002) &amp; Broad DepMap CRISPR Essentiality (N = 1,208)</h2>
@@ -1361,19 +1973,43 @@ def build_web_explorer():
             <tr>
               <th>Gene</th>
               <th>Role</th>
-              <th>PDB Complexes</th>
-              <th>CPTAC CNA&rarr;mRNA &rho;</th>
-              <th>CPTAC CNA&rarr;Protein &rho;</th>
-              <th>Attenuation (&Delta;&rho;)</th>
-              <th>DepMap Median Chronos</th>
-              <th>% Dependent (&le;&minus;0.5)</th>
-              <th>Dependency Class</th>
+              <th data-term="kpi_pdb">PDB Complexes</th>
+              <th data-term="cptac_rho">CPTAC CNA&rarr;mRNA &rho;</th>
+              <th data-term="cptac_rho">CPTAC CNA&rarr;Protein &rho;</th>
+              <th data-term="cptac_atten">Attenuation (&Delta;&rho;)</th>
+              <th data-term="depmap_chronos">DepMap Median Chronos</th>
+              <th data-term="depmap_chronos">% Dependent (&le;&minus;0.5)</th>
+              <th data-term="depmap_chronos">Dependency Class</th>
             </tr>
           </thead>
           <tbody></tbody>
         </table>
       </div>
     </div>
+
+    <div class="surface">
+      <div class="section-head">
+        <h2>DepMap CRISPR-Cas9 Collateral Synthetic Lethality, CYCLOPS &amp; Oncofetal Addiction Benchmarks</h2>
+        <span class="section-meta">1,208 CRISPR-screened cancer cell lines</span>
+      </div>
+      <div class="table-wrap">
+        <table id="collat-table">
+          <thead>
+            <tr>
+              <th>Test ID</th>
+              <th>CRISPR Target</th>
+              <th>Biological Hypothesis</th>
+              <th>Altered Lines (n, Median Chronos)</th>
+              <th>Control Lines (n, Median Chronos)</th>
+              <th data-term="depmap_chronos">&Delta;Chronos</th>
+              <th data-term="rank_shift_p">Two-Sided p</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+
     <div class="surface">
       <div class="section-head">
         <h2>Cancer-Type-Stratified Log-Rank &amp; Multivariable Breslow Cox Survival Benchmarks</h2>
@@ -1385,13 +2021,13 @@ def build_web_explorer():
             <tr>
               <th>Benchmark ID</th>
               <th>Cohort</th>
-              <th>Endpoint</th>
+              <th data-term="surv_endpoints">Endpoint</th>
               <th>Altered (Events / n)</th>
               <th>Control (Events / n)</th>
-              <th>Stratified HR (95% CI)</th>
-              <th>Log-Rank p</th>
-              <th>Multivariable Cox HR (95% CI)</th>
-              <th>Multivariable p</th>
+              <th data-term="strat_hr">Stratified HR (95% CI)</th>
+              <th data-term="strat_hr">Log-Rank p</th>
+              <th data-term="multivar_cox">Multivariable Cox HR (95% CI)</th>
+              <th data-term="multivar_cox">Multivariable p</th>
             </tr>
           </thead>
           <tbody></tbody>
@@ -1408,13 +2044,13 @@ def build_web_explorer():
           <thead>
             <tr>
               <th>Benchmark ID</th>
-              <th>Metric</th>
+              <th data-term="hrd_score">Metric</th>
               <th>Group A (n)</th>
               <th>Median A</th>
               <th>Group B (n)</th>
               <th>Median B</th>
-              <th>Median Shift</th>
-              <th>Two-Sided p</th>
+              <th data-term="rank_shift_p">Median Shift</th>
+              <th data-term="rank_shift_p">Two-Sided p</th>
             </tr>
           </thead>
           <tbody></tbody>
@@ -1422,7 +2058,225 @@ def build_web_explorer():
       </div>
     </div>
   </section>
+
+  <!-- SECTION 7: METHODS, MATHEMATICAL FORMULAS, DATASETS & A-Z GLOSSARY -->
+  <section id="tab-docs" class="panel">
+    <div class="doc-jumpbar">
+      <button class="btn-quiet" onclick="document.getElementById('sec-pathway').scrollIntoView({{behavior:'smooth'}})">1. Pathway &amp; Gene Tiers</button>
+      <button class="btn-quiet" onclick="document.getElementById('sec-formulas').scrollIntoView({{behavior:'smooth'}})">2. Mathematical Formulas (F1&ndash;F16)</button>
+      <button class="btn-quiet" onclick="document.getElementById('sec-datasets').scrollIntoView({{behavior:'smooth'}})">3. Source Consortia &amp; 41 Datasets</button>
+      <button class="btn-quiet" onclick="document.getElementById('sec-tcga-codes').scrollIntoView({{behavior:'smooth'}})">4. 32 TCGA Study Codes &amp; N</button>
+      <button class="btn-quiet" onclick="document.getElementById('sec-glossary').scrollIntoView({{behavior:'smooth'}})">5. Searchable A&ndash;Z Glossary</button>
+    </div>
+
+    <!-- 7.1 Pathway Architecture & Nested Tiers -->
+    <div class="surface" id="sec-pathway">
+      <div class="section-head">
+        <h2>1. Canonical Human miRNA Biogenesis Cascade, Nested Gene-Set Tiers &amp; Exclusion Rationale</h2>
+        <span class="section-meta">15 included proteins &middot; 4 nested analysis tiers &middot; 8 excluded pleiotropic factors</span>
+      </div>
+
+      <div class="pathway-flow">
+        <div class="pf-step">
+          <div class="pf-num">Step 1 &middot; Nucleus</div>
+          <div class="pf-title">Microprocessor Cropping</div>
+          <div class="pf-desc"><strong>DROSHA</strong> (RNase III, 5p13.3) + <strong>DGCR8</strong> (dsRBD dimer, 22q11.21) cleave capped/polyadenylated pri-miRNAs into ~65&ndash;70 nt hairpin pre-miRNAs (PDB <code>9ASM</code>, <code>6V5B</code>).</div>
+        </div>
+        <div class="pf-step">
+          <div class="pf-num">Step 2 &middot; Nuclear Pore</div>
+          <div class="pf-title">Pre-miRNA Nuclear Export</div>
+          <div class="pf-desc"><strong>XPO5</strong> (Exportin-5, 6p21.1) recognises the 2-nt 3&prime; overhang and dsRNA stem of pre-miRNAs in a RanGTP-dependent tunnel (PDB <code>3A6P</code>).</div>
+        </div>
+        <div class="pf-step">
+          <div class="pf-num">Step 3 &middot; Cytoplasm</div>
+          <div class="pf-title">Dicing into 5p / 3p Duplex</div>
+          <div class="pf-desc"><strong>DICER1</strong> (14q32.13; RNase IIIb cleaves <code>5p</code>, RNase IIIa cleaves <code>3p</code>) with dsRNA cofactors <strong>TARBP2</strong> (12q13.13) &amp; <strong>PRKRA</strong> (2q31.2) produces ~22-nt duplexes (PDB <code>7XW2</code>, <code>5ZAK</code>).</div>
+        </div>
+        <div class="pf-step">
+          <div class="pf-num">Step 4 &middot; RISC Complex</div>
+          <div class="pf-title">Guide Loading &amp; Slicing</div>
+          <div class="pf-desc"><strong>AGO2</strong> (8q24.3, catalytic PIWI Slicer; cleaves <em>miR-451a</em> &amp; aids RAD51 HR repair; PDB <code>4W5N</code>) + syntenic <code>1p34.3</code> paralogues <strong>AGO1, AGO3, AGO4</strong> silence target mRNAs.</div>
+        </div>
+        <div class="pf-step">
+          <div class="pf-num">Step 5 &middot; Regulation</div>
+          <div class="pf-title">Let-7 Gate &amp; Accessories</div>
+          <div class="pf-desc">Oncofetal <strong>LIN28A/B</strong> block pri/pre-<em>let-7</em> maturation (PDB <code>5UDZ</code>, <code>4A4I</code>); <strong>SMAD2/4</strong> (18q21.1) &amp; <strong>TP53</strong> (17p13.1) modulate pri-miRNA cropping &amp; <em>miR-34</em> transcription.</div>
+        </div>
+      </div>
+
+      <div class="table-wrap" style="max-height:none;margin-bottom:14px;">
+        <table>
+          <thead>
+            <tr>
+              <th>Nested Tier</th>
+              <th>Gene Count</th>
+              <th>Included Symbols</th>
+              <th>Syntenic Clusters Collapsed in Patient Union</th>
+              <th>When to Use This Tier</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Core-10</strong></td>
+              <td>10</td>
+              <td><code>DROSHA, DGCR8, XPO5, DICER1, TARBP2, PRKRA, AGO1, AGO2, AGO3, AGO4</code></td>
+              <td><code>1p34.3</code> (<em>AGO1/3/4</em>)</td>
+              <td>Primary specific burden of dedicated canonical miRNA maturation &amp; RISC machinery.</td>
+            </tr>
+            <tr>
+              <td><strong>Extended-12</strong></td>
+              <td>12</td>
+              <td>Core-10 + <code>LIN28A, LIN28B</code></td>
+              <td><code>1p34.3</code> (<em>AGO1/3/4</em>)</td>
+              <td>Captures direct pri/pre-<em>let-7</em> oncofetal blockade alongside core enzymatic defects.</td>
+            </tr>
+            <tr>
+              <td><strong>Panel-14</strong></td>
+              <td>14</td>
+              <td>Extended-12 + <code>SMAD2, SMAD4</code></td>
+              <td><code>1p34.3</code> (<em>AGO1/3/4</em>) &amp; <code>18q21.1</code> (<em>SMAD2/4</em>)</td>
+              <td>Includes TGF-&beta;/SMAD Microprocessor accessory cofactors while still excluding <em>TP53</em>.</td>
+            </tr>
+            <tr>
+              <td><strong>All-15 (Reference)</strong></td>
+              <td>15</td>
+              <td>Panel-14 + <code>TP53</code></td>
+              <td>All above + <code>17p13.1</code> (<em>TP53</em>)</td>
+              <td>Gene-level &amp; structural comparison only; <em>TP53</em> is excluded from pathway union summaries to prevent pan-cancer tumour-suppressor dominance.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <details style="margin-top:8px;">
+        <summary style="cursor:pointer;font-size:12.5px;font-weight:600;color:var(--embl-petrol);">View 8 Pleiotropic / Downstream RNA Factors Explicitly Excluded from the Core Panel &darr;</summary>
+        <div class="table-wrap" style="margin-top:10px;max-height:none;">
+          <table id="excluded-cands-table">
+            <thead>
+              <tr><th>Candidate Gene</th><th>Cytoband</th><th>Molecular Function</th><th>Exclusion Rationale</th></tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </details>
+    </div>
+
+    <!-- 7.2 Complete Mathematical Formulas (F1-F16) -->
+    <div class="surface" id="sec-formulas">
+      <div class="section-head">
+        <h2>2. Mathematical, Biophysical &amp; Biostatistical Formulas Used Across miRBioGenAtlas</h2>
+        <span class="section-meta">16 exact equations verified against pipeline source code</span>
+      </div>
+      <div class="toolbar">
+        <div class="field-group">
+          <span class="field-label">Category</span>
+          <select id="formula-cat" onchange="renderFormulas()">
+            <option value="ALL">All 16 formulas</option>
+            <option value="Genomics & Cohorts">Genomics &amp; Cohorts (F1&ndash;F2)</option>
+            <option value="3D Structural Biophysics">3D Structural Biophysics (F3, F5&ndash;F7)</option>
+            <option value="Deep Mutational Scoring">Deep Mutational Scoring (F4)</option>
+            <option value="Small-RNA Enzymology">Small-RNA Enzymology &amp; Couplings (F8&ndash;F11)</option>
+            <option value="Tissue & Proteogenomics">Tissue Specificity &amp; Proteogenomics (F12&ndash;F13)</option>
+            <option value="Biostatistics & Survival">Biostatistics, ROC-AUC &amp; Survival (F14&ndash;F16)</option>
+          </select>
+        </div>
+        <div class="field-group">
+          <span class="field-label">Filter</span>
+          <input type="text" id="formula-q" placeholder="e.g. Cox, 5p:3p, Grantham, ESM-IF1..." oninput="renderFormulas()" style="width:240px;">
+        </div>
+      </div>
+      <div id="formula-cards-wrap" class="formula-grid"></div>
+    </div>
+
+    <!-- 7.3 Source Consortia & 41 Derived Datasets -->
+    <div class="surface" id="sec-datasets">
+      <div class="section-head">
+        <h2>3. Integrated Public Consortia (10 Sources) &amp; Derived Dataset Files Catalogue</h2>
+        <span class="section-meta">46 SHA-256-verified raw snapshots &rarr; 41 derived CSV / CSV.GZ tables</span>
+      </div>
+      <h3 style="font-size:13.5px;margin:0 0 8px;color:var(--ink);">3.1 Upstream Multi-Consortium Data Sources &amp; Harmonisation Keys</h3>
+      <div class="table-wrap" style="max-height:none;margin-bottom:18px;">
+        <table id="consortia-sources-table">
+          <thead>
+            <tr><th>Consortium / Resource</th><th>Cohort / Variant Scale</th><th>Data Layers Extracted</th><th>Harmonisation Join Key</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:10px;">
+        <h3 style="font-size:13.5px;margin:0;color:var(--ink);">3.2 Derived CSV / CSV.GZ Tables in <code>data/</code> (Zenodo DOI: 10.5281/zenodo.24455067)</h3>
+        <div class="field-group">
+          <span class="field-label">Search files</span>
+          <input type="text" id="ds-q" placeholder="Filter filename, key, or metric..." oninput="renderDatasetsCatalogue()" style="width:240px;">
+        </div>
+      </div>
+      <div class="table-wrap" style="max-height:420px;">
+        <table id="datasets-cat-table">
+          <thead>
+            <tr><th>Dataset Filename (<code>data/</code>)</th><th>Rows &times; Cols</th><th>Size</th><th>Primary Key / Grain</th><th>Contents &amp; Analytical Purpose</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 7.4 32 TCGA Study Codes Decoder -->
+    <div class="surface" id="sec-tcga-codes">
+      <div class="section-head">
+        <h2>4. TCGA PanCancer Atlas 32-Study Acronym Decoder &amp; Matched Sample Denominators</h2>
+        <span class="section-meta">Total matched N = 10,195 (33 cancer types; COAD + READ combined in COADREAD)</span>
+      </div>
+      <div class="table-wrap" style="max-height:380px;">
+        <table id="study-decoder-table">
+          <thead>
+            <tr>
+              <th>Code</th>
+              <th>Full Tumour Study Name</th>
+              <th>Matched N (Seq &cap; CNA)</th>
+              <th>Exome Seq</th>
+              <th>CNA SNP6</th>
+              <th>mRNA-seq</th>
+              <th>miRNA-seq</th>
+              <th data-term="hypermutator">Hypermutated (n)</th>
+              <th data-term="hypermutator">Non-Hypermut (n)</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 7.5 Searchable A-Z Glossary -->
+    <div class="surface" id="sec-glossary">
+      <div class="section-head">
+        <h2>5. Interactive A&ndash;Z Glossary of Terms, Biophysical Scores &amp; Statistical Metrics</h2>
+        <span class="section-meta" id="gloss-count">All terms</span>
+      </div>
+      <div class="toolbar">
+        <div class="field-group">
+          <span class="field-label">Search Glossary</span>
+          <input type="text" id="gloss-q" placeholder="Type any term (e.g. LOEUF, GISTIC2, RNase IIIb, Chronos, HRD, pLDDT)..." oninput="renderGlossaryCards()" style="width:340px;">
+        </div>
+      </div>
+      <div id="glossary-cards-wrap" class="glossary-grid"></div>
+    </div>
+  </section>
 </main>
+
+<div id="term-popover" class="term-popover" role="dialog" aria-live="polite">
+  <div class="tp-head">
+    <div>
+      <span class="tp-cat" id="tp-cat"></span>
+      <div class="tp-title" id="tp-title"></div>
+    </div>
+    <button class="tp-close" onclick="hideTermPopover(true)" aria-label="Close definition">&times;</button>
+  </div>
+  <div class="tp-meaning" id="tp-meaning"></div>
+  <div class="tp-formula" id="tp-formula"></div>
+  <div class="tp-thresh" id="tp-thresh"></div>
+  <button class="tp-link" id="tp-link">Open full derivation in Methods, Formulas &amp; Datasets &rarr;</button>
+</div>
 
 <footer>
   <div class="container footer-inner">
@@ -1499,6 +2353,86 @@ function switchTab(id, btn) {{
   }}
 }}
 
+function openDocsSection(anchorId) {{
+  switchTab('tab-docs', document.getElementById('btn-tab-docs'));
+  if (anchorId) {{
+    setTimeout(() => {{
+      const el = document.getElementById(anchorId);
+      if (el) el.scrollIntoView({{behavior: 'smooth', block: 'start'}});
+    }}, 40);
+  }}
+}}
+
+let tpPinned = false;
+let tpHideTimer = null;
+function showTermPopover(targetEl, pin) {{
+  const key = targetEl.getAttribute('data-term');
+  const item = ATLAS.glossary && ATLAS.glossary[key];
+  if (!item) return;
+  clearTimeout(tpHideTimer);
+  if (pin) tpPinned = true;
+
+  const pop = document.getElementById('term-popover');
+  document.getElementById('tp-cat').textContent = item.cat || 'Definition';
+  document.getElementById('tp-title').textContent = item.title || key;
+  document.getElementById('tp-meaning').textContent = item.meaning || '';
+  const fEl = document.getElementById('tp-formula');
+  if (item.formula) {{ fEl.style.display = 'block'; fEl.textContent = item.formula; }}
+  else {{ fEl.style.display = 'none'; }}
+  document.getElementById('tp-thresh').textContent = item.thresholds || '';
+  const lnk = document.getElementById('tp-link');
+  lnk.onclick = () => {{
+    hideTermPopover(true);
+    openDocsSection(item.anchor || 'sec-formulas');
+  }};
+
+  pop.classList.add('visible');
+  const rect = targetEl.getBoundingClientRect();
+  const pw = pop.offsetWidth || 380;
+  const ph = pop.offsetHeight || 210;
+  let left = rect.left;
+  if (left + pw > window.innerWidth - 14) left = Math.max(12, window.innerWidth - pw - 14);
+  let top = rect.bottom + 8;
+  if (top + ph > window.innerHeight - 12 && rect.top - ph - 8 > 8) {{
+    top = rect.top - ph - 8;
+  }}
+  pop.style.left = left + 'px';
+  pop.style.top = top + 'px';
+}}
+
+function hideTermPopover(force) {{
+  if (tpPinned && !force) return;
+  tpPinned = false;
+  const pop = document.getElementById('term-popover');
+  if (pop) pop.classList.remove('visible');
+}}
+
+document.addEventListener('mouseover', e => {{
+  const t = e.target.closest('[data-term]');
+  if (t && !tpPinned) showTermPopover(t, false);
+}});
+document.addEventListener('mouseout', e => {{
+  const t = e.target.closest('[data-term]');
+  if (t && !tpPinned) {{
+    tpHideTimer = setTimeout(() => hideTermPopover(false), 220);
+  }}
+}});
+document.addEventListener('click', e => {{
+  const pop = document.getElementById('term-popover');
+  if (pop && pop.contains(e.target)) return;
+  const t = e.target.closest('[data-term]');
+  if (t) {{
+    e.stopPropagation();
+    showTermPopover(t, true);
+    return;
+  }}
+  if (tpPinned) hideTermPopover(true);
+}});
+document.getElementById('term-popover').addEventListener('mouseenter', () => clearTimeout(tpHideTimer));
+document.getElementById('term-popover').addEventListener('mouseleave', () => {{
+  if (!tpPinned) tpHideTimer = setTimeout(() => hideTermPopover(false), 180);
+}});
+
 function runGlobalSearch(raw) {{
   const q = (raw || '').trim().toUpperCase().replace(/^P\\./, '');
   if (!q) return;
@@ -1514,10 +2448,24 @@ function runGlobalSearch(raw) {{
     renderLollipopAndLoadSat();
     return;
   }}
-  if (/^[A-Z]?\\d+[A-Z]?$/.test(q)) {{
+  if (/^[A-Z]\\d+[A-Z]$/.test(q)) {{
     document.getElementById('sat-query').value = q;
     switchTab('tab-variants', document.getElementById('btn-tab-variants'));
     inspectSaturationCodon();
+    return;
+  }}
+  const studyHit = (ATLAS.study_summary || []).find(s => s.tumour_acronym === q);
+  if (studyHit) {{
+    openDocsSection('sec-tcga-codes');
+    return;
+  }}
+  const glossEntries = Object.values(ATLAS.glossary || {{}});
+  const qLow = raw.trim().toLowerCase();
+  const glossHit = glossEntries.find(g => (g.title + ' ' + g.cat + ' ' + g.formula).toLowerCase().includes(qLow));
+  if (glossHit) {{
+    document.getElementById('gloss-q').value = raw.trim();
+    renderGlossaryCards();
+    openDocsSection('sec-glossary');
     return;
   }}
   document.getElementById('var-q').value = raw.trim();
@@ -1527,6 +2475,7 @@ function runGlobalSearch(raw) {{
 }}
 
 document.addEventListener('keydown', e => {{
+  if (e.key === 'Escape') hideTermPopover(true);
   if (e.key === '/' && document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'SELECT') {{
     e.preventDefault();
     document.getElementById('global-search').focus();
@@ -2226,44 +3175,44 @@ function renderPropertyDeltaCard(gene, pos, wt, mut, entry, subRow) {{
             <td>${{wp.cls === mp.cls ? 'Conserved group' : 'Group transition'}}</td>
           </tr>
           <tr>
-            <td><strong>Net charge (pH 7.4)</strong></td>
+            <td><strong data-term="delta_q">Net charge (pH 7.4)</strong></td>
             <td>${{wp.q >= 0 ? '+' : ''}}${{wp.q.toFixed(1)}} e</td>
             <td>${{mp.q >= 0 ? '+' : ''}}${{mp.q.toFixed(1)}} e</td>
             <td>${{dq >= 0 ? '+' : ''}}${{dq.toFixed(1)}} e &middot; ${{tagDot(chargeDot, chargeNote)}}</td>
           </tr>
           <tr>
-            <td><strong>Side-chain volume</strong></td>
+            <td><strong data-term="delta_vol">Side-chain volume</strong></td>
             <td>${{wp.vol.toFixed(1)}} &Aring;&sup3;</td>
             <td>${{mp.vol.toFixed(1)}} &Aring;&sup3;</td>
             <td>${{dvol >= 0 ? '+' : ''}}${{dvol.toFixed(1)}} &Aring;&sup3; (${{dvol >= 0 ? '+' : ''}}${{((dvol/wp.vol)*100).toFixed(0)}}%)</td>
           </tr>
           <tr>
-            <td><strong>Hydropathy (KD)</strong></td>
+            <td><strong data-term="hydropathy_kd">Hydropathy (KD)</strong></td>
             <td>${{wp.kd.toFixed(1)}}</td>
             <td>${{mp.kd.toFixed(1)}}</td>
             <td>${{dkd >= 0 ? '+' : ''}}${{dkd.toFixed(1)}} (${{dkd > 1.5 ? 'More hydrophobic' : (dkd < -1.5 ? 'More polar' : 'Comparable')}})</td>
           </tr>
           <tr>
-            <td><strong>H-bond / metal</strong></td>
+            <td><strong data-term="dist_metal">H-bond / metal</strong></td>
             <td>${{wp.hd}}D / ${{wp.ha}}A${{wp.metal ? ' · Metal' : ''}}</td>
             <td>${{mp.hd}}D / ${{mp.ha}}A${{mp.metal ? ' · Metal' : ''}}</td>
             <td>&Delta;D=${{mp.hd-wp.hd>=0?'+':''}}${{mp.hd-wp.hd}}, &Delta;A=${{mp.ha-wp.ha>=0?'+':''}}${{mp.ha-wp.ha}}</td>
           </tr>
           <tr>
-            <td><strong>Grantham / alerts</strong></td>
+            <td><strong data-term="grantham">Grantham / alerts</strong></td>
             <td colspan="2">D = <strong>${{gDist}}</strong> &middot; ${{tagDot(gDot, gLabel)}}</td>
             <td>${{alerts.length ? alerts.join('; ') : 'None'}}</td>
           </tr>
           <tr>
-            <td><strong>3D environment</strong></td>
+            <td><strong data-term="burial_8a">3D environment</strong></td>
             <td>${{burialStr}}</td>
             <td>WT ${{geom && geom.wtMinDist ? geom.wtMinDist.toFixed(2)+'&Aring;' : '&mdash;'}}</td>
-            <td>${{clashTag}}</td>
+            <td data-term="rotamer_clash">${{clashTag}}</td>
           </tr>
           <tr>
-            <td><strong>Model scores</strong></td>
-            <td colspan="2">AM ${{am !== null ? am.toFixed(3) : '&mdash;'}} &middot; ESM-2 ${{e2 !== null ? e2.toFixed(2) : '&mdash;'}}</td>
-            <td>ESM-IF1 &Delta;logP: <strong>${{if1 !== null ? if1.toFixed(2) : '&mdash;'}}</strong></td>
+            <td><strong data-term="esm_if1">Model scores</strong></td>
+            <td colspan="2"><span data-term="alphamissense">AM ${{am !== null ? am.toFixed(3) : '&mdash;'}}</span> &middot; <span data-term="esm2_llr">ESM-2 ${{e2 !== null ? e2.toFixed(2) : '&mdash;'}}</span></td>
+            <td data-term="esm_if1">ESM-IF1 &Delta;logP: <strong>${{if1 !== null ? if1.toFixed(2) : '&mdash;'}}</strong></td>
           </tr>
         </tbody>
       </table>
@@ -2332,7 +3281,7 @@ function inspectSaturationCodon() {{
     </div>
     <div class="table-wrap" style="max-height:240px;">
       <table>
-        <thead><tr><th>3D</th><th>Variant</th><th>Grantham</th><th>&Delta;q</th><th>&Delta;Vol (&Aring;&sup3;)</th><th>AlphaMissense</th><th>ESM-2 3B</th><th>ESM-1v</th><th>ESM-IF1 3D</th><th>Regime</th><th>TCGA</th><th>ClinVar</th></tr></thead>
+        <thead><tr><th>3D</th><th>Variant</th><th data-term="grantham">Grantham</th><th data-term="delta_q">&Delta;q</th><th data-term="delta_vol">&Delta;Vol (&Aring;&sup3;)</th><th data-term="alphamissense">AlphaMissense</th><th data-term="esm2_llr">ESM-2 3B</th><th data-term="esm1v_llr">ESM-1v</th><th data-term="esm_if1">ESM-IF1 3D</th><th data-term="mech_regime">Regime</th><th>TCGA</th><th data-term="kpi_auc">ClinVar</th></tr></thead>
         <tbody>`;
   rows.forEach(r => {{
     const [alt, am, e2, e1v, if1, tn, cv] = r;
@@ -2420,7 +3369,7 @@ function renderGtexBars() {{
   const vals = ATLAS.gtex_tpm[g] || [];
   const pairs = ATLAS.gtex_tissues.map((t, i) => [t, vals[i] || 0]).sort((a,b) => b[1] - a[1]);
   const mx = Math.max(1, ...pairs.map(x => x[1]));
-  document.getElementById('gtex-bars').innerHTML = '<table><thead><tr><th>GTEx v10 Adult Tissue (54 Sites)</th><th>Median TPM</th><th>Relative Expression</th></tr></thead><tbody>' +
+  document.getElementById('gtex-bars').innerHTML = '<table><thead><tr><th>GTEx v10 Adult Tissue (54 Sites)</th><th data-term="gtex_tpm">Median TPM</th><th>Relative Expression</th></tr></thead><tbody>' +
     pairs.map(([t, v]) => `<tr>
       <td>${{t.replace(/_/g, ' ')}}</td>
       <td><strong>${{v.toFixed(2)}}</strong></td>
@@ -2428,7 +3377,133 @@ function renderGtexBars() {{
     </tr>`).join('') + '</tbody></table>';
 }}
 
+function renderFormulas() {{
+  const cat = document.getElementById('formula-cat').value;
+  const q = (document.getElementById('formula-q').value || '').trim().toLowerCase();
+  const list = (ATLAS.formulas || []).filter(f => {{
+    if (cat !== 'ALL' && f.cat !== cat) return false;
+    if (q && !(`${{f.id}} ${{f.title}} ${{f.eq}} ${{f.vars}} ${{f.meaning}} ${{f.script}}`.toLowerCase().includes(q))) return false;
+    return true;
+  }});
+  document.getElementById('formula-cards-wrap').innerHTML = list.map(f => `
+    <div class="formula-card" id="${{f.id}}">
+      <div class="fc-top">
+        <span class="fc-id">${{f.id}}</span>
+        <span class="fc-cat">${{f.cat}}</span>
+      </div>
+      <div class="fc-title">${{f.title}}</div>
+      <div class="fc-eq">${{f.eq}}</div>
+      <div class="fc-vars"><strong>Variables:</strong> ${{f.vars}}</div>
+      <div class="fc-meaning">${{f.meaning}}</div>
+      <div class="fc-script">Source: ${{f.script}}</div>
+    </div>
+  `).join('') || '<p style="font-size:12.5px;color:var(--ink-tertiary);">No formulas match the current filter.</p>';
+}}
+
+function renderDatasetsCatalogue() {{
+  const q = (document.getElementById('ds-q').value || '').trim().toLowerCase();
+  const list = (ATLAS.datasets || []).filter(d => !q || (`${{d.file}} ${{d.pk}} ${{d.desc}}`.toLowerCase().includes(q)));
+  document.querySelector('#datasets-cat-table tbody').innerHTML = list.map(d => `
+    <tr>
+      <td><code>${{d.file}}</code></td>
+      <td><strong>${{Number(d.rows).toLocaleString()}}</strong> &times; ${{d.cols}}</td>
+      <td>${{d.size}}</td>
+      <td><code>${{d.pk}}</code></td>
+      <td style="white-space:normal;min-width:340px;">${{d.desc}}</td>
+    </tr>
+  `).join('');
+}}
+
+function renderGlossaryCards() {{
+  const q = (document.getElementById('gloss-q').value || '').trim().toLowerCase();
+  const entries = Object.entries(ATLAS.glossary || {{}})
+    .map(([k, v]) => ({{key: k, ...v}}))
+    .sort((a, b) => a.title.localeCompare(b.title))
+    .filter(g => !q || (`${{g.title}} ${{g.cat}} ${{g.meaning}} ${{g.formula}} ${{g.thresholds}}`.toLowerCase().includes(q)));
+  document.getElementById('gloss-count').textContent = `Showing ${{entries.length}} of ${{Object.keys(ATLAS.glossary || {{}}).length}} defined terms`;
+  document.getElementById('glossary-cards-wrap').innerHTML = entries.map(g => `
+    <div class="gloss-card">
+      <div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-bottom:4px;">
+        <strong style="font-size:13px;color:var(--ink);">${{g.title}}</strong>
+        <span style="font-family:var(--mono);font-size:10.5px;color:var(--embl-petrol);">${{g.cat}}</span>
+      </div>
+      <div style="font-size:12.3px;color:var(--ink-secondary);margin-bottom:6px;">${{g.meaning}}</div>
+      <div style="font-family:var(--mono);font-size:11px;background:var(--surface);border:1px solid var(--line-light);border-radius:5px;padding:5px 8px;margin-bottom:5px;white-space:pre-wrap;word-break:break-word;">${{g.formula}}</div>
+      <div style="font-size:11.5px;color:var(--ink-tertiary);"><strong>Interpretation:</strong> ${{g.thresholds}}</div>
+    </div>
+  `).join('');
+}}
+
 function renderAllTables() {{
+  if (ATLAS.top_tumours && document.querySelector('#cohort-burden-table tbody')) {{
+    document.querySelector('#cohort-burden-table tbody').innerHTML = ATLAS.top_tumours.map(r => {{
+      const n = Number(r.N);
+      const c10 = Number(r.patient_prop_core10_strict);
+      const n10 = Math.round(c10 * n);
+      return `<tr>
+        <td>${{r.rank_core10_strict}}</td>
+        <td><strong>${{r.tumour_acronym}}${{r.low_coverage_N_lt_100 === '1' ? '*' : ''}}</strong></td>
+        <td>${{n.toLocaleString()}}</td>
+        <td><strong>${{(c10 * 100).toFixed(1)}}%</strong> (${{n10}})</td>
+        <td>${{(Number(r.patient_prop_extended12_strict) * 100).toFixed(1)}}%</td>
+        <td>${{(Number(r.patient_prop_panel14_strict) * 100).toFixed(1)}}%</td>
+        <td>${{(Number(r.patient_prop_core10_any_alter) * 100).toFixed(1)}}%</td>
+        <td>${{(Number(r.ago1_3_4_1p34_concordant_cna_prop) * 100).toFixed(1)}}%</td>
+      </tr>`;
+    }}).join('');
+  }}
+
+  if (ATLAS.collateral && document.querySelector('#collat-table tbody')) {{
+    document.querySelector('#collat-table tbody').innerHTML = ATLAS.collateral.map(c => `
+      <tr>
+        <td><code>${{c.test_id}}</code></td>
+        <td><strong>${{c.crispr_target_gene}}</strong></td>
+        <td style="white-space:normal;min-width:280px;">${{c.hypothesis}}</td>
+        <td>${{c.n_altered_lines}} (${{Number(c.median_chronos_altered).toFixed(4)}})</td>
+        <td>${{c.n_control_lines}} (${{Number(c.median_chronos_control).toFixed(4)}})</td>
+        <td><strong>${{(Number(c.chronos_shift_altered_minus_control)>=0?'+':'') + Number(c.chronos_shift_altered_minus_control).toFixed(4)}}</strong></td>
+        <td>${{c.p_value_two_sided}}</td>
+      </tr>
+    `).join('');
+  }}
+
+  if (ATLAS.excluded_cands && document.querySelector('#excluded-cands-table tbody')) {{
+    document.querySelector('#excluded-cands-table tbody').innerHTML = ATLAS.excluded_cands.map(e => `
+      <tr>
+        <td><strong>${{e.candidateGene}}</strong></td>
+        <td><code>${{e.cytoband}}</code></td>
+        <td>${{e.molecularFunction}}</td>
+        <td style="white-space:normal;">${{e.exclusionRationale}}</td>
+      </tr>
+    `).join('');
+  }}
+
+  if (ATLAS.consortia && document.querySelector('#consortia-sources-table tbody')) {{
+    document.querySelector('#consortia-sources-table tbody').innerHTML = ATLAS.consortia.map(c => `
+      <tr>
+        <td><strong>${{c.consortium}}</strong></td>
+        <td>${{c.scale}}</td>
+        <td style="white-space:normal;min-width:320px;">${{c.layers}}</td>
+        <td><code>${{c.join_key}}</code></td>
+      </tr>
+    `).join('');
+  }}
+
+  if (ATLAS.study_summary && document.querySelector('#study-decoder-table tbody')) {{
+    document.querySelector('#study-decoder-table tbody').innerHTML = ATLAS.study_summary.map(s => `
+      <tr>
+        <td><strong>${{s.tumour_acronym}}${{s.low_coverage_flag_N_lt_100 === '1' ? '*' : ''}}</strong></td>
+        <td>${{s.studyName.replace(' (TCGA, PanCancer Atlas)', '')}}</td>
+        <td><strong>${{Number(s.intersection_sequenced_cna_n).toLocaleString()}}</strong></td>
+        <td>${{Number(s.sampleCount_sequenced).toLocaleString()}}</td>
+        <td>${{Number(s.sampleCount_cna).toLocaleString()}}</td>
+        <td>${{Number(s.sampleCount_mrna_matched_n).toLocaleString()}}</td>
+        <td>${{Number(s.sampleCount_mirnaseq_matched_n).toLocaleString()}}</td>
+        <td>${{s.hypermutated_samples_n}}</td>
+        <td>${{s.nonhypermutated_samples_n}}</td>
+      </tr>
+    `).join('');
+  }}
   document.querySelector('#mir-bench-table tbody').innerHTML = ATLAS.mir_bench.map(b => `
     <tr>
       <td><strong>${{b.benchmark_id}}</strong></td>
@@ -2589,6 +3664,9 @@ window.addEventListener('DOMContentLoaded', () => {{
   renderVariants();
   renderAllTables();
   renderGtexBars();
+  renderFormulas();
+  renderDatasetsCatalogue();
+  renderGlossaryCards();
   renderLollipopAndLoadSat();
 }});
 </script>

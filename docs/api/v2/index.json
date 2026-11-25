@@ -1,0 +1,47 @@
+{
+  "resource": "miRBioGenAtlas",
+  "version": "2.0.2",
+  "doi": "10.5281/zenodo.24455067",
+  "license_data": "CC-BY-4.0",
+  "license_code": "MIT",
+  "assemblies_supported": [
+    "GRCh38",
+    "GRCh37"
+  ],
+  "counts": {
+    "version": "2.0.2",
+    "doi": "10.5281/zenodo.24455067",
+    "tcga_n": 10195,
+    "msk_n": 10945,
+    "combined_tumours_n": 21140,
+    "mirna_n": 9578,
+    "dual_mrna_mirna_n": 9353,
+    "sat_mut_n": 213940,
+    "clinvar_n": 16569,
+    "cptac_n": 1002,
+    "depmap_n": 1208
+  },
+  "endpoints": {
+    "manifest": "api/v2/index.json",
+    "panel": "api/v2/panel.json",
+    "pancancer": "api/v2/pancancer.json",
+    "gene_template": "api/v2/genes/{GENE}.json",
+    "genes": [
+      "DROSHA",
+      "DGCR8",
+      "XPO5",
+      "DICER1",
+      "TARBP2",
+      "PRKRA",
+      "AGO1",
+      "AGO2",
+      "AGO3",
+      "AGO4",
+      "LIN28A",
+      "LIN28B",
+      "SMAD2",
+      "SMAD4",
+      "TP53"
+    ]
+  }
+}

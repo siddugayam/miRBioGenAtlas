@@ -242,6 +242,31 @@ def build_web_explorer():
     residue_tracks = build_saturation_js_chunks(clinvar_rows)
     rotamer_lib = build_struct3d_chunks_and_rotamers()
 
+    cds_json_path = DATA_DIR / "canonical_cds_genomic_15genes.json"
+    cds_genomic = json.loads(cds_json_path.read_text(encoding="utf-8")).get("genes", {}) if cds_json_path.exists() else {}
+
+    id_lookup = {}
+    clinvar_by_gene = defaultdict(list)
+    for r in clinvar_rows:
+        g = r["geneSymbol"]
+        pc = r["proteinChange"]
+        if r.get("rsid"):
+            id_lookup[r["rsid"].lower()] = f"{g}:{pc}"
+        if r.get("clinvarVariationId"):
+            id_lookup[f"vcv{int(r['clinvarVariationId']):09d}"] = f"{g}:{pc}"
+            id_lookup[f"cv:{r['clinvarVariationId']}"] = f"{g}:{pc}"
+        if r.get("significanceCategory") == "Pathogenic_or_Likely_Pathogenic":
+            clinvar_by_gene[g].append({
+                "clinvarVariationId": r["clinvarVariationId"],
+                "proteinChange": pc,
+                "codonPos": int(r["codonPos"]) if str(r.get("codonPos", "")).isdigit() else None,
+                "clinicalSignificance": r["clinicalSignificance"],
+                "reviewStars": int(r["reviewStars"]) if str(r.get("reviewStars", "")).isdigit() else 0,
+                "rsid": r.get("rsid", ""),
+                "grch38Vcf": r.get("grch38Vcf", ""),
+                "phenotypes": r.get("phenotypes", ""),
+            })
+
     compact_long = [
         {
             "t": r["tumour_acronym"],
@@ -352,7 +377,74 @@ def build_web_explorer():
         "formulas": FORMULA_CARDS,
         "guides": SECTION_GUIDES,
         "glossary": TERM_GLOSSARY,
+        "cds_genomic": cds_genomic,
+        "id_lookup": id_lookup,
     }
+
+    # Build static REST-style JSON API v2 under docs/api/v2/
+    api_dir = DOCS_DIR / "api" / "v2"
+    api_genes_dir = api_dir / "genes"
+    api_genes_dir.mkdir(parents=True, exist_ok=True)
+
+    (api_dir / "index.json").write_text(json.dumps({
+        "resource": "miRBioGenAtlas",
+        "version": "2.0.2",
+        "doi": "10.5281/zenodo.24455067",
+        "license_data": "CC-BY-4.0",
+        "license_code": "MIT",
+        "assemblies_supported": ["GRCh38", "GRCh37"],
+        "counts": bundle["meta"],
+        "endpoints": {
+            "manifest": "api/v2/index.json",
+            "panel": "api/v2/panel.json",
+            "pancancer": "api/v2/pancancer.json",
+            "gene_template": "api/v2/genes/{GENE}.json",
+            "genes": [p["geneSymbol"] for p in panel],
+        },
+    }, indent=2), encoding="utf-8")
+
+    (api_dir / "panel.json").write_text(json.dumps({
+        "version": "2.0.2",
+        "n_genes": len(panel),
+        "genes": panel,
+    }, indent=2), encoding="utf-8")
+
+    (api_dir / "pancancer.json").write_text(json.dumps({
+        "version": "2.0.2",
+        "n_studies": len(study_summary),
+        "n_gene_study_pairs": len(compact_long),
+        "pathway_burden_ranking_excluding_TP53": top_tumours,
+        "study_denominators": study_summary,
+        "alteration_frequencies": compact_long,
+    }, indent=2), encoding="utf-8")
+
+    vars_by_gene = defaultdict(list)
+    for v in compact_vars:
+        vars_by_gene[v["g"]].append(v)
+
+    for p in panel:
+        g = p["geneSymbol"]
+        g_cds = cds_genomic.get(g, {})
+        gene_api_obj = {
+            "geneSymbol": g,
+            "version": "2.0.2",
+            "metadata": p,
+            "genomic_coordinates": {
+                "ensembl_gene_id": g_cds.get("ensg", p["ensemblGeneId"]),
+                "ensembl_canonical_transcript": g_cds.get("enst", ""),
+                "refseq_canonical": g_cds.get("refseq", p["canonicalRefSeq"]),
+                "chromosome": g_cds.get("chr", ""),
+                "strand": g_cds.get("strand", 1),
+                "cds_exons_grch38": g_cds.get("cds_exons_grch38", []),
+                "cds_exons_grch37": g_cds.get("cds_exons_grch37", []),
+            },
+            "tcga_somatic_variants": vars_by_gene.get(g, []),
+            "clinvar_pathogenic_or_likely_pathogenic": clinvar_by_gene.get(g, []),
+            "residue_track_columns": ["codonPos", "wtAA", "afdbPlddt", "is3dPocket_le6A", "mean_alphamissense", "mean_esm2_3b_llr", "mean_esm_if1_3d_llr", "observedTcgaCodonMutCount", "clinvarPathogenicCount", "pdbComplexId"],
+            "residue_track": residue_tracks.get(g, []),
+        }
+        (api_genes_dir / f"{g}.json").write_text(json.dumps(gene_api_obj, separators=(",", ":")), encoding="utf-8")
+    print("   Exported 18 static REST JSON API endpoints in docs/api/v2/")
 
     data_json = json.dumps(bundle, separators=(",", ":"))
 
@@ -1388,7 +1480,7 @@ def build_web_explorer():
           <circle cx="11" cy="11" r="7"></circle>
           <line x1="20" y1="20" x2="16.35" y2="16.35"></line>
         </svg>
-        <input type="text" id="global-search" autocomplete="off" placeholder="Search gene, mutation, cancer type, or formula (e.g. DICER1 E1705K, AGO2, 5p:3p, LOEUF)..." oninput="updateSearchSuggestions(this.value)" onfocus="showRecentOrSuggestions(this.value)" onkeydown="handleSearchKey(event)">
+        <input type="text" id="global-search" autocomplete="off" placeholder="Search gene, AA/cDNA/GRCh38 VCF, rsID, or formula (e.g. DICER1 E1705K, chr14:95094139:C>T, c.5113G>A)..." oninput="updateSearchSuggestions(this.value)" onfocus="showRecentOrSuggestions(this.value)" onkeydown="handleSearchKey(event)">
         <span class="search-kbd">&#8984;K</span>
       </div>
       <div id="suggest-menu" class="suggest-menu"></div>
@@ -1396,12 +1488,12 @@ def build_web_explorer():
 
     <div class="quick-Row">
       <button class="chip" onclick="loadPresetMutation('DICER1','E1705K')">DICER1 E1705K</button>
-      <button class="chip" onclick="loadPresetMutation('DICER1','D1810Y')">DICER1 D1810Y</button>
+      <button class="chip" onclick="runGlobalSearch('chr14:95094139:C>T')" title="Resolve GRCh38 VCF coordinate directly to 3D protein">chr14:95094139:C&gt;T</button>
       <button class="chip" onclick="loadPresetMutation('DROSHA','E1147K')">DROSHA E1147K</button>
       <button class="chip" onclick="loadPresetMutation('TP53','R175H')">TP53 R175H</button>
-      <button class="chip" onclick="loadPresetMutation('AGO2','M364T')">AGO2 M364T</button>
       <button class="chip" onclick="openDmsLandscape()">2D DMS Heatmap</button>
-      <button class="chip" onclick="openBatchTriage()">Batch Variant Triage</button>
+      <button class="chip" onclick="openBatchTriage()">VCF / Batch Triage</button>
+      <button class="chip" onclick="openApiDocs()">REST API &amp; CLI</button>
       <button class="chip" onclick="openFormulaTab()">LaTeX Equations &rarr;</button>
     </div>
 
@@ -1604,18 +1696,22 @@ def build_web_explorer():
       </div>
 
       <div id="exp-batch" class="subpanel exp-sub">
-        <div class="card">
+        <div class="card" ondragover="event.preventDefault()" ondrop="handleBatchFileDrop(event)">
           <div class="card-head">
             <div>
-              <h2>Batch Variant Triage (213,940-Variant Reference)</h2>
-              <div class="meta-note" style="margin-top:2px;">Paste clinical panel, exome, or CRISPR edits (1 per line or comma-separated, e.g. <code>DICER1 E1705K</code> or <code>DROSHA p.Glu1147Lys</code>)</div>
+              <h2>VCF &amp; Batch Variant Triage (GRCh38 / GRCh37 / HGVS / Protein)</h2>
+              <div class="meta-note" style="margin-top:2px;">Paste protein changes (<code>DICER1 E1705K</code>), genomic VCF coordinates (<code>chr14:95094139:C&gt;T</code>, <code>14-95094139-C-T</code>), cDNA (<code>DICER1 c.5113G&gt;A</code>), <code>rsID</code>, or drop a <code>.vcf</code> file (100% local in browser)</div>
             </div>
             <span class="meta-note" id="batch-summary"></span>
           </div>
-          <textarea id="batch-input" class="batch-area" placeholder="DICER1 E1705K&#10;DICER1 D1810Y&#10;DROSHA E1147K&#10;AGO2 p.Met364Thr&#10;TP53 R175H&#10;DICER1 K868R"></textarea>
+          <textarea id="batch-input" class="batch-area" placeholder="chr14:95094139:C>T&#10;DICER1 p.Asp1810Tyr&#10;DROSHA c.3439G>A&#10;AGO2 M364T&#10;17-7675088-C-T&#10;rs2073092496"></textarea>
           <div class="controls" style="margin-top:10px;">
             <button class="btn-action" onclick="runBatchTriage()">Score Variants</button>
-            <button class="btn-subtle" style="height:34px;" onclick="loadBatchExample()">Load Example Panel</button>
+            <button class="btn-subtle" style="height:34px;" onclick="loadBatchExample()">Load Mixed VCF/HGVS Example</button>
+            <label class="btn-subtle" style="height:34px;display:inline-flex;align-items:center;cursor:pointer;">
+              Upload .VCF / .TXT
+              <input type="file" id="vcf-file-input" accept=".vcf,.txt,.tsv,.csv,.maf" style="display:none;" onchange="handleBatchFileSelect(this.files)">
+            </label>
             <button class="btn-subtle" style="height:34px;" onclick="clearBatchTriage()">Clear</button>
             <button class="btn-subtle" style="height:34px;" onclick="exportBatchTriageCSV()">Export Triage CSV</button>
           </div>
@@ -1623,7 +1719,7 @@ def build_web_explorer():
             <table id="batch-table">
               <thead>
                 <tr>
-                  <th>3D</th><th>Input</th><th>Gene</th><th>Variant</th>
+                  <th>3D</th><th>Input / Genomic</th><th>Gene</th><th>Protein &amp; cDNA</th>
                   <th data-term="mech_regime">3D Mechanism</th>
                   <th data-term="alphamissense">AlphaMissense</th>
                   <th data-term="esm_if1">ESM-IF1 3D &Delta;logP</th>
@@ -1965,13 +2061,14 @@ def build_web_explorer():
       </div>
     </section>
 
-    <!-- TAB 5: FORMULAS (LATEX), PATHWAY, DATASETS & GLOSSARY -->
+    <!-- TAB 5: FORMULAS (LATEX), PATHWAY, DATASETS, API & GLOSSARY -->
     <section id="tab-docs" class="panel">
       <div class="view-bar">
         <div class="seg-group">
           <button class="seg-btn active" id="seg-eq" onclick="switchSub('doc-sub', 'doc-formulas', this)">Equations (LaTeX)</button>
           <button class="seg-btn" id="seg-path" onclick="switchSub('doc-sub', 'doc-pathway', this)">Pathway &amp; Tiers</button>
           <button class="seg-btn" id="seg-ds" onclick="switchSub('doc-sub', 'doc-datasets', this)">Datasets (41)</button>
+          <button class="seg-btn" id="seg-api" onclick="switchSub('doc-sub', 'doc-api', this); renderApiSnippet();">REST API &amp; CLI</button>
           <button class="seg-btn" id="seg-gl" onclick="switchSub('doc-sub', 'doc-glossary', this)">Glossary (50)</button>
         </div>
       </div>
@@ -2071,6 +2168,37 @@ def build_web_explorer():
               <tbody></tbody>
             </table>
           </div>
+        </div>
+      </div>
+
+      <div id="doc-api" class="subpanel doc-sub">
+        <div class="card" style="margin-bottom:16px;">
+          <div class="card-head">
+            <div>
+              <h2>Static JSON REST API (<code>/api/v2/</code>) &amp; Offline Python CLI</h2>
+              <div class="meta-note" style="margin-top:2px;">CORS-open static JSON endpoints hosted directly on GitHub Pages — zero API key or rate limit</div>
+            </div>
+            <div style="display:flex;gap:8px;align-items:center;">
+              <select id="api-gene-sel" onchange="renderApiSnippet()"></select>
+              <a id="api-open-link" href="api/v2/genes/DICER1.json" target="_blank" rel="noopener" class="btn-action" style="text-decoration:none;display:inline-flex;align-items:center;height:34px;">Open Gene JSON &#8599;</a>
+            </div>
+          </div>
+          <div class="table-wrap" style="margin-bottom:16px;">
+            <table>
+              <thead><tr><th>Endpoint</th><th>Scope</th><th>Action</th></tr></thead>
+              <tbody>
+                <tr><td><code>api/v2/index.json</code></td><td>Atlas manifest, version, DOI, assemblies &amp; endpoint index</td><td><a href="api/v2/index.json" target="_blank" rel="noopener" style="color:var(--accent);text-decoration:none;font-weight:600;">Open JSON &#8599;</a></td></tr>
+                <tr><td><code>api/v2/panel.json</code></td><td>All 15 biogenesis proteins with gnomAD v4, GTEx v10, CPTAC, DepMap &amp; PDB metadata</td><td><a href="api/v2/panel.json" target="_blank" rel="noopener" style="color:var(--accent);text-decoration:none;font-weight:600;">Open JSON &#8599;</a></td></tr>
+                <tr><td><code>api/v2/pancancer.json</code></td><td>480 gene &times; study alteration frequencies, 32-study pathway burden &amp; sample denominators</td><td><a href="api/v2/pancancer.json" target="_blank" rel="noopener" style="color:var(--accent);text-decoration:none;font-weight:600;">Open JSON &#8599;</a></td></tr>
+                <tr><td><code id="api-gene-path">api/v2/genes/DICER1.json</code></td><td>Per-gene GRCh38/GRCh37 CDS exons, TCGA somatic variants, ClinVar P/LP &amp; residue 3D constraint track</td><td><a id="api-gene-row-link" href="api/v2/genes/DICER1.json" target="_blank" rel="noopener" style="color:var(--accent);text-decoration:none;font-weight:600;">Open JSON &#8599;</a></td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+            <strong style="font-size:13px;">Programmatic Quick-Start (curl, Python &amp; Local CLI)</strong>
+            <button class="btn-subtle" id="btn-copy-api" onclick="copyApiCode()">Copy Snippet</button>
+          </div>
+          <pre id="api-code-box" style="margin:0;padding:14px 16px;background:#111315;color:#e8eaed;border-radius:10px;font-family:var(--mono);font-size:12px;line-height:1.55;overflow-x:auto;"></pre>
         </div>
       </div>
 
@@ -2434,6 +2562,199 @@ function closeGuideDrawer() {{
   document.getElementById('guide-drawer').classList.remove('open');
 }}
 
+const CODON_TO_AA = {{
+  TTT:'F',TTC:'F',TTA:'L',TTG:'L',CTT:'L',CTC:'L',CTA:'L',CTG:'L',
+  ATT:'I',ATC:'I',ATA:'I',ATG:'M',GTT:'V',GTC:'V',GTA:'V',GTG:'V',
+  TCT:'S',TCC:'S',TCA:'S',TCG:'S',CCT:'P',CCC:'P',CCA:'P',CCG:'P',
+  ACT:'T',ACC:'T',ACA:'T',ACG:'T',GCT:'A',GCC:'A',GCA:'A',GCG:'A',
+  TAT:'Y',TAC:'Y',TAA:'*',TAG:'*',CAT:'H',CAC:'H',CAA:'Q',CAG:'Q',
+  AAT:'N',AAC:'N',AAA:'K',AAG:'K',GAT:'D',GAC:'D',GAA:'E',GAG:'E',
+  TGT:'C',TGC:'C',TGA:'*',TGG:'W',CGT:'R',CGC:'R',CGA:'R',CGG:'R',
+  AGT:'S',AGC:'S',AGA:'R',AGG:'R',GGT:'G',GGC:'G',GGA:'G',GGG:'G'
+}};
+const DNA_COMP = {{ A:'T', T:'A', C:'G', G:'C' }};
+
+function mapGenomicSnvToProtein(chromRaw, posNum, refRaw, altRaw, preferredAssembly) {{
+  const chr = String(chromRaw).replace(/^chr/i, '').toUpperCase();
+  const pos = Number(posNum);
+  const ref = String(refRaw || '').toUpperCase();
+  const alt = String(altRaw || '').toUpperCase();
+  if (!pos || ref.length !== 1 || alt.length !== 1 || !DNA_COMP[ref] || !DNA_COMP[alt]) return null;
+  const cdsMap = ATLAS.cds_genomic || {{}};
+  const builds = preferredAssembly === 'GRCh37' ? ['GRCh37', 'GRCh38'] : ['GRCh38', 'GRCh37'];
+
+  for (const bld of builds) {{
+    const exKey = bld === 'GRCh38' ? 'cds_exons_grch38' : 'cds_exons_grch37';
+    const stKey = bld === 'GRCh38' ? 'strand' : 'strand_grch37';
+    for (const [gene, gd] of Object.entries(cdsMap)) {{
+      if (String(gd.chr).toUpperCase() !== chr) continue;
+      const exons = gd[exKey] || [];
+      const strand = gd[stKey] || gd.strand || 1;
+      let cum = 0;
+      for (let i = 0; i < exons.length; i++) {{
+        const [exNum, cs, ce] = exons[i];
+        if (pos >= cs && pos <= ce) {{
+          const off = strand === 1 ? (pos - cs) : (ce - pos);
+          const cIdx = cum + off;
+          const cRef = strand === 1 ? ref : DNA_COMP[ref];
+          const cAlt = strand === 1 ? alt : DNA_COMP[alt];
+          const seq = gd.cds_seq || '';
+          if (cIdx < 0 || cIdx >= seq.length) break;
+          if (seq[cIdx] !== cRef) {{
+            return {{ err: `${{bld}} ref allele mismatch at chr${{chr}}:${{pos}} (expected ${{strand===1?seq[cIdx]:DNA_COMP[seq[cIdx]]}}, got ${{ref}})` }};
+          }}
+          const codStart = Math.floor(cIdx / 3) * 3;
+          const wtCod = seq.slice(codStart, codStart + 3);
+          const mutArr = wtCod.split('');
+          mutArr[cIdx % 3] = cAlt;
+          const mutCod = mutArr.join('');
+          const wtAA = CODON_TO_AA[wtCod] || 'X';
+          const mutAA = CODON_TO_AA[mutCod] || 'X';
+          const codonPos = Math.floor(cIdx / 3) + 1;
+          return {{
+            gene, wt: wtAA, pos: codonPos, alt: mutAA,
+            norm: `${{wtAA}}${{codonPos}}${{mutAA}}`,
+            cdna: `c.${{cIdx + 1}}${{cRef}}>${{cAlt}}`,
+            wtCod, mutCod, exon: exNum, totalExons: gd.total_exons,
+            assembly: bld, vcf: `chr${{chr}}:${{pos}}:${{ref}}>${{alt}}`
+          }};
+        }}
+        cum += (ce - cs + 1);
+      }}
+    }}
+  }}
+  return null;
+}}
+
+function mapCdnaHgvsToProtein(geneSym, cdnaToken) {{
+  const gd = (ATLAS.cds_genomic || {{}})[geneSym];
+  if (!gd || !gd.cds_seq) return null;
+  const m = String(cdnaToken || '').trim().match(/^c\\.(\\d+)([ACGT])>([ACGT])$/i);
+  if (!m) return null;
+  const cIdx = parseInt(m[1], 10) - 1;
+  const cRef = m[2].toUpperCase(), cAlt = m[3].toUpperCase();
+  if (cIdx < 0 || cIdx >= gd.cds_seq.length) return {{ err: `c.${{cIdx+1}} outside ${{geneSym}} CDS` }};
+  if (gd.cds_seq[cIdx] !== cRef) return {{ err: `${{geneSym}} c.${{cIdx+1}} reference base is ${{gd.cds_seq[cIdx]}} (not ${{cRef}})` }};
+  const codStart = Math.floor(cIdx / 3) * 3;
+  const wtCod = gd.cds_seq.slice(codStart, codStart + 3);
+  const mutArr = wtCod.split(''); mutArr[cIdx % 3] = cAlt;
+  const mutCod = mutArr.join('');
+  const wtAA = CODON_TO_AA[wtCod] || 'X', mutAA = CODON_TO_AA[mutCod] || 'X';
+  const codonPos = Math.floor(cIdx / 3) + 1;
+  return {{ gene: geneSym, wt: wtAA, pos: codonPos, alt: mutAA, norm: `${{wtAA}}${{codonPos}}${{mutAA}}`, cdna: `c.${{cIdx+1}}${{cRef}}>${{cAlt}}`, wtCod, mutCod }};
+}}
+
+function reverseMapVariantToGenomic(gene, codonPos, wtAA, mutAA) {{
+  const gd = (ATLAS.cds_genomic || {{}})[gene];
+  if (!gd || !gd.cds_seq) return null;
+  const codStart = (codonPos - 1) * 3;
+  if (codStart < 0 || codStart + 3 > gd.cds_seq.length) return null;
+  const wtCod = gd.cds_seq.slice(codStart, codStart + 3);
+
+  const mapCdsIdxToGenomic = (cIdx, exList, strand) => {{
+    let cum = 0;
+    for (let i = 0; i < exList.length; i++) {{
+      const [exNum, cs, ce] = exList[i];
+      const len = ce - cs + 1;
+      if (cIdx < cum + len) {{
+        const off = cIdx - cum;
+        const gPos = strand === 1 ? (cs + off) : (ce - off);
+        return {{ exNum, gPos }};
+      }}
+      cum += len;
+    }}
+    return null;
+  }};
+
+  const gStart = mapCdsIdxToGenomic(codStart, gd.cds_exons_grch38 || [], gd.strand);
+  if (!gStart) return null;
+  const strandSym = gd.strand === 1 ? '+' : '−';
+
+  if (wtAA === mutAA) {{
+    return {{ wtCod, mutCod: wtCod, exon: gStart.exNum, totalExons: gd.total_exons, strandSym, chr: gd.chr, gPos: gStart.gPos, snvVcf: `chr${{gd.chr}}:${{gStart.gPos}}`, cdna: `c.${{codStart+1}}_${{codStart+3}}` }};
+  }}
+
+  let bestCod = '', bestDiffs = 99, diffIdx = -1;
+  Object.entries(CODON_TO_AA).forEach(([cod, aa]) => {{
+    if (aa !== mutAA) return;
+    let d = 0, lastI = -1;
+    for (let k = 0; k < 3; k++) {{ if (cod[k] !== wtCod[k]) {{ d++; lastI = k; }} }}
+    if (d < bestDiffs) {{ bestDiffs = d; bestCod = cod; diffIdx = lastI; }}
+  }});
+
+  if (bestDiffs === 1 && diffIdx >= 0) {{
+    const cIdx = codStart + diffIdx;
+    const hit38 = mapCdsIdxToGenomic(cIdx, gd.cds_exons_grch38 || [], gd.strand);
+    const cRef = wtCod[diffIdx], cAlt = bestCod[diffIdx];
+    const gRef = gd.strand === 1 ? cRef : DNA_COMP[cRef];
+    const gAlt = gd.strand === 1 ? cAlt : DNA_COMP[cAlt];
+    return {{
+      wtCod, mutCod: bestCod, nDiff: 1, exon: hit38.exNum, totalExons: gd.total_exons,
+      strandSym, chr: gd.chr, gPos: hit38.gPos,
+      snvVcf: `chr${{gd.chr}}:${{hit38.gPos}}:${{gRef}}>${{gAlt}}`,
+      cdna: `c.${{cIdx + 1}}${{cRef}}>${{cAlt}}`
+    }};
+  }}
+  return {{
+    wtCod, mutCod: bestCod, nDiff: bestDiffs, exon: gStart.exNum, totalExons: gd.total_exons,
+    strandSym, chr: gd.chr, gPos: gStart.gPos,
+    snvVcf: `chr${{gd.chr}}:${{gStart.gPos}} (${{bestDiffs}}-nt codon edit)`,
+    cdna: `c.${{codStart+1}}_${{codStart+3}}${{wtCod}}>${{bestCod}}`
+  }};
+}}
+
+function resolveUniversalVariantQuery(rawLine) {{
+  const s = (rawLine || '').trim();
+  if (!s || s.startsWith('#')) return null;
+
+  // 1. Check rsID or ClinVar VCV/ID
+  const low = s.toLowerCase().replace(/^clinvar[:\\s]*/i, 'cv:');
+  const idMap = ATLAS.id_lookup || {{}};
+  if (idMap[low]) {{
+    const [g, pc] = idMap[low].split(':');
+    const m = pc.match(/^([A-Z])(\\d+)([A-Z*])$/);
+    if (m) return {{ raw: s, gene: g, wt: m[1], pos: parseInt(m[2], 10), alt: m[3], norm: pc, note: s }};
+  }}
+
+  // 2. Check tab/space multi-column VCF data row: CHROM POS ID REF ALT ...
+  const cols = s.split(/\\t+/);
+  if (cols.length >= 5 && /^(?:chr)?(?:[1-9]|1\\d|2[0-2]|X|Y)$/i.test(cols[0]) && /^\\d+$/.test(cols[1])) {{
+    const altFirst = cols[4].split(',')[0];
+    const hit = mapGenomicSnvToProtein(cols[0], parseInt(cols[1], 10), cols[3], altFirst);
+    if (!hit) return {{ skipVcfNonPanel: true }};
+    if (hit.err) return {{ raw: `${{cols[0]}}:${{cols[1]}}:${{cols[3]}}>${{altFirst}}`, err: hit.err }};
+    return {{ raw: hit.vcf, ...hit }};
+  }}
+
+  // 3. Check compact VCF / gnomAD / hg19 strings: [hg19:]chr14:95094139:C>T or 14-95094139-C-T or 14:95094139:C:T
+  const vcfMatch = s.match(/^(?:(hg19|grch37|hg38|grch38)[:\\s-]+)?(?:chr)?([0-9XY]+)[:\\s-]+(\\d+)[:\\s-]+([ACGT])(?:>|:|-|\\s+)([ACGT])$/i);
+  if (vcfMatch) {{
+    const pref = (vcfMatch[1] && /19|37/i.test(vcfMatch[1])) ? 'GRCh37' : 'GRCh38';
+    const hit = mapGenomicSnvToProtein(vcfMatch[2], parseInt(vcfMatch[3], 10), vcfMatch[4], vcfMatch[5], pref);
+    if (!hit) return {{ raw: s, err: 'Coordinate outside canonical CDS exons of the 15-gene panel' }};
+    if (hit.err) return {{ raw: s, err: hit.err }};
+    return {{ raw: s, ...hit }};
+  }}
+
+  // 4. Check GENE + cDNA or Protein (e.g. DICER1 c.5113G>A or DICER1 p.Glu1705Lys or DICER1 E1705K)
+  const parts = s.split(/[\\s:]+/);
+  if (parts.length >= 2 && GENE_SET.has(parts[0].toUpperCase())) {{
+    const gene = parts[0].toUpperCase();
+    if (/^c\\./i.test(parts[1])) {{
+      const ch = mapCdnaHgvsToProtein(gene, parts[1]);
+      if (!ch) return {{ raw: s, gene, err: 'Unrecognised cDNA HGVS (use e.g. c.5113G>A)' }};
+      if (ch.err) return {{ raw: s, gene, err: ch.err }};
+      return {{ raw: s, ...ch }};
+    }}
+    const mut = normalizeMutToken(parts[1]);
+    const m = mut.match(/^([A-Z])(\\d+)([A-Z*])$/);
+    if (!m) return {{ raw: s, gene, err: 'Unrecognised substitution format' }};
+    return {{ raw: s, gene, wt: m[1], pos: parseInt(m[2], 10), alt: m[3], norm: `${{m[1]}}${{m[2]}}${{m[3]}}` }};
+  }}
+
+  return {{ raw: s, err: 'Use GENE MUT, chr:pos:ref>alt, GENE c.posRef>Alt, or rsID' }};
+}}
+
 function normalizeMutToken(rawMut) {{
   let s = (rawMut || '').trim().replace(/^p\\./i, '');
   const m3 = s.match(/^([A-Za-z]{{3}})(\\d+)([A-Za-z]{{3}}|\\*)$/);
@@ -2453,6 +2774,17 @@ function updateSearchSuggestions(val) {{
   const qUp = q.toUpperCase();
   const qLow = q.toLowerCase();
   const hits = [];
+
+  const univ = resolveUniversalVariantQuery(q);
+  if (univ && univ.gene && univ.norm && !univ.err) {{
+    const extra = univ.cdna ? ` · ${{univ.cdna}}` : '';
+    const bld = univ.assembly ? ` [${{univ.assembly}}]` : '';
+    hits.push({{
+      label: `${{univ.gene}} ${{univ.norm}}${{extra}}${{bld}}`,
+      cat: 'Resolved 3D Variant',
+      fn: () => openVariantIn3D(univ.gene, univ.norm)
+    }});
+  }}
 
   ATLAS.panel.forEach(p => {{
     if (p.geneSymbol.includes(qUp) || p.pathwayStep.toLowerCase().includes(qLow)) {{
@@ -2512,6 +2844,15 @@ function handleSearchKey(e) {{
 function runGlobalSearch(raw) {{
   const trimmed = (raw || '').trim();
   if (!trimmed) return;
+  const univ = resolveUniversalVariantQuery(trimmed);
+  if (univ && univ.gene && univ.norm && !univ.err) {{
+    loadPresetMutation(univ.gene, univ.norm);
+    return;
+  }}
+  if (/^(api|rest|json|cli)$/i.test(trimmed)) {{
+    openApiDocs();
+    return;
+  }}
   const parts = trimmed.split(/[\\s:]+/);
   if (parts.length >= 2 && GENE_SET.has(parts[0].toUpperCase())) {{
     loadPresetMutation(parts[0].toUpperCase(), normalizeMutToken(parts[1]));
@@ -3350,6 +3691,13 @@ function renderPropertyDeltaCard(gene, pos, wt, mut, entry, subRow) {{
   const minPktA = pktDists.length ? Math.min(...pktDists) : null;
   const domHit = domainAtPos(gene, pos);
   const domBadge = domHit ? `<span class="tag" style="background:${{domHit.color}}18;color:${{domHit.color}};font-weight:600;">${{domHit.name}}</span>` : '';
+  const gInfo = reverseMapVariantToGenomic(gene, pos, wt, mut);
+  const genomicBar = gInfo ? `
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:6px;flex-wrap:wrap;margin-top:6px;padding:5px 9px;background:var(--canvas);border:1px solid var(--line-soft);border-radius:7px;font-family:var(--mono);font-size:11px;color:var(--ink-2);">
+      <span>GRCh38 <strong>${{gInfo.snvVcf}}</strong> &middot; ${{gInfo.cdna}} &middot; Codon ${{gInfo.wtCod}}&rarr;${{gInfo.mutCod}} &middot; Exon ${{gInfo.exon}}/${{gInfo.totalExons}} (${{gInfo.strandSym}})</span>
+      <button class="btn-subtle no-print" style="height:21px;padding:0 7px;font-size:10.5px;" onclick="navigator.clipboard.writeText('${{gInfo.snvVcf}}');this.textContent='Copied ✓';setTimeout(()=>this.textContent='Copy VCF',1300)">Copy VCF</button>
+    </div>
+  ` : '';
 
   const pocketNote = (dmet !== null && dmet <= 6.0) ? `${{dmet}} Å from catalytic metal`
     : ((dna !== null && dna <= 6.0) ? `${{dna}} Å from bound RNA/DNA` : `${{geom ? geom.caNeighbors8A : '—'}} Cα within 8 Å`);
@@ -3374,6 +3722,7 @@ function renderPropertyDeltaCard(gene, pos, wt, mut, entry, subRow) {{
           <button class="btn-subtle no-print" style="height:26px;padding:0 9px;font-size:11.5px;" onclick="printVariantReport()" title="Print or save 1-page PDF report">Report / PDF</button>
         </div>
       </div>
+      ${{genomicBar}}
 
       <div class="aa-strip">${{aaCells}}</div>
 
@@ -3842,15 +4191,39 @@ function openBatchTriage() {{
 
 function loadBatchExample() {{
   document.getElementById('batch-input').value = [
-    'DICER1 E1705K',
+    'chr14:95094139:C>T',
     'DICER1 p.Asp1810Tyr',
-    'DROSHA E1147K',
+    'DROSHA c.3439G>A',
+    '17-7675088-C-T',
     'AGO2 M364T',
-    'TP53 R175H',
-    'XPO5 R1167C',
+    'rs2073092496',
     'DICER1 K868R'
   ].join('\\n');
   runBatchTriage();
+}}
+
+function handleBatchFileSelect(files) {{
+  if (!files || !files.length) return;
+  const reader = new FileReader();
+  reader.onload = ev => {{
+    const txt = String(ev.target.result || '');
+    const lines = txt.split(/\\r?\\n/).filter(l => l.trim() && !l.startsWith('#'));
+    const kept = [];
+    for (let i = 0; i < lines.length && kept.length < 300; i++) {{
+      const u = resolveUniversalVariantQuery(lines[i]);
+      if (u && !u.skipVcfNonPanel) kept.push(lines[i]);
+    }}
+    document.getElementById('batch-input').value = kept.join('\\n');
+    runBatchTriage();
+  }};
+  reader.readAsText(files[0]);
+}}
+
+function handleBatchFileDrop(ev) {{
+  ev.preventDefault();
+  if (ev.dataTransfer && ev.dataTransfer.files && ev.dataTransfer.files.length) {{
+    handleBatchFileSelect(ev.dataTransfer.files);
+  }}
 }}
 
 function clearBatchTriage() {{
@@ -3861,21 +4234,20 @@ function clearBatchTriage() {{
 }}
 
 function parseBatchLines(rawText) {{
-  return (rawText || '')
-    .split(/[\\n,;]+/)
-    .map(s => s.trim())
-    .filter(Boolean)
-    .slice(0, 250)
-    .map(line => {{
-      const parts = line.split(/[\\s:]+/);
-      if (parts.length < 2) return {{ raw: line, err: 'Use GENE MUT (e.g. DICER1 E1705K)' }};
-      const gene = parts[0].toUpperCase();
-      if (!GENE_SET.has(gene)) return {{ raw: line, gene, err: 'Gene not in 15-gene panel' }};
-      const mut = normalizeMutToken(parts[1]);
-      const m = mut.match(/^([A-Z])(\\d+)([A-Z*])$/);
-      if (!m) return {{ raw: line, gene, err: 'Unrecognised substitution format' }};
-      return {{ raw: line, gene, wt: m[1], pos: parseInt(m[2], 10), alt: m[3], norm: `${{m[1]}}${{m[2]}}${{m[3]}}` }};
-    }});
+  const lines = (rawText || '').split(/\\r?\\n/);
+  const tokens = [];
+  lines.forEach(ln => {{
+    const t = ln.trim();
+    if (!t || t.startsWith('#')) return;
+    if (t.includes('\\t')) tokens.push(t);
+    else t.split(/[,;]+/).map(x => x.trim()).filter(Boolean).forEach(x => tokens.push(x));
+  }});
+  const resolved = [];
+  for (let i = 0; i < tokens.length && resolved.length < 250; i++) {{
+    const u = resolveUniversalVariantQuery(tokens[i]);
+    if (u && !u.skipVcfNonPanel) resolved.push(u);
+  }}
+  return resolved;
 }}
 
 function runBatchTriage() {{
@@ -3931,17 +4303,20 @@ function runBatchTriage() {{
       nScored++;
       const minPkt = [dna, dmet].filter(x => x !== null);
       const pktStr = minPkt.length ? Math.min(...minPkt).toFixed(2) : '—';
+      const gRev = reverseMapVariantToGenomic(item.gene, item.pos, trueWt, alt);
+      const cdnaTag = item.cdna || (gRev ? gRev.cdna : '');
+      const vcfTag = item.vcf || (gRev ? gRev.snvVcf : '');
       const wtWarn = item.wt !== trueWt ? ` <span style="color:var(--amber);font-size:11px;" title="Canonical WT residue is ${{trueWt}}">(WT=${{trueWt}})</span>` : '';
       currentBatchRows.push({{
-        input: item.raw, gene: item.gene, variant: `${{trueWt}}${{item.pos}}${{alt}}`,
+        input: item.raw, grch38_vcf: vcfTag, cdna: cdnaTag, gene: item.gene, variant: `${{trueWt}}${{item.pos}}${{alt}}`,
         mechanism: mechLbl, alphamissense: am, esm_if1_3d_dlogp: if1, esm2_3b_llr: e2,
         grantham_D: gd, min_pocket_A: pktStr, pdb: pdb || 'AFDB_v6', tcga_n: tn, clinvar: cv || ''
       }});
       return `<tr>
         <td><button class="btn-subtle" style="height:24px;padding:0 9px;font-size:11.5px;" onclick="openVariantIn3D('${{item.gene}}','${{trueWt}}${{item.pos}}${{alt}}')">View</button></td>
-        <td><code>${{item.raw}}</code></td>
+        <td><code>${{item.raw}}</code>${{item.assembly ? ` <span class="meta-note">[${{item.assembly}}]</span>` : ''}}</td>
         <td><strong>${{item.gene}}</strong></td>
-        <td><code>${{trueWt}}${{item.pos}}${{alt}}</code>${{wtWarn}}</td>
+        <td><code>${{trueWt}}${{item.pos}}${{alt}}</code>${{cdnaTag ? ` <span class="meta-note">(${{cdnaTag}})</span>` : ''}}${{wtWarn}}</td>
         <td>${{mechHtml}}</td>
         <td><strong>${{am !== null ? am.toFixed(3) : '—'}}</strong></td>
         <td>${{if1 !== null ? if1.toFixed(2) : '—'}}</td>
@@ -4095,10 +4470,57 @@ function applyUrlState() {{
       if (hit) switchTab(hit[0], document.getElementById(hit[1]), true);
       if (kv.tab.toLowerCase() === 'batch') openBatchTriage();
       if (kv.tab.toLowerCase() === 'dms') openDmsLandscape();
+      if (kv.tab.toLowerCase() === 'api') openApiDocs();
     }}
   }} finally {{
     setTimeout(() => {{ suppressHashSync = false; }}, 120);
   }}
+}}
+
+function openApiDocs() {{
+  switchTab('tab-docs', document.getElementById('btn-tab-docs'), true);
+  switchSub('doc-sub', 'doc-api', document.getElementById('seg-api'));
+  renderApiSnippet();
+  syncUrlHash('#tab=api');
+}}
+
+function renderApiSnippet() {{
+  const sel = document.getElementById('api-gene-sel');
+  const g = (sel && sel.value) ? sel.value : 'DICER1';
+  const baseUrl = 'https://siddugayam.github.io/miRBioGenAtlas';
+  const relPath = `api/v2/genes/${{g}}.json`;
+  const pathEl = document.getElementById('api-gene-path');
+  const openBtn = document.getElementById('api-open-link');
+  const rowLnk = document.getElementById('api-gene-row-link');
+  if (pathEl) pathEl.textContent = relPath;
+  if (openBtn) openBtn.href = relPath;
+  if (rowLnk) rowLnk.href = relPath;
+  const codeBox = document.getElementById('api-code-box');
+  if (!codeBox) return;
+  codeBox.textContent = [
+    `# 1. Fetch ${{g}} JSON profile (metadata, GRCh38/37 CDS exons, TCGA variants, ClinVar & 3D track)`,
+    `curl -sL ${{baseUrl}}/${{relPath}} | jq '.metadata.gnomad_LOEUF, .tcga_somatic_variants[:2]'`,
+    ``,
+    `# 2. Python (urllib / requests) — zero dependencies`,
+    `import json, urllib.request`,
+    `data = json.load(urllib.request.urlopen("${{baseUrl}}/${{relPath}}"))`,
+    `print(data["geneSymbol"], len(data["tcga_somatic_variants"]), "observed TCGA variants")`,
+    ``,
+    `# 3. Local CLI — query by protein, GRCh38/GRCh37 VCF coordinate, or cDNA HGVS`,
+    `python3 scripts/query_variant.py DICER1 E1705K`,
+    `python3 scripts/query_variant.py chr14:95094139:C>T --json`
+  ].join('\\n');
+}}
+
+function copyApiCode() {{
+  const box = document.getElementById('api-code-box');
+  const btn = document.getElementById('btn-copy-api');
+  if (!box || !navigator.clipboard) return;
+  const orig = btn.textContent;
+  navigator.clipboard.writeText(box.textContent).then(() => {{
+    btn.textContent = 'Copied ✓';
+    setTimeout(() => {{ btn.textContent = orig; }}, 1500);
+  }});
 }}
 
 /* MaveDB / dms-viz Style 2D Deep Mutational Scanning Heatmap Synced to 3D */
@@ -4242,11 +4664,13 @@ window.addEventListener('DOMContentLoaded', () => {{
   const selVar = document.getElementById('var-gene');
   const selLol = document.getElementById('lol-gene');
   const selGtex = document.getElementById('gtex-gene');
+  const selApi = document.getElementById('api-gene-sel');
   ATLAS.panel.forEach(p => {{
     const g = p.geneSymbol;
     selVar.insertAdjacentHTML('beforeend', `<option value="${{g}}">${{g}} (${{p.uniprotAccession}})</option>`);
     selLol.insertAdjacentHTML('beforeend', `<option value="${{g}}" ${{g==='DICER1'?'selected':''}}>${{g}} · ${{p.uniprotAccession}} (${{p.proteinLengthAa}} aa)</option>`);
     selGtex.insertAdjacentHTML('beforeend', `<option value="${{g}}" ${{g==='LIN28B'?'selected':''}}>${{g}} (&tau; = ${{p.gtex_tau_tissue_specificity}})</option>`);
+    if (selApi) selApi.insertAdjacentHTML('beforeend', `<option value="${{g}}" ${{g==='DICER1'?'selected':''}}>${{g}}.json</option>`);
   }});
   document.getElementById('sat-query').value = 'E1705K';
   renderHeatmap();
@@ -4256,6 +4680,7 @@ window.addEventListener('DOMContentLoaded', () => {{
   renderGtexBars();
   renderFormulas();
   renderDatasetsCatalogue();
+  renderApiSnippet();
   renderGlossaryCards();
   initUniversalTableSorting();
   renderLollipopAndLoadSat();

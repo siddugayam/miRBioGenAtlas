@@ -17,9 +17,75 @@ AA3_TO_1 = {
 }
 HGVS3_RE = re.compile(r"^(?:p\.)?([A-Za-z]{3})(\d+)([A-Za-z]{3})$")
 HGVS1_RE = re.compile(r"^(?:p\.)?([A-Z])(\d+)([A-Z])$")
+VCF_RE = re.compile(r"^(?:(hg19|grch37|hg38|grch38)[:\s-]+)?(?:chr)?([0-9XY]+)[:\s-]+(\d+)[:\s-]+([ACGT])(?:>|:|-|\s+)([ACGT])$", re.I)
+CDNA_RE = re.compile(r"^c\.(\d+)([ACGT])>([ACGT])$", re.I)
+DNA_COMP = {"A": "T", "T": "A", "C": "G", "G": "C"}
+CODON_TO_AA = {
+    "TTT":"F","TTC":"F","TTA":"L","TTG":"L","CTT":"L","CTC":"L","CTA":"L","CTG":"L",
+    "ATT":"I","ATC":"I","ATA":"I","ATG":"M","GTT":"V","GTC":"V","GTA":"V","GTG":"V",
+    "TCT":"S","TCC":"S","TCA":"S","TCG":"S","CCT":"P","CCC":"P","CCA":"P","CCG":"P",
+    "ACT":"T","ACC":"T","ACA":"T","ACG":"T","GCT":"A","GCC":"A","GCA":"A","GCG":"A",
+    "TAT":"Y","TAC":"Y","TAA":"*","TAG":"*","CAT":"H","CAC":"H","CAA":"Q","CAG":"Q",
+    "AAT":"N","AAC":"N","AAA":"K","AAG":"K","GAT":"D","GAC":"D","GAA":"E","GAG":"E",
+    "TGT":"C","TGC":"C","TGA":"*","TGG":"W","CGT":"R","CGC":"R","CGA":"R","CGG":"R",
+    "AGT":"S","AGC":"S","AGA":"R","AGG":"R","GGT":"G","GGC":"G","GGA":"G","GGG":"G",
+}
 
 REPO_ROOT = pathlib.Path(__file__).resolve().parent.parent
 DATA_DIR = REPO_ROOT / "data"
+
+
+def resolve_genomic_or_cdna(arg1: str, arg2: str = None):
+    cds_file = DATA_DIR / "canonical_cds_genomic_15genes.json"
+    if not cds_file.exists():
+        return None
+    cds_db = json.loads(cds_file.read_text(encoding="utf-8")).get("genes", {})
+
+    if arg2 and CDNA_RE.match(arg2.strip()):
+        gene = arg1.strip().upper()
+        gd = cds_db.get(gene)
+        if not gd:
+            return None
+        m = CDNA_RE.match(arg2.strip())
+        c_idx = int(m.group(1)) - 1
+        c_ref, c_alt = m.group(2).upper(), m.group(3).upper()
+        seq = gd["cds_seq"]
+        if 0 <= c_idx < len(seq) and seq[c_idx] == c_ref:
+            cs = (c_idx // 3) * 3
+            wt_c = seq[cs:cs+3]
+            mut_c = wt_c[:c_idx % 3] + c_alt + wt_c[c_idx % 3 + 1:]
+            return gene, f"{CODON_TO_AA[wt_c]}{c_idx // 3 + 1}{CODON_TO_AA[mut_c]}"
+
+    token = f"{arg1} {arg2}".strip() if (arg2 and not HGVS1_RE.match(arg2) and not HGVS3_RE.match(arg2)) else arg1.strip()
+    mv = VCF_RE.match(token)
+    if mv:
+        pref = "GRCh37" if (mv.group(1) and ("19" in mv.group(1) or "37" in mv.group(1))) else "GRCh38"
+        chrom = mv.group(2).upper()
+        pos = int(mv.group(3))
+        ref, alt = mv.group(4).upper(), mv.group(5).upper()
+        builds = ["GRCh37", "GRCh38"] if pref == "GRCh37" else ["GRCh38", "GRCh37"]
+        for bld in builds:
+            ek = "cds_exons_grch38" if bld == "GRCh38" else "cds_exons_grch37"
+            sk = "strand" if bld == "GRCh38" else "strand_grch37"
+            for gene, gd in cds_db.items():
+                if str(gd["chr"]).upper() != chrom:
+                    continue
+                cum = 0
+                strand = gd.get(sk, gd["strand"])
+                for _, cs, ce in gd.get(ek, []):
+                    if cs <= pos <= ce:
+                        off = (pos - cs) if strand == 1 else (ce - pos)
+                        c_idx = cum + off
+                        c_ref = ref if strand == 1 else DNA_COMP[ref]
+                        c_alt = alt if strand == 1 else DNA_COMP[alt]
+                        seq = gd["cds_seq"]
+                        if 0 <= c_idx < len(seq) and seq[c_idx] == c_ref:
+                            cod_s = (c_idx // 3) * 3
+                            wt_c = seq[cod_s:cod_s+3]
+                            mut_c = wt_c[:c_idx % 3] + c_alt + wt_c[c_idx % 3 + 1:]
+                            return gene, f"{CODON_TO_AA[wt_c]}{c_idx // 3 + 1}{CODON_TO_AA[mut_c]}"
+                    cum += (ce - cs + 1)
+    return None
 
 
 def normalize_variant(raw: str) -> str:
@@ -212,8 +278,15 @@ def main():
 
     if args.codon:
         query_codon_profile(args.codon[0], int(args.codon[1]), as_json=args.json)
-    elif args.gene and args.variant:
-        query_single_variant(args.gene, args.variant, as_json=args.json)
+    elif args.gene:
+        resolved = resolve_genomic_or_cdna(args.gene, args.variant)
+        if resolved:
+            query_single_variant(resolved[0], resolved[1], as_json=args.json)
+        elif args.variant:
+            query_single_variant(args.gene, args.variant, as_json=args.json)
+        else:
+            ap.print_help()
+            sys.exit(1)
     else:
         ap.print_help()
         sys.exit(1)
